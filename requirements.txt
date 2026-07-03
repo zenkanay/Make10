@@ -1,0 +1,3 @@
+sympy==1.12
+requests
+antlr4-python3-runtime==4.11.1
