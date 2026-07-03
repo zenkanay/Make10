@@ -22,7 +22,7 @@ const settingsModal = document.getElementById("settings-modal");
 const closeSettingsBtn = document.getElementById("close-settings-btn");
 const saveSettingsBtn = document.getElementById("save-settings-btn");
 const apiKeyInput = document.getElementById("api-key-input");
-const backendUrlInput = document.getElementById("backend-url-input");
+// backend URL input removed
 const themeSelect = document.getElementById("theme-select");
 const sortNumbersCheckbox = document.getElementById("sort-numbers-checkbox");
 const langSelect = document.getElementById("lang-select");
@@ -31,9 +31,12 @@ const langSelect = document.getElementById("lang-select");
 let targetNumbers = [1, 2, 3, 4];
 let gameDifficulty = "medium";
 let apiKey = "";
-let backendUrl = "http://localhost:8000";
+const backendUrl = "https://your-backend.example.com"; // hardcoded backend URL
 let sortNumbers = false;
 let currentLang = "ja";
+let settingsSnapshot = null;
+// Tracks the order of clicked digit-card indices (for duplicate number disambiguation)
+let clickedIndices = [];
 
 let engine;
 try {
@@ -82,6 +85,7 @@ const TRANSLATIONS = {
         easy: "Easy (四則演算)",
         medium: "Medium (標準)",
         hard: "Hard (難問)",
+        random_mode: "Random (完全ランダム)",
         custom: "Custom (自由設定)",
         generate_btn: "新規生成",
         custom_desc: "使いたい4つの数字を入力してください（0〜9）",
@@ -95,7 +99,7 @@ const TRANSLATIONS = {
         latex_expr: "LaTeX 表現:",
         eval_engine: "評価エンジン:",
         settings_title: "ゲーム設定",
-        lang_label: "言語 / Language",
+        lang_label: "言語",
         theme_label: "カラーテーマ",
         theme_system: "システム設定に従う",
         theme_light: "ライトモード",
@@ -132,6 +136,7 @@ const TRANSLATIONS = {
         easy: "Easy (Basic Ops)",
         medium: "Medium (Standard)",
         hard: "Hard (Advanced)",
+        random_mode: "Random (Full Random)",
         custom: "Custom",
         generate_btn: "New Game",
         custom_desc: "Enter 4 digits (0-9) to use:",
@@ -145,7 +150,7 @@ const TRANSLATIONS = {
         latex_expr: "LaTeX Expression:",
         eval_engine: "Evaluation Engine:",
         settings_title: "Game Settings",
-        lang_label: "Language / 言語",
+        lang_label: "Language",
         theme_label: "Color Theme",
         theme_system: "Follow System Settings",
         theme_light: "Light Mode",
@@ -171,8 +176,252 @@ const TRANSLATIONS = {
         msg_digits_also_invalid: " And digits are used incorrectly.",
         msg_eval_failed: "Failed to evaluate formula: {explanation}",
         msg_backend_offline: "Error: Cannot connect to the backend server. Please check the server status.",
-        err_label: "Error",
         alert_custom_invalid: "Please enter 4 digits between 0 and 9."
+    },
+    zh: {
+        settings_btn: "设置",
+        settings_btn_aria: "打开设置",
+        close_settings_btn_aria: "关闭设置",
+        difficulty_label: "难度",
+        easy: "简单 (基本运算)",
+        medium: "中等 (标准)",
+        hard: "困难 (高级)",
+        random_mode: "随机 (完全随机)",
+        custom: "自定义",
+        generate_btn: "新游戏",
+        custom_desc: "输入您想使用的4个数字（0-9）：",
+        apply_btn: "应用",
+        available_digits: "可用数字",
+        formula_input: "输入公式",
+        clear_btn: "清除",
+        evaluate_btn: "评判",
+        current_value_label: "当前值",
+        debug_info: "详细信息 (调试)",
+        latex_expr: "LaTeX 表达式:",
+        eval_engine: "评估引擎:",
+        settings_title: "游戏设置",
+        lang_label: "语言",
+        theme_label: "颜色主题",
+        theme_system: "遵循系统设置",
+        theme_light: "浅色模式",
+        theme_dark: "深色模式",
+        sort_label: "按升序排列显示可用数字",
+        api_key_label: "Gemini API 密钥 (可选)",
+        api_key_help: "设置 API 密钥后，Gemini 可以计算 SymPy 无法计算的极复杂公式。密钥仅保存在浏览器的 LocalStorage 中。",
+        backend_url_label: "后端服务器 URL",
+        save_btn: "保存",
+        api_key_placeholder: "请输入用于 AI 高级数式评估的 API 密钥",
+        math_field_placeholder: "在此输入公式 (例如: 8 / (1 - 1/5))",
+        msg_enter_formula: "请输入公式",
+        msg_press_evaluate: "请按“评判”按钮或 Enter 键确定。",
+        msg_empty_formula: "错误：公式为空。",
+        msg_analyzing: "正在解析公式...",
+        msg_analyzing_engine: "解析中...",
+        msg_success_make10: "达成 Make 10！ 🎉",
+        msg_missing_digits: "计算结果为10，但有未使用的数字。",
+        msg_invalid_digits: "计算结果为10，但数字的使用方式不正确。",
+        msg_not_10: "计算结果不是10 (当前结果: {value})",
+        msg_digits_also_invalid: "。而且数字的使用方式也不正确。",
+        msg_eval_failed: "公式评估失败: {explanation}",
+        msg_backend_offline: "错误：无法连接到后端服务器。请检查服务器启动状态。",
+        err_label: "错误",
+        alert_custom_invalid: "请输入0到9之间的4个数字。"
+    },
+    ko: {
+        settings_btn: "설정",
+        settings_btn_aria: "설정 열기",
+        close_settings_btn_aria: "설정 닫기",
+        difficulty_label: "난이도",
+        easy: "쉬움 (기본 연산)",
+        medium: "보통 (표준)",
+        hard: "어려움 (고급)",
+        random_mode: "무작위 (완전 랜덤)",
+        custom: "사용자 정의",
+        generate_btn: "새 게임",
+        custom_desc: "사용할 4자리 숫자(0-9)를 입력하세요:",
+        apply_btn: "적용",
+        available_digits: "사용 가능한 숫자",
+        formula_input: "수식 입력",
+        clear_btn: "지우기",
+        evaluate_btn: "판정하기",
+        current_value_label: "현재 값",
+        debug_info: "상세 정보 (디버그)",
+        latex_expr: "LaTeX 표현식:",
+        eval_engine: "평가 엔진:",
+        settings_title: "게임 설정",
+        lang_label: "언어",
+        theme_label: "컬러 테마",
+        theme_system: "시스템 설정 따르기",
+        theme_light: "라이트 모드",
+        theme_dark: "다크 모드",
+        sort_label: "사용 가능한 숫자를 오름차순으로 정렬하여 표시",
+        api_key_label: "Gemini API 키 (선택 사항)",
+        api_key_help: "API 키를 설정하면 SymPy가 계산할 수 없는 복잡한 수식을 Gemini가 올바르게 평가할 수 있습니다. 키는 브라우저의 LocalStorage에만 저장됩니다.",
+        backend_url_label: "백엔드 서버 URL",
+        save_btn: "저장하기",
+        api_key_placeholder: "AI를 통한 고급 수식 평가용 API 키를 입력하세요",
+        math_field_placeholder: "여기에 수식을 입력하세요 (예: 8 / (1 - 1/5))",
+        msg_enter_formula: "수식을 입력하세요",
+        msg_press_evaluate: "「판정하기」 버튼이나 Enter 키를 눌러 확정하세요.",
+        msg_empty_formula: "오류: 수식이 비어 있습니다.",
+        msg_analyzing: "수식 분석 중...",
+        msg_analyzing_engine: "분석 중...",
+        msg_success_make10: "Make 10 달성! 🎉",
+        msg_missing_digits: "결과는 10이지만 사용되지 않은 숫자가 있습니다.",
+        msg_invalid_digits: "결과는 10이지만 숫자가 잘못 사용되었습니다.",
+        msg_not_10: "결과가 10이 아닙니다 (계산 결과: {value})",
+        msg_digits_also_invalid: " 그리고 숫자가 잘못 사용되었습니다.",
+        msg_eval_failed: "수식 평가 실패: {explanation}",
+        msg_backend_offline: "오류: 백엔드 서버에 연결할 수 없습니다. 서버의 기동 상태를 확인하세요.",
+        err_label: "오류",
+        alert_custom_invalid: "0에서 9 사이의 4자리 숫자를 입력해 주세요."
+    },
+    es: {
+        settings_btn: "Configuración",
+        settings_btn_aria: "Abrir configuración",
+        close_settings_btn_aria: "Cerrar configuración",
+        difficulty_label: "Dificultad",
+        easy: "Fácil (Ops. Básicas)",
+        medium: "Medio (Estándar)",
+        hard: "Difícil (Avanzado)",
+        random_mode: "Aleatorio (Totalmente Aleatorio)",
+        custom: "Personalizado",
+        generate_btn: "Nuevo Juego",
+        custom_desc: "Introduce 4 dígitos (0-9) a usar:",
+        apply_btn: "Aplicar",
+        available_digits: "Dígitos Disponibles",
+        formula_input: "Entrada de Fórmula",
+        clear_btn: "Limpiar",
+        evaluate_btn: "Evaluar",
+        current_value_label: "Valor Actual",
+        debug_info: "Información Detallada (Depuración)",
+        latex_expr: "Expresión LaTeX:",
+        eval_engine: "Motor de Evaluación:",
+        settings_title: "Configuración del Juego",
+        lang_label: "Idioma",
+        theme_label: "Tema de Color",
+        theme_system: "Seguir Configuración del Sistema",
+        theme_light: "Modo Claro",
+        theme_dark: "Modo Oscuro",
+        sort_label: "Ordenar dígitos disponibles en orden ascendente",
+        api_key_label: "Clave API de Gemini (Opcional)",
+        api_key_help: "Configurar una clave API permite a Gemini evaluar fórmulas altamente complejas que SymPy no puede calcular. La clave se guarda solo en el LocalStorage.",
+        backend_url_label: "URL del Servidor Backend",
+        save_btn: "Guardar",
+        api_key_placeholder: "Introduce la clave API para evaluación avanzada de IA",
+        math_field_placeholder: "Introduce la fórmula aquí (ej. 8 / (1 - 1/5))",
+        msg_enter_formula: "Introduce tu fórmula",
+        msg_press_evaluate: "Presiona \"Evaluar\" o Enter para verificar.",
+        msg_empty_formula: "Error: La fórmula está vacía.",
+        msg_analyzing: "Analizando fórmula...",
+        msg_analyzing_engine: "Analizando...",
+        msg_success_make10: "¡Make 10 Conseguido! 🎉",
+        msg_missing_digits: "El valor es 10, pero algunos dígitos no se han usado.",
+        msg_invalid_digits: "El valor es 10, pero los dígitos se usaron incorrectamente.",
+        msg_not_10: "El valor no es 10 (Resultado: {value})",
+        msg_digits_also_invalid: " Y los dígitos se usaron incorrectamente.",
+        msg_eval_failed: "Error al evaluar la fórmula: {explanation}",
+        msg_backend_offline: "Error: No se puede conectar al servidor backend. Verifica el estado del servidor.",
+        err_label: "Error",
+        alert_custom_invalid: "Introduce 4 dígitos entre 0 y 9."
+    },
+    fr: {
+        settings_btn: "Paramètres",
+        settings_btn_aria: "Ouvrir les paramètres",
+        close_settings_btn_aria: "Fermer les paramètres",
+        difficulty_label: "Difficulté",
+        easy: "Facile (Op. de base)",
+        medium: "Moyen (Standard)",
+        hard: "Difficile (Avancé)",
+        random_mode: "Aléatoire (Complètement Aléatoire)",
+        custom: "Personnalisé",
+        generate_btn: "Nouveau Jeu",
+        custom_desc: "Entrez 4 chiffres (0-9) à utiliser :",
+        apply_btn: "Appliquer",
+        available_digits: "Chiffres Disponibles",
+        formula_input: "Saisie de Formule",
+        clear_btn: "Effacer",
+        evaluate_btn: "Évaluer",
+        current_value_label: "Valeur Actuelle",
+        debug_info: "Infos Détaillées (Débogage)",
+        latex_expr: "Expression LaTeX :",
+        eval_engine: "Moteur d'Évaluation :",
+        settings_title: "Paramètres du Jeu",
+        lang_label: "Langue",
+        theme_label: "Thème de Couleur",
+        theme_system: "Suivre les Paramètres Système",
+        theme_light: "Mode Clair",
+        theme_dark: "Mode Sombre",
+        sort_label: "Trier les chiffres disponibles par ordre croissant",
+        api_key_label: "Clé API Gemini (Optionnel)",
+        api_key_help: "Définir une clé API permet à Gemini d'évaluer des formules très complexes que SymPy ne peut pas calculer. La clé est enregistrée uniquement dans le LocalStorage.",
+        backend_url_label: "URL du Serveur Backend",
+        save_btn: "Enregistrer",
+        api_key_placeholder: "Entrez la clé API pour l'évaluation IA avancée",
+        math_field_placeholder: "Entrez la formule ici (ex. 8 / (1 - 1/5))",
+        msg_enter_formula: "Entrez votre formule",
+        msg_press_evaluate: "Appuyez sur \"Évaluer\" ou Entrée pour vérifier.",
+        msg_empty_formula: "Erreur : La formule est vide.",
+        msg_analyzing: "Analyse de la formule...",
+        msg_analyzing_engine: "Analyse...",
+        msg_success_make10: "Make 10 Réussi ! 🎉",
+        msg_missing_digits: "La valeur est 10, mais certains chiffres ne sont pas utilisés.",
+        msg_invalid_digits: "La valeur est 10, mais les chiffres sont mal utilisés.",
+        msg_not_10: "La valeur n'est pas 10 (Résultat : {value})",
+        msg_digits_also_invalid: " Et les chiffres sont mal utilisés.",
+        msg_eval_failed: "Échec de l'évaluation : {explanation}",
+        msg_backend_offline: "Erreur : Connexion impossible au serveur backend. Veuillez vérifier son état.",
+        err_label: "Erreur",
+        alert_custom_invalid: "Veuillez entrer 4 chiffres entre 0 et 9."
+    },
+    de: {
+        settings_btn: "Einstellungen",
+        settings_btn_aria: "Einstellungen öffnen",
+        close_settings_btn_aria: "Einstellungen schließen",
+        difficulty_label: "Schwierigkeit",
+        easy: "Einfach (Grundrechenarten)",
+        medium: "Mittel (Standard)",
+        hard: "Schwer (Fortgeschritten)",
+        random_mode: "Zufällig (Vollständig Zufällig)",
+        custom: "Benutzerdefiniert",
+        generate_btn: "Neues Spiel",
+        custom_desc: "Geben Sie 4 Ziffern (0-9) ein:",
+        apply_btn: "Anwenden",
+        available_digits: "Verfügbare Ziffern",
+        formula_input: "Formeleingabe",
+        clear_btn: "Löschen",
+        evaluate_btn: "Auswerten",
+        current_value_label: "Aktueller Wert",
+        debug_info: "Detailinfos (Debug)",
+        latex_expr: "LaTeX-Ausdruck:",
+        eval_engine: "Evaluierungs-Engine:",
+        settings_title: "Spiel-Einstellungen",
+        lang_label: "Sprache",
+        theme_label: "Farbthema",
+        theme_system: "Systemeinstellungen folgen",
+        theme_light: "Heller Modus",
+        theme_dark: "Dunkler Modus",
+        sort_label: "Verfügbare Ziffern aufsteigend sortieren",
+        api_key_label: "Gemini API-Schlüssel (Optional)",
+        api_key_help: "Durch das Festlegen eines API-Schlüssels kann Gemini hochkomplexe Formeln auswerten, die SymPy nicht berechnen kann. Der Schlüssel wird nur im LocalStorage gespeichert.",
+        backend_url_label: "Backend-Server-URL",
+        save_btn: "Speichern",
+        api_key_placeholder: "API-Schlüssel für erweiterte KI-Formelprüfung eingeben",
+        math_field_placeholder: "Formel hier eingeben (z. B. 8 / (1 - 1/5))",
+        msg_enter_formula: "Geben Sie Ihre Formel ein",
+        msg_press_evaluate: "Drücken Sie „Auswerten“ oder die Eingabetaste zur Prüfung.",
+        msg_empty_formula: "Fehler: Formel ist leer.",
+        msg_analyzing: "Formel wird analysiert...",
+        msg_analyzing_engine: "Analysieren...",
+        msg_success_make10: "Make 10 erreicht! 🎉",
+        msg_missing_digits: "Wert ist 10, aber einige Ziffern wurden nicht verwendet.",
+        msg_invalid_digits: "Wert ist 10, aber die Ziffern wurden falsch verwendet.",
+        msg_not_10: "Wert ist nicht 10 (Ergebnis: {value})",
+        msg_digits_also_invalid: " Und die Ziffern wurden falsch verwendet.",
+        msg_eval_failed: "Formelauswertung fehlgeschlagen: {explanation}",
+        msg_backend_offline: "Fehler: Keine Verbindung zum Backend-Server. Bitte prüfen Sie den Serverstatus.",
+        err_label: "Fehler",
+        alert_custom_invalid: "Bitte geben Sie 4 Ziffern zwischen 0 und 9 ein."
     }
 };
 
@@ -226,15 +475,7 @@ function initSettings() {
         apiKeyInput.value = savedKey;
     }
 
-    const savedUrl = localStorage.getItem("backend_url");
-    if (savedUrl !== null) {
-        backendUrl = savedUrl;
-        backendUrlInput.value = savedUrl;
-    } else {
-        backendUrl = "http://localhost:8000";
-        backendUrlInput.value = "http://localhost:8000";
-        localStorage.setItem("backend_url", backendUrl);
-    }
+    // Backend URL configuration removed; using hardcoded URL
 
     // Color Theme initialization
     const savedTheme = localStorage.getItem("color_theme") || "system";
@@ -256,6 +497,46 @@ function initSettings() {
         langSelect.value = savedLang;
     }
     applyLanguage(savedLang);
+
+    // Configure math-field options
+    mf.menuItems = [];
+    mf.virtualKeyboardMode = "onfocus";
+
+    // Add custom inline shortcuts for ceil and floor functions
+    mf.inlineShortcuts = {
+        ...mf.inlineShortcuts,
+        'ceil': '\\lceil #? \\rceil',
+        'floor': '\\lfloor #? \\rfloor'
+    };
+
+    // Focus: show keyboard-visible class and explicitly show MathLive keyboard (critical for mobile)
+    mf.addEventListener("focus", () => {
+        document.body.classList.add("keyboard-visible");
+        // Ensure custom layout is applied (timing-safe)
+        updateVirtualKeyboard();
+        // Explicitly show the virtual keyboard (required on some mobile browsers)
+        if (window.mathVirtualKeyboard) {
+            window.mathVirtualKeyboard.show();
+        }
+    });
+
+    mf.addEventListener("blur", () => {
+        document.body.classList.remove("keyboard-visible");
+    });
+
+    // Click / tap: ensure focus
+    mf.addEventListener("click", () => { mf.focus(); });
+
+    // Mobile touch: prevent native keyboard, show MathLive keyboard instead
+    mf.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        mf.focus();
+        if (window.mathVirtualKeyboard) {
+            window.mathVirtualKeyboard.show();
+        }
+    }, { passive: false });
+
+    updateVirtualKeyboard();
 }
 
 
@@ -271,27 +552,57 @@ function hasVariables(latex) {
     return /[a-zA-Z]/.test(cleaned);
 }
 
-// Check digit usage in LaTeX
+// Check digit usage in LaTeX, using clickedIndices to disambiguate duplicates
 function checkNumbersUsage(latex, numbers) {
-    // Extract all digits (0-9) from LaTeX
-    const usedDigits = latex.replace(/[^0-9]/g, "").split("");
+    // Count each digit value in the LaTeX expression
+    const rawDigits = latex.replace(/[^0-9]/g, "").split("");
+    const digitCount = {};
+    for (let d of rawDigits) digitCount[d] = (digitCount[d] || 0) + 1;
+
     const targets = numbers.map(String);
     const usedIndices = new Array(targets.length).fill(false);
     const unmatched = [];
 
-    for (let digit of usedDigits) {
-        let found = false;
-        for (let i = 0; i < targets.length; i++) {
-            if (targets[i] === digit && !usedIndices[i]) {
-                usedIndices[i] = true;
-                found = true;
-                break;
+    // First pass: mark indices that were explicitly clicked, in click order
+    // Only honour a click if the value still appears in the LaTeX
+    const remaining = { ...digitCount };
+    for (let idx of clickedIndices) {
+        if (idx < targets.length) {
+            const v = targets[idx];
+            if (remaining[v] > 0 && !usedIndices[idx]) {
+                usedIndices[idx] = true;
+                remaining[v]--;
             }
         }
-        if (!found) {
-            unmatched.push(digit);
+    }
+
+    // Second pass: handle any digits present in LaTeX that weren't covered by clicks
+    // (e.g. manually typed digits)
+    for (let v of Object.keys(remaining)) {
+        let leftover = remaining[v];
+        for (let i = 0; i < targets.length && leftover > 0; i++) {
+            if (targets[i] === v && !usedIndices[i]) {
+                usedIndices[i] = true;
+                leftover--;
+            }
+        }
+        if (leftover > 0) {
+            for (let k = 0; k < leftover; k++) unmatched.push(v);
         }
     }
+
+    // Trim clickedIndices to only those still reflected in latex
+    // (removes stale entries when user deletes characters)
+    const validClicked = [];
+    const usedCount = {};
+    for (let idx of clickedIndices) {
+        const v = targets[idx];
+        usedCount[v] = (usedCount[v] || 0) + 1;
+        if (usedCount[v] <= (digitCount[v] || 0)) {
+            validClicked.push(idx);
+        }
+    }
+    clickedIndices = validClicked;
 
     const allUsed = usedIndices.every(val => val);
     const noExtra = unmatched.length === 0;
@@ -313,14 +624,23 @@ function renderDigitCards(usage = null) {
         card.textContent = num;
         card.setAttribute("data-index", idx);
 
-        if (usage) {
-            if (usage.usedIndices[idx]) {
-                card.classList.add("used-digit");
-            } else {
-                card.classList.add("active-digit");
-            }
+        const isUsed = usage ? usage.usedIndices[idx] : false;
+
+        if (isUsed) {
+            card.classList.add("used-digit");
+            // Disabled: no pointer events, no click
         } else {
             card.classList.add("active-digit");
+            // Click to insert number into the math field
+            card.addEventListener("click", () => {
+                // Record which index was pressed
+                clickedIndices.push(idx);
+                // Animate press
+                card.classList.add("pressing");
+                setTimeout(() => card.classList.remove("pressing"), 150);
+                mf.focus();
+                mf.insert(num.toString());
+            });
         }
 
         numbersContainer.appendChild(card);
@@ -430,6 +750,13 @@ function generateNewGame() {
 
     customNumbersSection.classList.add("hidden");
 
+    if (gameDifficulty === "random") {
+        targetNumbers = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9) + 1);
+        applySortIfEnabled();
+        resetGame();
+        return;
+    }
+
     let generated = [];
     let attempts = 0;
     const maxAttempts = 1000;
@@ -501,16 +828,15 @@ function handleLiveInput() {
 // Final evaluation using local-first hybrid flow and backend fallback
 async function evaluateFinal() {
     const latex = mf.value;
+    console.log("evaluateFinal: Starting evaluation for LaTeX:", latex);
+
+    if (!latex.trim()) {
+        console.log("evaluateFinal: LaTeX is empty. Skipping evaluation.");
+        return;
+    }
 
     // Check numbers usage for feedback, but do not block calculation evaluation
     const usage = checkNumbersUsage(latex, targetNumbers);
-
-    if (!latex.trim()) {
-        statusCard.className = "result-card error-card";
-        feedbackMsg.textContent = TRANSLATIONS[currentLang].msg_empty_formula;
-        currentValue.textContent = "---";
-        return;
-    }
 
     feedbackMsg.textContent = TRANSLATIONS[currentLang].msg_analyzing;
     engineUsed.textContent = TRANSLATIONS[currentLang].msg_analyzing_engine;
@@ -522,7 +848,10 @@ async function evaluateFinal() {
     let localValue = null;
 
     // 1. Try local Compute Engine for basic operations (skip if advanced LaTeX math symbols or variables are present)
-    const hasAdvancedMath = /\\int|\\lim|\\sum|\\prod/.test(latex);
+    // \binom: Compute Engine returns 0 incorrectly; \int,\lim,\sum,\prod: not supported locally
+    // \lceil,\lfloor: rounding functions may not be supported
+    // \sqrt[n]: indexed roots may not evaluate correctly
+    const hasAdvancedMath = /\\int|\\lim|\\sum|\\prod|\\binom|\\lceil|\\lfloor|\\gcd|\\text\{lcm\}/.test(latex);
     const hasVars = hasVariables(latex);
     if (!hasAdvancedMath && !hasVars) {
         try {
@@ -555,6 +884,8 @@ async function evaluateFinal() {
         }
     }
 
+    console.log("evaluateFinal: Local evaluation finished. Success:", localSuccess, "Value:", localValue);
+
     // 2. Render locally if successful, otherwise fallback to backend
     if (localSuccess && localValue !== null) {
         engineUsed.textContent = "Compute Engine (Local)";
@@ -585,6 +916,7 @@ async function evaluateFinal() {
             }
         }
     } else {
+        console.log("evaluateFinal: Local evaluation failed or skipped. Sending backend request to:", backendUrl);
         // Fallback: request backend server for advanced formulas or when local fails
         try {
             const response = await fetch(`${backendUrl}/api/evaluate`, {
@@ -604,6 +936,7 @@ async function evaluateFinal() {
             }
 
             const data = await response.json();
+            console.log("evaluateFinal: Backend evaluation returned:", data);
 
             // Render result based on backend response
             engineUsed.textContent = data.engine_used === "gemini" ? "Gemini 2.5 Flash" : "SymPy (Backend)";
@@ -666,12 +999,191 @@ function triggerConfetti() {
 }
 
 // Reset Game state
+// Update custom virtual keyboard layout based on currently active digits
+function updateVirtualKeyboard() {
+    // Retry if MathLive keyboard object is not yet initialized (timing issue on mobile)
+    if (!window.mathVirtualKeyboard) {
+        setTimeout(updateVirtualKeyboard, 200);
+        return;
+    }
+
+    const targetDigitKeys = targetNumbers.map(num => ({
+        label: num.toString(),
+        latex: num.toString(),
+        class: 'action',
+        style: 'background-color: var(--primary-color, #4f46e5); color: white; font-weight: bold; font-size: 1.2rem;'
+    }));
+
+    window.mathVirtualKeyboard.layouts = [
+        // ── Tab 1: Basic ──────────────────────────────────────────────
+        {
+            label: "Basic",
+            layers: [{
+                rows: [
+                    // Row 1: Game digits + delete
+                    [
+                        ...targetDigitKeys,
+                        { class: 'separator w5' },
+                        { label: '⌫', command: 'deleteBackward', width: 2 }
+                    ],
+                    // Row 2: Operators + brackets + fraction (7 keys)
+                    [
+                        { label: '+',   latex: '+' },
+                        { label: '−',   latex: '-' },
+                        { label: '×',   latex: '\\times' },
+                        { label: '÷',   latex: '\\div' },
+                        { label: '(',   latex: '(' },
+                        { label: ')',   latex: ')' },
+                        { label: 'a/b', latex: '\\frac{#@}{#?}' }
+                    ],
+                    // Row 3: Power, roots, misc math (7 keys)
+                    [
+                        { label: 'xⁿ',  latex: '#@^{#?}' },
+                        { label: '√',   latex: '\\sqrt{#?}' },
+                        {
+                            label: 'ⁿ√',
+                            latex: '\\sqrt[#?]{#?}',
+                            variants: [
+                                { label: '³√', latex: '\\sqrt[3]{#?}' },
+                                { label: '⁴√', latex: '\\sqrt[4]{#?}' },
+                                { label: '⁵√', latex: '\\sqrt[5]{#?}' },
+                                { label: '⁶√', latex: '\\sqrt[6]{#?}' },
+                                { label: '⁷√', latex: '\\sqrt[7]{#?}' },
+                                { label: '⁸√', latex: '\\sqrt[8]{#?}' },
+                                { label: '⁹√', latex: '\\sqrt[9]{#?}' }
+                            ]
+                        },
+                        { label: '|x|', latex: '\\left|#?\\right|' },
+                        { label: '!',   latex: '!' },
+                        { label: '.',   latex: '.' },
+                        { label: 'nCr', latex: '\\binom{#?}{#?}' }
+                    ],
+                    // Row 4: Auxiliary digits + cursor navigation
+                    [
+                        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
+                    ],
+                    // Row 5: Cursor navigation
+                    [
+                        { label: '←', command: 'moveBackward', width: 2 },
+                        { label: '↑', command: 'moveUp', width: 2 },
+                        { label: '↓', command: 'moveDown', width: 2 },
+                        { label: '→', command: 'moveForward', width: 2 }
+                    ]
+                ]
+            }]
+        },
+
+        // ── Tab 2: Func ───────────────────────────────────────────────
+        {
+            label: "Func",
+            layers: [{
+                rows: [
+                    // Trig (6 keys)
+                    [
+                        { label: 'sin',    latex: '\\sin\\left(#?\\right)' },
+                        { label: 'cos',    latex: '\\cos\\left(#?\\right)' },
+                        { label: 'tan',    latex: '\\tan\\left(#?\\right)' },
+                        { label: 'sin⁻¹', latex: '\\arcsin\\left(#?\\right)' },
+                        { label: 'cos⁻¹', latex: '\\arccos\\left(#?\\right)' },
+                        { label: 'tan⁻¹', latex: '\\arctan\\left(#?\\right)' }
+                    ],
+                    // Log / exp (6 keys)
+                    [
+                        { label: 'ln',    latex: '\\ln\\left(#?\\right)' },
+                        { label: 'log',   latex: '\\log\\left(#?\\right)' },
+                        { label: 'log_b', latex: '\\log_{#?}\\left(#?\\right)' },
+                        { label: 'eˣ',    latex: 'e^{#?}' },
+                        { label: '10ˣ',   latex: '10^{#?}' },
+                        { label: 'exp',   latex: '\\exp\\left(#?\\right)' }
+                    ],
+                    // Rounding / discrete (5 keys)
+                    [
+                        { label: '⌈x⌉', latex: '\\lceil #? \\rceil' },
+                        { label: '⌊x⌋', latex: '\\lfloor #? \\rfloor' },
+                        { label: 'mod',  latex: '\\bmod' },
+                        { label: 'gcd',  latex: '\\gcd\\left(#?,#?\\right)' },
+                        { label: 'lcm',  latex: '\\text{lcm}\\left(#?,#?\\right)' }
+                    ],
+                    // Max / min / hyperbolic (5 keys)
+                    [
+                        { label: 'max',  latex: '\\max\\left(#?,#?\\right)' },
+                        { label: 'min',  latex: '\\min\\left(#?,#?\\right)' },
+                        { label: 'sinh', latex: '\\sinh\\left(#?\\right)' },
+                        { label: 'cosh', latex: '\\cosh\\left(#?\\right)' },
+                        { label: 'tanh', latex: '\\tanh\\left(#?\\right)' }
+                    ],
+                    // Navigation
+                    [
+                        { label: '⌫', command: 'deleteBackward', width: 2 },
+                        { label: '←', command: 'moveBackward', width: 2 },
+                        { label: '→', command: 'moveForward', width: 2 }
+                    ]
+                ]
+            }]
+        },
+
+        // ── Tab 3: Adv ────────────────────────────────────────────────
+        {
+            label: "Adv",
+            layers: [{
+                rows: [
+                    // Limits / derivatives (5 keys)
+                    [
+                        { label: 'lim',   latex: '\\lim_{#? \\to #?}' },
+                        { label: 'lim∞',  latex: '\\lim_{#? \\to \\infty}' },
+                        { label: 'd/dx',  latex: '\\frac{d}{d#?}' },
+                        { label: '∂/∂x', latex: '\\frac{\\partial}{\\partial #?}' }
+                    ],
+                    // Integrals (3 keys)
+                    [
+                        { label: '∫',    latex: '\\int_{#?}^{#?} #? \\, d#?' },
+                        { label: '∫∞',   latex: '\\int_{-\\infty}^{\\infty} #? \\, d#?' },
+                        { label: '∬',    latex: '\\iint #? \\, dA' }
+                    ],
+                    // Sums / products (4 keys) + combinatorics (2 keys)
+                    [
+                        { label: 'Σ',   latex: '\\sum_{#?=0}^{#?} #?' },
+                        { label: 'Σ∞',  latex: '\\sum_{#?=0}^{\\infty} #?' },
+                        { label: '∏',   latex: '\\prod_{#?=1}^{#?} #?' },
+                        { label: '∏∞',  latex: '\\prod_{#?=1}^{\\infty} #?' },
+                        { label: 'n!',  latex: '#@!' },
+                        { label: 'nCr', latex: '\\binom{#?}{#?}' }
+                    ],
+                    // Constants + comparisons (10 keys)
+                    [
+                        { label: 'π',  latex: '\\pi' },
+                        { label: 'e',  latex: 'e' },
+                        { label: 'i',  latex: 'i' },
+                        { label: 'φ',  latex: '\\varphi' },
+                        { label: '∞',  latex: '\\infty' },
+                        { label: '=',  latex: '=' },
+                        { label: '≠',  latex: '\\ne' },
+                        { label: '≈',  latex: '\\approx' },
+                        { label: '<',  latex: '<' },
+                        { label: '>',  latex: '>' }
+                    ],
+                    // Navigation
+                    [
+                        { label: '⌫', command: 'deleteBackward', width: 2 },
+                        { label: '←', command: 'moveBackward', width: 2 },
+                        { label: '↑', command: 'moveUp', width: 2 },
+                        { label: '↓', command: 'moveDown', width: 2 },
+                        { label: '→', command: 'moveForward', width: 2 }
+                    ]
+                ]
+            }]
+        }
+    ];
+}
+
+
 function resetGame() {
     if (mf.setValue) {
         mf.setValue("");
     } else {
         mf.value = "";
     }
+    clickedIndices = [];
     latexCode.textContent = "";
     currentValue.textContent = "---";
     feedbackMsg.textContent = TRANSLATIONS[currentLang].msg_enter_formula;
@@ -681,6 +1193,9 @@ function resetGame() {
 
     // Trigger live input handler to reset digit highlight cards properly
     handleLiveInput();
+
+    // Update virtual keyboard digits
+    updateVirtualKeyboard();
 }
 
 // Setup Custom Numbers Mode
@@ -710,15 +1225,17 @@ function applyCustomNumbers() {
 // Event Listeners
 mf.addEventListener("input", handleLiveInput);
 
-// Enter key in math-field triggers final check
+// Enter key in math-field triggers final check (using capture phase to intercept MathLive internal events)
 mf.addEventListener("keydown", (e) => {
+    console.log("Mathfield Keydown (Capture):", e.key);
     if (e.key === "Enter") {
         e.preventDefault();
+        e.stopPropagation(); // Stop MathLive from consuming the Enter key internally
+        evaluateFinal();
         mf.blur();
-        // Slight timeout to let the blur happen and keyboard dismiss
-        setTimeout(evaluateFinal, 50);
     }
-});
+}, { capture: true });
+
 
 clearBtn.addEventListener("click", resetGame);
 evaluateBtn.addEventListener("click", evaluateFinal);
@@ -728,19 +1245,32 @@ applyCustomBtn.addEventListener("click", applyCustomNumbers);
 
 // Modal Management
 settingsBtn.addEventListener("click", () => {
+    // Snapshot current saved values when opening settings
+    settingsSnapshot = {
+        lang: localStorage.getItem("app_lang") || "ja",
+        theme: localStorage.getItem("color_theme") || "system",
+        sort: (localStorage.getItem("sort_numbers") === "true"),
+        apiKey: localStorage.getItem("gemini_api_key") || "",
+        backendUrl: localStorage.getItem("backend_url") || "http://localhost:8000"
+    };
     settingsModal.classList.remove("hidden");
 });
 
 closeSettingsBtn.addEventListener("click", () => {
+    // Discard changes: restore snapshot values to UI inputs
+    if (settingsSnapshot) {
+        if (langSelect) langSelect.value = settingsSnapshot.lang;
+        if (themeSelect) themeSelect.value = settingsSnapshot.theme;
+        if (sortNumbersCheckbox) sortNumbersCheckbox.checked = settingsSnapshot.sort;
+        if (apiKeyInput) apiKeyInput.value = settingsSnapshot.apiKey;
+        // backend URL input removed
+    }
     settingsModal.classList.add("hidden");
 });
 
 saveSettingsBtn.addEventListener("click", () => {
     apiKey = apiKeyInput.value.trim();
-    backendUrl = backendUrlInput.value.trim();
-
     localStorage.setItem("gemini_api_key", apiKey);
-    localStorage.setItem("backend_url", backendUrl);
 
     // Save and apply theme
     if (themeSelect) {
@@ -769,12 +1299,7 @@ saveSettingsBtn.addEventListener("click", () => {
     settingsModal.classList.add("hidden");
 });
 
-// Settings click outside to close
-settingsModal.addEventListener("click", (e) => {
-    if (e.target === settingsModal) {
-        settingsModal.classList.add("hidden");
-    }
-});
+
 
 // Initialization
 initSettings();

@@ -7,26 +7,30 @@
   --border-color: #e5e7eb;
   --text-color: #111827;
   --text-muted: #6b7280;
-  
-  --primary: #2563eb;       /* Royal Blue */
+
+  --primary: #2563eb;
+  /* Royal Blue */
   --primary-hover: #1d4ed8;
   --primary-glow: rgba(37, 99, 235, 0.15);
-  
-  --secondary: #4b5563;     /* Slate Gray */
+
+  --secondary: #4b5563;
+  /* Slate Gray */
   --secondary-hover: #374151;
-  
-  --success: #059669;       /* Emerald */
+
+  --success: #059669;
+  /* Emerald */
   --success-bg: #ecfdf5;
   --success-border: #10b981;
-  
-  --error: #dc2626;         /* Red */
+
+  --error: #dc2626;
+  /* Red */
   --error-bg: #fef2f2;
   --error-border: #ef4444;
-  
+
   --card-active-bg: #ffffff;
   --card-active-border: #3b82f6;
   --card-active-shadow: rgba(59, 130, 246, 0.15);
-  
+
   --card-used-bg: #f3f4f6;
   --card-used-text: #d1d5db;
   --card-used-border: #e5e7eb;
@@ -44,26 +48,26 @@
   --border-color: #e5e7eb;
   --text-color: #111827;
   --text-muted: #6b7280;
-  
+
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
   --primary-glow: rgba(37, 99, 235, 0.15);
-  
+
   --secondary: #4b5563;
   --secondary-hover: #374151;
-  
+
   --success: #059669;
   --success-bg: #ecfdf5;
   --success-border: #10b981;
-  
+
   --error: #dc2626;
   --error-bg: #fef2f2;
   --error-border: #ef4444;
-  
+
   --card-active-bg: #ffffff;
   --card-active-border: #3b82f6;
   --card-active-shadow: rgba(59, 130, 246, 0.15);
-  
+
   --card-used-bg: #f3f4f6;
   --card-used-text: #d1d5db;
   --card-used-border: #e5e7eb;
@@ -77,26 +81,27 @@
   --border-color: #30363d;
   --text-color: #c9d1d9;
   --text-muted: #8b949e;
-  
-  --primary: #58a6ff;       /* Soft Cyan/Blue */
+
+  --primary: #58a6ff;
+  /* Soft Cyan/Blue */
   --primary-hover: #388bfd;
   --primary-glow: rgba(88, 166, 255, 0.15);
-  
+
   --secondary: #8b949e;
   --secondary-hover: #c9d1d9;
-  
+
   --success: #3fdb9b;
   --success-bg: rgba(63, 219, 155, 0.08);
   --success-border: #3fdb9b;
-  
+
   --error: #ff7b72;
   --error-bg: rgba(255, 123, 114, 0.08);
   --error-border: #ff7b72;
-  
+
   --card-active-bg: #21262d;
   --card-active-border: #58a6ff;
   --card-active-shadow: rgba(88, 166, 255, 0.15);
-  
+
   --card-used-bg: #0d1117;
   --card-used-text: #30363d;
   --card-used-border: #21262d;
@@ -112,26 +117,27 @@
     --border-color: #30363d;
     --text-color: #c9d1d9;
     --text-muted: #8b949e;
-    
-    --primary: #58a6ff;       /* Soft Cyan/Blue */
+
+    --primary: #58a6ff;
+    /* Soft Cyan/Blue */
     --primary-hover: #388bfd;
     --primary-glow: rgba(88, 166, 255, 0.15);
-    
+
     --secondary: #8b949e;
     --secondary-hover: #c9d1d9;
-    
+
     --success: #3fdb9b;
     --success-bg: rgba(63, 219, 155, 0.08);
     --success-border: #3fdb9b;
-    
+
     --error: #ff7b72;
     --error-bg: rgba(255, 123, 114, 0.08);
     --error-border: #ff7b72;
-    
+
     --card-active-bg: #21262d;
     --card-active-border: #58a6ff;
     --card-active-shadow: rgba(88, 166, 255, 0.15);
-    
+
     --card-used-bg: #0d1117;
     --card-used-text: #30363d;
     --card-used-border: #21262d;
@@ -418,6 +424,18 @@ body {
   border-color: var(--card-active-border);
   background-color: var(--card-active-bg);
   box-shadow: 0 4px 10px var(--card-active-shadow);
+  cursor: pointer;
+}
+
+.digit-card.active-digit:hover {
+  background-color: var(--card-active-bg);
+  filter: brightness(0.88);
+}
+
+.digit-card.active-digit.pressing {
+  transform: scale(0.88);
+  box-shadow: none;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
 /* State: Used (Dimmed / Slate) */
@@ -426,6 +444,8 @@ body {
   background-color: var(--card-used-bg);
   color: var(--card-used-text);
   box-shadow: none;
+  pointer-events: none;
+  cursor: default;
 }
 
 /* Input Section */
@@ -524,9 +544,11 @@ math-field {
   border-color: var(--success-border);
   background-color: var(--success-bg);
 }
+
 .result-card.success-card .result-value {
   color: var(--success);
 }
+
 .result-card.success-card .feedback-msg {
   color: var(--success);
   background-color: var(--panel-bg);
@@ -538,9 +560,11 @@ math-field {
   border-color: var(--error-border);
   background-color: var(--error-bg);
 }
+
 .result-card.error-card .result-value {
   color: var(--error);
 }
+
 .result-card.error-card .feedback-msg {
   color: var(--error);
   background-color: var(--panel-bg);
@@ -630,7 +654,7 @@ math-field {
   gap: 16px;
   background-color: var(--panel-bg);
   border: 1px solid var(--border-color);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .modal-header {
@@ -644,6 +668,23 @@ math-field {
 .modal-header h3 {
   font-size: 1.1rem;
   font-weight: 700;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color var(--transition), background var(--transition);
+}
+
+.modal-close-btn:hover {
+  color: var(--text-color);
+  background: var(--border-color);
 }
 
 .modal-body {
@@ -700,9 +741,17 @@ math-field {
 
 /* Pulse animation */
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .pulse-animation {
@@ -718,6 +767,7 @@ math-field {
   .app-container {
     padding: 16px;
   }
+
   .glass-panel {
     padding: 20px;
   }
@@ -728,7 +778,7 @@ math-field {
   .app-container {
     padding: 10px;
   }
-  
+
   .glass-panel {
     padding: 16px;
     gap: 16px;
@@ -738,7 +788,7 @@ math-field {
   .logo {
     font-size: 1.35rem;
   }
-  
+
   .api-settings-btn {
     padding: 6px 10px;
     font-size: 0.8rem;
@@ -756,10 +806,12 @@ math-field {
     width: 100%;
   }
 
-  .primary-btn, .secondary-btn {
+  .primary-btn,
+  .secondary-btn {
     width: 100%;
     text-align: center;
-    padding: 12px; /* Bigger touch target */
+    padding: 12px;
+    /* Bigger touch target */
     font-size: 0.95rem;
   }
 
@@ -777,10 +829,12 @@ math-field {
   .custom-numbers-section {
     padding: 12px;
   }
+
   .custom-inputs {
     width: 100%;
     justify-content: center;
   }
+
   .custom-digit-input {
     width: 38px;
     height: 38px;
@@ -797,7 +851,8 @@ math-field {
   .input-actions {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1.5fr; /* Clearance/Clear left, Evaluate right */
+    grid-template-columns: 1fr 1.5fr;
+    /* Clearance/Clear left, Evaluate right */
     gap: 8px;
   }
 
@@ -827,7 +882,8 @@ math-field {
 
   .modal-content {
     width: 100%;
-    max-height: 90vh; /* Leave room for margin */
+    max-height: 90vh;
+    /* Leave room for margin */
     display: flex;
     flex-direction: column;
   }
@@ -835,7 +891,8 @@ math-field {
   .modal-body {
     overflow-y: auto;
     max-height: 60vh;
-    padding-right: 4px; /* Smooth scroll padding */
+    padding-right: 4px;
+    /* Smooth scroll padding */
     gap: 16px;
   }
 
@@ -850,8 +907,68 @@ math-field {
   .digit-card {
     font-size: 1.3rem;
   }
+
   .custom-digit-input {
     width: 34px;
     height: 34px;
   }
+}
+
+/* math-field のメニューバーを非表示にする */
+math-field::part(menu-toggle) {
+  display: none;
+}
+
+/* 仮想キーボードの高さを抑える */
+:root {
+  --keyboard-height: 220px;
+}
+
+/* スマホでキーボードが表示されているときのレイアウト最適化 */
+@media (max-width: 600px) {
+  body.keyboard-visible .app-container {
+    padding-top: 4px;
+    /* MathLive keyboard height (~300px) + extra scroll room */
+    padding-bottom: 340px;
+  }
+
+  body.keyboard-visible .app-header {
+    display: none;
+  }
+
+  body.keyboard-visible .glass-panel {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  body.keyboard-visible .numbers-section {
+    gap: 4px;
+  }
+
+  body.keyboard-visible .digit-card {
+    aspect-ratio: 1.6;
+    font-size: 1.3rem;
+    border-radius: 8px;
+    /* Larger touch target */
+    min-height: 44px;
+  }
+
+  body.keyboard-visible .math-field-container {
+    padding: 2px 6px;
+  }
+
+  body.keyboard-visible math-field {
+    min-height: 48px;
+    font-size: 1.15rem;
+  }
+
+  /* Scroll math-field into view when keyboard appears */
+  body.keyboard-visible .input-section {
+    scroll-margin-bottom: 360px;
+  }
+}
+
+/* Ensure virtual keyboard toggle button is always reachable */
+math-field::part(virtual-keyboard-toggle) {
+  display: flex !important;
 }
