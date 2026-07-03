@@ -65,23 +65,29 @@ def evaluate_with_sympy(latex_str: str):
     evaluated = expr.doit().evalf()
     
     if evaluated.is_number:
-        # Check if it is a complex number or real number
-        if evaluated.is_real:
-            return float(evaluated)
+        # If it is a real number and can be converted to float
+        if evaluated.is_real and evaluated.is_comparable:
+            try:
+                return float(evaluated)
+            except Exception:
+                pass
         else:
-            # Try to simplify if imaginary part is negligible
+            # Try to convert to complex number
             try:
                 complex_val = complex(evaluated)
                 if abs(complex_val.imag) < 1e-9:
-                    return complex_val.real
+                    return float(complex_val.real)
+                # Format complex number representation (e.g. "2 + 3i")
+                real_part = complex_val.real
+                imag_part = complex_val.imag
+                if real_part == 0:
+                    return f"{imag_part}i"
+                return f"{real_part} + {imag_part}i" if imag_part >= 0 else f"{real_part} - {abs(imag_part)}i"
             except Exception:
                 pass
             
-            # Return complex number representation (e.g. "2 + 3i")
-            # Replace SymPy's 'I' with 'i'
-            return str(evaluated).replace('*I', 'i').replace('I', 'i')
-            
-    # For symbolic expressions or variables, raise SymbolicResultError
+    # If it is not a concrete number or failed to convert to float/complex (e.g., unevaluated integrals),
+    # raise SymbolicResultError to trigger Gemini fallback.
     raise SymbolicResultError(str(evaluated))
 
 def evaluate_with_gemini(latex_str: str, api_key: str):
