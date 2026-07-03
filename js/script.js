@@ -31,7 +31,7 @@ const langSelect = document.getElementById("lang-select");
 let targetNumbers = [1, 2, 3, 4];
 let gameDifficulty = "medium";
 let apiKey = "";
-let backendUrl = "";
+let backendUrl = "http://localhost:8000";
 let sortNumbers = false;
 let currentLang = "ja";
 
@@ -227,15 +227,12 @@ function initSettings() {
     }
 
     const savedUrl = localStorage.getItem("backend_url");
-    // If the saved URL is the old local default, clear it to default to Netlify Serverless Functions (relative path)
-    if (savedUrl === "http://localhost:8000") {
-        backendUrl = "";
-        backendUrlInput.value = "";
-        localStorage.setItem("backend_url", "");
-    } else if (savedUrl !== null) {
+    if (savedUrl !== null) {
         backendUrl = savedUrl;
         backendUrlInput.value = savedUrl;
     } else {
+        backendUrl = "http://localhost:8000";
+        backendUrlInput.value = "http://localhost:8000";
         localStorage.setItem("backend_url", backendUrl);
     }
 
