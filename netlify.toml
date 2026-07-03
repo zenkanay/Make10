@@ -1,9 +1,3 @@
-[build.environment]
-  PYTHON_VERSION = "3.10"
-
-[functions]
-  directory = "netlify/functions"
-
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
