@@ -513,10 +513,12 @@ math-field {
   border: none;
   padding-right: 40px; /* Prevents text overlap with custom keyboard toggle */
   caret-color: transparent !important;
+  touch-action: pan-y !important;
 }
 
 .math-field-container.focused math-field {
   caret-color: var(--text-color) !important;
+  touch-action: auto !important;
 }
 
 /* Results Section */

@@ -19,6 +19,10 @@ const shareModalCopyBtn = document.getElementById("share-modal-copy-btn");
 const shareModalUrlBtn = document.getElementById("share-modal-url-btn");
 const difficultySelect = document.getElementById("difficulty-select");
 
+if (mf) {
+    mf.readOnly = true;
+}
+
 // Custom numbers section elements
 const customNumbersSection = document.getElementById("custom-numbers-section");
 const applyCustomBtn = document.getElementById("apply-custom-btn");
@@ -862,7 +866,8 @@ function initSettings() {
                 }
                 setKeyboardMode('standard');
                 
-                // Trigger direct focus on math-field (trusted user event context)
+                // Disable readonly to allow cursor and typing
+                mf.readOnly = false;
                 mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             }
@@ -898,11 +903,13 @@ function initSettings() {
                 // Close virtual KB → no keyboard (don't open standard KB)
                 window.mathVirtualKeyboard.hide();
                 setKeyboardMode('none');
+                mf.readOnly = true;
                 if (mathContainer) mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             } else {
                 // Open virtual KB → close standard KB first
                 setKeyboardMode('none');
+                mf.readOnly = false;
                 mf.blur();
                 setTimeout(() => {
                     window.mathVirtualKeyboard.show();
@@ -924,8 +931,9 @@ function initSettings() {
             
             if (goingToMf) return;
 
-            // 完全にはずれた場合のみ、青枠を消す
+            // 完全にはずれた場合のみ、青枠を消し、読み取り専用に戻す
             if (!goingToToggle) {
+                mf.readOnly = true;
                 if (mathContainer) mathContainer.classList.remove('focused');
             }
 
@@ -1668,6 +1676,7 @@ function resetGame() {
     } else {
         mf.value = "";
     }
+    mf.readOnly = true;
     clickedIndices = [];
     latexCode.textContent = "";
     currentValue.textContent = "---";
