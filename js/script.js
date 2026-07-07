@@ -872,26 +872,39 @@ function initSettings() {
 
     // --- スクロール防止: キーボード開閉時のビューポート変化で位置がずれないようにする ---
     // Visual Viewport API: iOS/Android でキーボードが出たとき viewport がリサイズされるので、
-    // そのタイミングでスクロール位置を固定する
+    // そのタイミングでスクロール位置を固定する。ただし、スクロールによるアドレスバー伸縮（通常50-100px未満）は除外する。
     if (window.visualViewport) {
         let savedScrollY = window.scrollY;
         let isKeyboardTransition = false;
+        let lastViewportHeight = window.visualViewport.height;
 
         window.addEventListener('scroll', () => {
             if (!isKeyboardTransition) savedScrollY = window.scrollY;
         }, { passive: true });
 
         window.visualViewport.addEventListener('resize', () => {
-            // ビューポートがリサイズされた（＝キーボードが出た/消えた）タイミングで
-            // スクロール位置を固定
-            isKeyboardTransition = true;
-            window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
-            // 少し待ってから解除
-            clearTimeout(window._scrollLockTimer);
-            window._scrollLockTimer = setTimeout(() => {
-                isKeyboardTransition = false;
+            const currentHeight = window.visualViewport.height;
+            const heightDiff = Math.abs(currentHeight - lastViewportHeight);
+            lastViewportHeight = currentHeight;
+
+            // アドレスバーの出し入れによる変化は比較的小さい（通常100px以下）。キーボードは通常150px以上変化する。
+            // また、入力欄にフォーカスがあるか、仮想キーボードが開いている場合のみ処理を行う。
+            const isInputActive = (document.activeElement === mf || mf.contains(document.activeElement)) ||
+                                  (window.mathVirtualKeyboard && window.mathVirtualKeyboard.visible);
+
+            if (heightDiff >= 150 && isInputActive) {
+                isKeyboardTransition = true;
+                window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
+                // 少し待ってから解除
+                clearTimeout(window._scrollLockTimer);
+                window._scrollLockTimer = setTimeout(() => {
+                    isKeyboardTransition = false;
+                    savedScrollY = window.scrollY;
+                }, 400);
+            } else {
+                // 通常のスクロール中（アドレスバー伸縮等）は位置を上書き保存
                 savedScrollY = window.scrollY;
-            }, 400);
+            }
         });
     }
 
