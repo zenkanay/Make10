@@ -731,19 +731,33 @@ function initSettings() {
         'floor': '\\lfloor #? \\rfloor'
     };
 
-    // --- Standard OS keyboard support ---
-    // MathLive uses a <span class="ML__keyboard-sink" contenteditable inputmode=none> in its shadow DOM.
-    // This element is created once and never recreated, so we just need to patch it once.
-    let allowInputmodeNone = false;
+    // --- Keyboard State Machine ---
+    // MathLive uses <span class="ML__keyboard-sink" inputmode=none> in its shadow DOM.
+    // We patch setAttribute to control whether the OS keyboard appears.
+    let allowInputmodeNone = true; // start with no keyboard (changed when user taps mf)
+
+    function getSink() {
+        return mf.shadowRoot?.querySelector('.ML__keyboard-sink')
+            || mf.querySelector('.ML__keyboard-sink');
+    }
+
+    function setKeyboardMode(mode) {
+        // mode: "standard" = OS keyboard, "virtual" = virtual KB only, "none" = no keyboard
+        const sink = getSink();
+        if (mode === 'standard') {
+            allowInputmodeNone = false;
+            if (sink) sink.setAttribute('inputmode', 'text');
+        } else {
+            allowInputmodeNone = true;
+            if (sink) sink.setAttribute('inputmode', 'none');
+        }
+    }
 
     function patchKeyboardSink() {
-        // Try both the shadow root and the light DOM
-        const sink = mf.shadowRoot?.querySelector('.ML__keyboard-sink')
-                  || mf.querySelector('.ML__keyboard-sink');
+        const sink = getSink();
         if (!sink || sink.__patched) return false;
         sink.__patched = true;
 
-        // Override setAttribute to intercept inputmode="none"
         const origSetAttr = sink.setAttribute.bind(sink);
         sink.setAttribute = function(name, value) {
             if (name === 'inputmode' && value === 'none' && !allowInputmodeNone) {
@@ -753,12 +767,11 @@ function initSettings() {
             origSetAttr(name, value);
         };
 
-        // Also intercept the inputMode property setter
         const proto = Object.getPrototypeOf(sink);
         const descriptor = Object.getOwnPropertyDescriptor(proto, 'inputMode');
         if (descriptor) {
             Object.defineProperty(sink, 'inputMode', {
-                get: () => sink.getAttribute('inputmode') || 'text',
+                get: () => sink.getAttribute('inputmode') || 'none',
                 set: (val) => {
                     if (val === 'none' && !allowInputmodeNone) {
                         origSetAttr('inputmode', 'text');
@@ -770,20 +783,38 @@ function initSettings() {
             });
         }
 
-        // Set immediately
-        origSetAttr('inputmode', 'text');
-        console.log('[Make10] Patched ML__keyboard-sink inputmode -> text');
+        // Initial state: no keyboard until user explicitly taps mf
+        origSetAttr('inputmode', 'none');
         return true;
     }
 
-    // Try to patch immediately, then retry until found
     function tryPatch(attempts = 0) {
         if (patchKeyboardSink()) return;
         if (attempts < 20) setTimeout(() => tryPatch(attempts + 1), 100);
     }
     tryPatch();
 
-    // Custom virtual keyboard toggle button
+    // --- Tapping math field (pointerup) → switch to standard keyboard ---
+    // Always fires on release (not press), and closes virtual KB if open
+    const mathContainer = document.querySelector('.math-field-container');
+    if (mathContainer) {
+        let pointerDownOnMf = false;
+        mathContainer.addEventListener('pointerdown', () => { pointerDownOnMf = true; });
+        mathContainer.addEventListener('pointerup', (e) => {
+            if (!pointerDownOnMf) return;
+            pointerDownOnMf = false;
+
+            // Switch to standard keyboard mode
+            if (window.mathVirtualKeyboard?.visible) {
+                window.mathVirtualKeyboard.hide();
+            }
+            setKeyboardMode('standard');
+            mf.focus({ preventScroll: true });
+        });
+        mathContainer.addEventListener('pointercancel', () => { pointerDownOnMf = false; });
+    }
+
+    // --- Toggle button → open/close virtual keyboard ---
     const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
     if (customKeyboardToggle) {
         customKeyboardToggle.addEventListener("click", (e) => {
@@ -791,42 +822,24 @@ function initSettings() {
             e.stopPropagation();
             if (!window.mathVirtualKeyboard) return;
 
-            const getSink = () =>
-                mf.shadowRoot?.querySelector('.ML__keyboard-sink') || mf.querySelector('.ML__keyboard-sink');
-
             if (window.mathVirtualKeyboard.visible) {
-                // --- 仮想キーボードを閉じて、標準キーボードを有効化 ---
+                // Close virtual KB → no keyboard (don't open standard KB)
                 window.mathVirtualKeyboard.hide();
-                allowInputmodeNone = false;
-                const sink = getSink();
-                if (sink) sink.setAttribute('inputmode', 'text');
-                setTimeout(() => mf.focus(), 50);
+                setKeyboardMode('none');
+                mf.focus({ preventScroll: true });
             } else {
-                // --- 標準キーボードを閉じてから、仮想キーボードを開く ---
-                allowInputmodeNone = true;
-                const sink = getSink();
-                if (sink) sink.setAttribute('inputmode', 'none'); // 標準キーボードを非表示に
-                mf.blur(); // 一度フォーカスを外して標準キーボードを完全に閉じる
+                // Open virtual KB → close standard KB first
+                setKeyboardMode('none');
+                mf.blur();
                 setTimeout(() => {
                     window.mathVirtualKeyboard.show();
-                    mf.focus();
+                    mf.focus({ preventScroll: true });
                 }, 80);
             }
         });
     }
 
-    // Scroll reset on focus loss to fix mobile viewport layout shifts
-    mf.addEventListener("blur", () => {
-        setTimeout(() => {
-            if (!window.mathVirtualKeyboard || !window.mathVirtualKeyboard.visible) {
-                window.scrollTo(0, 0);
-            }
-        }, 100);
-    });
-
-
-
-    // Listen to virtual keyboard visibility changes to adapt page layout
+    // Listen to virtual keyboard visibility changes to update body class
     function setupKeyboardListeners() {
         if (!window.mathVirtualKeyboard) {
             setTimeout(setupKeyboardListeners, 100);
@@ -835,20 +848,13 @@ function initSettings() {
         const handleKeyboardVisibility = () => {
             if (window.mathVirtualKeyboard.visible) {
                 document.body.classList.add("keyboard-visible");
-                // Refocus math-field to prevent focus loss from layout shifts
+                setKeyboardMode('none'); // Ensure standard KB stays closed while virtual KB is open
                 setTimeout(() => {
-                    mf.focus();
-                    const container = document.querySelector(".math-field-container");
-                    if (container) {
-                        container.scrollIntoView({ behavior: "smooth", block: "center" });
-                    }
+                    mf.focus({ preventScroll: true });
                 }, 80);
             } else {
                 document.body.classList.remove("keyboard-visible");
-                // Scroll reset to fix mobile browser layout shift bugs
-                setTimeout(() => {
-                    window.scrollTo(0, 0);
-                }, 100);
+                // Do NOT auto-show any keyboard — user must tap mf explicitly
             }
         };
         window.mathVirtualKeyboard.addEventListener("geometrychange", handleKeyboardVisibility);
