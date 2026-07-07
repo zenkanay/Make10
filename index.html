@@ -4,8 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Make10++</title>
-  <meta name="description" content="Make10++: 四則演算から積分・微分まで、どんな数式を使っても「10」を作る新感覚数学パズルゲーム！">
+  <title>Make10++ (メイク10) | どんな数式でも10を作る数学パズルゲーム</title>
+  <meta name="description" content="Make10++ (メイク10) は、提示された4つの数字を組み合わせて10を作る無料の数学パズルゲームです。通常の四則演算（＋−×÷）だけでなく、ルート(√)、階乗(!)、積分などの高度な数式を使って難問を攻略！脳トレや算数・数学の学習に最適です。">
+  <meta name="keywords" content="Make10,メイク10,10作り,テンメイク,数学パズル,脳トレ,四則演算,数学ゲーム,無料ゲーム">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
@@ -16,15 +17,33 @@
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Make10++ - 数式で10を作る新感覚数学パズル">
-  <meta property="og:description" content="四則演算から積分・微分まで、どんな数学記号を使っても10が作れる！知的で美しい数学パズルゲーム。">
+  <meta property="og:title" content="Make10++ (メイク10) | どんな数式でも10を作る数学パズルゲーム">
+  <meta property="og:description" content="提示された4つの数字で10を作る新感覚数学パズル！四則演算からルート(√)、階乗(!)、積分まであらゆる数式に対応。">
   <meta property="og:image" content="apple-touch-icon.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:title" content="Make10++ - 数式で10を作る新感覚数学パズル">
-  <meta property="twitter:description" content="四則演算から積分・微分まで、どんな数学記号を使っても10が作れる！知的で美しい数学パズルゲーム。">
+  <meta property="twitter:title" content="Make10++ (メイク10) | どんな数式でも10を作る数学パズルゲーム">
+  <meta property="twitter:description" content="提示された4つの数字で10を作る新感覚数学パズル！四則演算からルート(√)、階乗(!)、積分まであらゆる数式に対応。">
   <meta property="twitter:image" content="apple-touch-icon.png">
+
+  <!-- JSON-LD 構造化データ (SEO対策) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Make10++ (メイク10)",
+    "operatingSystem": "All",
+    "applicationCategory": "GameApplication",
+    "genre": "Puzzle Game",
+    "description": "提示された4つの数字を使って10を作る、新感覚の数学パズルゲーム。四則演算から平方根、階乗、積分まであらゆる数式に対応。",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "JPY"
+    }
+  }
+  </script>
 
   <!-- Google Fonts: Outfit & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +51,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=82">
+  <link rel="stylesheet" href="css/style.css?v=83">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -43,6 +62,7 @@
 </head>
 
 <body>
+  <h1 class="visually-hidden">Make10++ (メイク10) | どんな数式でも10を作る数学パズルゲーム</h1>
   <div class="app-container">
     <header class="app-header">
       <a href="./" class="logo" aria-label="Make10++ Home">
@@ -267,11 +287,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=82"></script>
+  <script type="module" src="js/script.js?v=83"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=82')
+        navigator.serviceWorker.register('sw.js?v=83')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });
