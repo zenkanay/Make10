@@ -19,6 +19,10 @@ const shareModalCopyBtn = document.getElementById("share-modal-copy-btn");
 const shareModalUrlBtn = document.getElementById("share-modal-url-btn");
 const difficultySelect = document.getElementById("difficulty-select");
 
+if (mf) {
+    mf.style.pointerEvents = 'none';
+}
+
 // Custom numbers section elements
 const customNumbersSection = document.getElementById("custom-numbers-section");
 const applyCustomBtn = document.getElementById("apply-custom-btn");
@@ -853,8 +857,8 @@ function initSettings() {
                 }
                 setKeyboardMode('standard');
                 
-                // Disable readonly to allow typing, add focus styles and trigger focus
-                mf.readOnly = false;
+                // Enable pointer events to allow cursor placement and typing
+                mf.style.pointerEvents = 'auto';
                 mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             }
@@ -890,13 +894,13 @@ function initSettings() {
                 // Close virtual KB → no keyboard (don't open standard KB)
                 window.mathVirtualKeyboard.hide();
                 setKeyboardMode('none');
-                mf.readOnly = true;
+                mf.style.pointerEvents = 'none';
                 if (mathContainer) mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             } else {
                 // Open virtual KB → close standard KB first
                 setKeyboardMode('none');
-                mf.readOnly = false;
+                mf.style.pointerEvents = 'auto';
                 mf.blur();
                 setTimeout(() => {
                     window.mathVirtualKeyboard.show();
@@ -918,9 +922,9 @@ function initSettings() {
             
             if (goingToMf) return;
 
-            // 完全にはずれた場合のみ青枠を消し、読み取り専用に戻す
+            // 完全にはずれた場合のみ青枠を消し、非アクティブ時は pointer-events: none に戻す
             if (!goingToToggle) {
-                mf.readOnly = true;
+                mf.style.pointerEvents = 'none';
                 if (mathContainer) mathContainer.classList.remove('focused');
             }
 
@@ -1663,7 +1667,7 @@ function resetGame() {
     } else {
         mf.value = "";
     }
-    mf.readOnly = true;
+    mf.style.pointerEvents = 'none';
     clickedIndices = [];
     latexCode.textContent = "";
     currentValue.textContent = "---";
