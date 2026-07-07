@@ -845,6 +845,49 @@ function initSettings() {
         });
     }
 
+    // --- フォーカスが外れたら仮想キーボードも閉じる ---
+    mf.addEventListener('blur', () => {
+        setTimeout(() => {
+            // フォーカスがトグルボタンやmf自身に移った場合は閉じない
+            const active = document.activeElement;
+            const toggle = document.getElementById('custom-keyboard-toggle');
+            const goingToToggle = toggle && (active === toggle || toggle.contains(active));
+            const goingToMf = active === mf || mf.contains(active);
+            if (goingToToggle || goingToMf) return;
+
+            // それ以外（余白など）へのフォーカス移動 → 仮想KB・標準KB両方閉じる
+            if (window.mathVirtualKeyboard?.visible) {
+                window.mathVirtualKeyboard.hide();
+            }
+            setKeyboardMode('none');
+        }, 150);
+    });
+
+    // --- スクロール防止: キーボード開閉時のビューポート変化で位置がずれないようにする ---
+    // Visual Viewport API: iOS/Android でキーボードが出たとき viewport がリサイズされるので、
+    // そのタイミングでスクロール位置を固定する
+    if (window.visualViewport) {
+        let savedScrollY = window.scrollY;
+        let isKeyboardTransition = false;
+
+        window.addEventListener('scroll', () => {
+            if (!isKeyboardTransition) savedScrollY = window.scrollY;
+        }, { passive: true });
+
+        window.visualViewport.addEventListener('resize', () => {
+            // ビューポートがリサイズされた（＝キーボードが出た/消えた）タイミングで
+            // スクロール位置を固定
+            isKeyboardTransition = true;
+            window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
+            // 少し待ってから解除
+            clearTimeout(window._scrollLockTimer);
+            window._scrollLockTimer = setTimeout(() => {
+                isKeyboardTransition = false;
+                savedScrollY = window.scrollY;
+            }, 400);
+        });
+    }
+
     // Listen to virtual keyboard visibility changes to update body class
     function setupKeyboardListeners() {
         if (!window.mathVirtualKeyboard) {

@@ -165,6 +165,7 @@ body {
   justify-content: center;
   align-items: center;
   transition: var(--transition);
+  overscroll-behavior: none; /* キーボード開閉時のバウンス・スクロール連鎖を防止 */
 }
 
 /* Container */
