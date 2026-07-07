@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://make10.app/sitemap.xml
+Sitemap: https://make10pp.vercel.app/sitemap.xml
