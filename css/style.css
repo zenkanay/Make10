@@ -512,6 +512,15 @@ math-field {
   --keyboard-zindex: 1000;
   border: none;
   padding-right: 40px; /* Prevents text overlap with custom keyboard toggle */
+  caret-color: transparent !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.math-field-container.focused math-field {
+  caret-color: var(--text-color) !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
 }
 
 /* Results Section */
