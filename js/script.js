@@ -820,8 +820,10 @@ function initSettings() {
             touchStartTime = Date.now();
 
             // 押した瞬間（pointerdown）のデフォルトフォーカス（およびキーボード表示）を阻止
+            // キャプチャフェーズで伝播を完全に止めて子要素のフォーカスを防ぐ
             e.preventDefault();
-        });
+            e.stopPropagation();
+        }, true);
 
         mathContainer.addEventListener('pointerup', (e) => {
             if (!isPointerDown) return;
