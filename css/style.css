@@ -452,6 +452,7 @@ body {
   }
 }
 
+.digit-card.active-digit:active,
 .digit-card.active-digit.pressing {
   transform: scale(0.88);
   box-shadow: none;
@@ -974,8 +975,9 @@ kbd {
   }
 
   .modal-content {
-    width: 100%;
-    max-height: 90vh;
+    width: calc(100% - 24px);
+    margin: 0 auto;
+    max-height: 85vh;
     /* Leave room for margin */
     display: flex;
     flex-direction: column;
@@ -983,7 +985,7 @@ kbd {
 
   .modal-body {
     overflow-y: auto;
-    max-height: 60vh;
+    max-height: 55vh;
     padding-right: 4px;
     /* Smooth scroll padding */
     gap: 16px;
@@ -996,8 +998,23 @@ kbd {
 
   /* Share Modal responsive adjustments */
   .share-modal-overlay {
-    align-items: flex-start;
-    padding: 24px 16px;
+    align-items: center;
+    padding: 12px;
+  }
+
+  .share-modal-content {
+    width: calc(100% - 24px);
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .share-modal-buttons {
+    gap: 8px;
+  }
+
+  .share-modal-buttons button {
+    padding: 10px;
+    font-size: 0.85rem;
   }
 }
 
@@ -1027,7 +1044,7 @@ body.keyboard-visible {
   align-items: flex-start;
 }
 
-/* スマホで仕教キーボード表示時はスクロールで全体を見られるようにする */
+/* スマホでキーボード表示時はスクロールで全体を見られるようにする */
 @media (max-width: 600px) {
   body.keyboard-visible {
     overflow-y: auto;
@@ -1035,7 +1052,7 @@ body.keyboard-visible {
   }
 
   body.keyboard-visible .app-container {
-    /* 仕想キーボードの高さ分だけ下にパディングを追加してコンテンツが隠れないように */
+    /* キーボードの高さ分だけ下にパディングを追加してコンテンツが隠れないように */
     padding-bottom: 340px;
   }
 }
