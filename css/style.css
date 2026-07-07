@@ -1014,14 +1014,20 @@ body.keyboard-visible {
 
 /* スマホでキーボードが表示されているときのレイアウト最適化 */
 @media (max-width: 600px) {
+  body.keyboard-visible {
+    overflow-y: auto;
+    height: auto;
+  }
+
   body.keyboard-visible .app-container {
     padding-top: 4px;
     /* MathLive keyboard height (~300px) + extra scroll room */
     padding-bottom: 340px;
   }
 
+  /* ヘッダーは非表示にせず、スクロールで見えるようにする */
   body.keyboard-visible .app-header {
-    display: none;
+    display: flex;
   }
 
   body.keyboard-visible .glass-panel {
@@ -1037,7 +1043,6 @@ body.keyboard-visible {
     aspect-ratio: 1.6;
     font-size: 1.3rem;
     border-radius: 8px;
-    /* Larger touch target */
     min-height: 44px;
   }
 
@@ -1050,7 +1055,6 @@ body.keyboard-visible {
     font-size: 1.15rem;
   }
 
-  /* Scroll math-field into view when keyboard appears */
   body.keyboard-visible .input-section {
     scroll-margin-bottom: 360px;
   }
