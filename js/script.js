@@ -17,7 +17,6 @@ const closeShareModal = document.getElementById("close-share-modal");
 const shareModalDownloadBtn = document.getElementById("share-modal-download-btn");
 const shareModalCopyBtn = document.getElementById("share-modal-copy-btn");
 const shareModalUrlBtn = document.getElementById("share-modal-url-btn");
-let mfOverlayShield = document.getElementById("mf-overlay-shield");
 const difficultySelect = document.getElementById("difficulty-select");
 
 // Custom numbers section elements
@@ -692,7 +691,6 @@ function applyLanguage(lang) {
 
 // Initialize Settings & Local Data
 function initSettings() {
-    mfOverlayShield = document.getElementById("mf-overlay-shield");
     const savedKey = localStorage.getItem("gemini_api_key");
     if (savedKey) {
         apiKey = savedKey;
@@ -805,40 +803,52 @@ function initSettings() {
     tryPatch();
 
     // --- Tapping math field (pointerup/touchend) → switch to standard keyboard ---
-    // Fires ONLY when the pointer is released on the transparent overlay shield without significant drag.
-    // The transparent shield captures mobile swipes for fluid scrolling without triggering MathLive logic.
+    // The events are bound directly to mathContainer. preventDefault() is NEVER called
+    // to allow natural browser scrolling. If user scrolls (touchmove), focus is blurred immediately.
     const mathContainer = document.querySelector('.math-field-container');
-    const shield = document.getElementById("mf-overlay-shield");
-    if (shield && mathContainer) {
+    if (mathContainer) {
         let touchStartX = 0;
         let touchStartY = 0;
         let touchStartTime = 0;
         let isPointerDown = false;
 
-        const handleStart = (clientX, clientY) => {
+        const handleStart = (clientX, clientY, target) => {
+            if (target.closest('#custom-keyboard-toggle')) return;
             isPointerDown = true;
             touchStartX = clientX;
             touchStartY = clientY;
             touchStartTime = Date.now();
         };
 
-        shield.addEventListener('pointerdown', (e) => {
-            handleStart(e.clientX, e.clientY);
+        mathContainer.addEventListener('pointerdown', (e) => {
+            handleStart(e.clientX, e.clientY, e.target);
         });
 
-        shield.addEventListener('touchstart', (e) => {
+        mathContainer.addEventListener('touchstart', (e) => {
             if (e.touches.length > 0) {
-                handleStart(e.touches[0].clientX, e.touches[0].clientY);
+                handleStart(e.touches[0].clientX, e.touches[0].clientY, e.target);
             }
         }, { passive: true });
 
-        shield.addEventListener('mousedown', (e) => {
-            handleStart(e.clientX, e.clientY);
+        mathContainer.addEventListener('mousedown', (e) => {
+            handleStart(e.clientX, e.clientY, e.target);
         });
 
-        const handleEnd = (clientX, clientY) => {
+        // Touchmove detector to identify mobile scrolling and immediately blur the field
+        mathContainer.addEventListener('touchmove', () => {
+            if (isPointerDown) {
+                isPointerDown = false; // Cancel tap detection
+                if (document.activeElement === mf || mf.contains(document.activeElement)) {
+                    mf.blur();
+                }
+            }
+        }, { passive: true });
+
+        const handleEnd = (clientX, clientY, target) => {
             if (!isPointerDown) return;
             isPointerDown = false;
+
+            if (target.closest('#custom-keyboard-toggle')) return;
 
             const deltaX = Math.abs(clientX - touchStartX);
             const deltaY = Math.abs(clientY - touchStartY);
@@ -852,29 +862,28 @@ function initSettings() {
                 }
                 setKeyboardMode('standard');
                 
-                // Disable shield so interactions pass through directly to math-field, then focus
-                shield.classList.add('disabled');
+                // Trigger direct focus on math-field (trusted user event context)
                 mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             }
         };
 
-        shield.addEventListener('pointerup', (e) => {
-            handleEnd(e.clientX, e.clientY);
+        mathContainer.addEventListener('pointerup', (e) => {
+            handleEnd(e.clientX, e.clientY, e.target);
         });
 
-        shield.addEventListener('touchend', (e) => {
+        mathContainer.addEventListener('touchend', (e) => {
             if (e.changedTouches.length > 0) {
-                handleEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+                handleEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e.target);
             }
         });
 
-        shield.addEventListener('mouseup', (e) => {
-            handleEnd(e.clientX, e.clientY);
+        mathContainer.addEventListener('mouseup', (e) => {
+            handleEnd(e.clientX, e.clientY, e.target);
         });
 
-        shield.addEventListener('pointercancel', () => { isPointerDown = false; });
-        shield.addEventListener('touchcancel', () => { isPointerDown = false; });
+        mathContainer.addEventListener('pointercancel', () => { isPointerDown = false; });
+        mathContainer.addEventListener('touchcancel', () => { isPointerDown = false; });
     }
 
     // --- Toggle button → open/close virtual keyboard ---
@@ -889,13 +898,11 @@ function initSettings() {
                 // Close virtual KB → no keyboard (don't open standard KB)
                 window.mathVirtualKeyboard.hide();
                 setKeyboardMode('none');
-                if (mfOverlayShield) mfOverlayShield.classList.remove('disabled');
                 if (mathContainer) mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             } else {
                 // Open virtual KB → close standard KB first
                 setKeyboardMode('none');
-                if (mfOverlayShield) mfOverlayShield.classList.add('disabled');
                 mf.blur();
                 setTimeout(() => {
                     window.mathVirtualKeyboard.show();
@@ -917,9 +924,8 @@ function initSettings() {
             
             if (goingToMf) return;
 
-            // 完全にはずれた場合のみ、シールドを再有効化し、青枠を消す
+            // 完全にはずれた場合のみ、青枠を消す
             if (!goingToToggle) {
-                if (mfOverlayShield) mfOverlayShield.classList.remove('disabled');
                 if (mathContainer) mathContainer.classList.remove('focused');
             }
 
@@ -1661,9 +1667,6 @@ function resetGame() {
         mf.setValue("");
     } else {
         mf.value = "";
-    }
-    if (mfOverlayShield) {
-        mfOverlayShield.classList.remove('disabled');
     }
     clickedIndices = [];
     latexCode.textContent = "";

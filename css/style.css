@@ -502,21 +502,6 @@ body {
   box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
-.math-field-shield {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: calc(100% - 48px);
-  height: 100%;
-  z-index: 2;
-  background: transparent;
-  cursor: text;
-}
-
-.math-field-shield.disabled {
-  pointer-events: none;
-}
-
 math-field {
   width: 100%;
   min-height: 60px;

@@ -32,7 +32,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=77">
+  <link rel="stylesheet" href="css/style.css?v=78">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -133,7 +133,6 @@
           </div>
         </div>
         <div class="math-field-container">
-          <div id="mf-overlay-shield" class="math-field-shield"></div>
           <math-field id="mf" placeholder="ここに数式を入力 (例: 8 / (1 - 1/5))" data-i18n-placeholder="math_field_placeholder"></math-field>
           <button id="custom-keyboard-toggle" class="keyboard-toggle-btn" aria-label="キーボード切り替え" title="キーボード切り替え">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -268,11 +267,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=77"></script>
+  <script type="module" src="js/script.js?v=78"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=77')
+        navigator.serviceWorker.register('sw.js?v=78')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });
