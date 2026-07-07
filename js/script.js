@@ -802,29 +802,49 @@ function initSettings() {
     tryPatch();
 
     // --- Tapping math field (pointerup) → switch to standard keyboard ---
-    // Always fires on release (not press), and closes virtual KB if open
+    // Fires ONLY when the pointer is released (pointerup) on the math field without significant drag.
     const mathContainer = document.querySelector('.math-field-container');
     if (mathContainer) {
-        let pointerDownOnMf = false;
-        mathContainer.addEventListener('pointerdown', (e) => {
-            // トグルボタンへのタップは除外（別のハンドラで処理）
-            if (e.target.closest('#custom-keyboard-toggle')) return;
-            pointerDownOnMf = true;
-        });
-        mathContainer.addEventListener('pointerup', (e) => {
-            // トグルボタンへのタップは除外（伝播してきたイベントを無視）
-            if (e.target.closest('#custom-keyboard-toggle')) return;
-            if (!pointerDownOnMf) return;
-            pointerDownOnMf = false;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchStartTime = 0;
+        let isPointerDown = false;
 
-            // Switch to standard keyboard mode
-            if (window.mathVirtualKeyboard?.visible) {
-                window.mathVirtualKeyboard.hide();
-            }
-            setKeyboardMode('standard');
-            mf.focus({ preventScroll: true });
+        mathContainer.addEventListener('pointerdown', (e) => {
+            // トグルボタンへのタップは除外
+            if (e.target.closest('#custom-keyboard-toggle')) return;
+            
+            isPointerDown = true;
+            touchStartX = e.clientX;
+            touchStartY = e.clientY;
+            touchStartTime = Date.now();
+
+            // 押した瞬間（pointerdown）のデフォルトフォーカス（およびキーボード表示）を阻止
+            e.preventDefault();
         });
-        mathContainer.addEventListener('pointercancel', () => { pointerDownOnMf = false; });
+
+        mathContainer.addEventListener('pointerup', (e) => {
+            if (!isPointerDown) return;
+            isPointerDown = false;
+
+            if (e.target.closest('#custom-keyboard-toggle')) return;
+
+            const deltaX = Math.abs(e.clientX - touchStartX);
+            const deltaY = Math.abs(e.clientY - touchStartY);
+            const deltaTime = Date.now() - touchStartTime;
+
+            // スクロールやドラッグ（10px以上の移動）ではなく、短時間（500ms以内）の純粋なタップ判定
+            if (deltaX < 10 && deltaY < 10 && deltaTime < 500) {
+                // Switch to standard keyboard mode
+                if (window.mathVirtualKeyboard?.visible) {
+                    window.mathVirtualKeyboard.hide();
+                }
+                setKeyboardMode('standard');
+                mf.focus({ preventScroll: true });
+            }
+        });
+
+        mathContainer.addEventListener('pointercancel', () => { isPointerDown = false; });
     }
 
     // --- Toggle button → open/close virtual keyboard ---
