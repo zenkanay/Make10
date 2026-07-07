@@ -801,8 +801,9 @@ function initSettings() {
     }
     tryPatch();
 
-    // --- Tapping math field (pointerup) → switch to standard keyboard ---
-    // Fires ONLY when the pointer is released (pointerup) on the math field without significant drag.
+    // --- Tapping math field (pointerup/touchend) → switch to standard keyboard ---
+    // Fires ONLY when the pointer is released on the math field without significant drag.
+    // We capture touchstart, mousedown, and pointerdown to completely suppress focus on press.
     const mathContainer = document.querySelector('.math-field-container');
     if (mathContainer) {
         let touchStartX = 0;
@@ -810,29 +811,49 @@ function initSettings() {
         let touchStartTime = 0;
         let isPointerDown = false;
 
-        mathContainer.addEventListener('pointerdown', (e) => {
-            // トグルボタンへのタップは除外
-            if (e.target.closest('#custom-keyboard-toggle')) return;
+        const handleStart = (clientX, clientY, target, preventFunc) => {
+            if (target.closest('#custom-keyboard-toggle')) return;
             
             isPointerDown = true;
-            touchStartX = e.clientX;
-            touchStartY = e.clientY;
+            touchStartX = clientX;
+            touchStartY = clientY;
             touchStartTime = Date.now();
 
-            // 押した瞬間（pointerdown）のデフォルトフォーカス（およびキーボード表示）を阻止
-            // キャプチャフェーズで伝播を完全に止めて子要素のフォーカスを防ぐ
-            e.preventDefault();
-            e.stopPropagation();
+            // 押した瞬間のフォーカス動作を完全にブロック
+            preventFunc();
+        };
+
+        mathContainer.addEventListener('pointerdown', (e) => {
+            handleStart(e.clientX, e.clientY, e.target, () => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
         }, true);
 
-        mathContainer.addEventListener('pointerup', (e) => {
+        mathContainer.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                handleStart(e.touches[0].clientX, e.touches[0].clientY, e.target, () => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            }
+        }, { capture: true, passive: false });
+
+        mathContainer.addEventListener('mousedown', (e) => {
+            handleStart(e.clientX, e.clientY, e.target, () => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        }, true);
+
+        const handleEnd = (clientX, clientY, target) => {
             if (!isPointerDown) return;
             isPointerDown = false;
 
-            if (e.target.closest('#custom-keyboard-toggle')) return;
+            if (target.closest('#custom-keyboard-toggle')) return;
 
-            const deltaX = Math.abs(e.clientX - touchStartX);
-            const deltaY = Math.abs(e.clientY - touchStartY);
+            const deltaX = Math.abs(clientX - touchStartX);
+            const deltaY = Math.abs(clientY - touchStartY);
             const deltaTime = Date.now() - touchStartTime;
 
             // スクロールやドラッグ（10px以上の移動）ではなく、短時間（500ms以内）の純粋なタップ判定
@@ -844,9 +865,24 @@ function initSettings() {
                 setKeyboardMode('standard');
                 mf.focus({ preventScroll: true });
             }
+        };
+
+        mathContainer.addEventListener('pointerup', (e) => {
+            handleEnd(e.clientX, e.clientY, e.target);
+        });
+
+        mathContainer.addEventListener('touchend', (e) => {
+            if (e.changedTouches.length > 0) {
+                handleEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e.target);
+            }
+        });
+
+        mathContainer.addEventListener('mouseup', (e) => {
+            handleEnd(e.clientX, e.clientY, e.target);
         });
 
         mathContainer.addEventListener('pointercancel', () => { isPointerDown = false; });
+        mathContainer.addEventListener('touchcancel', () => { isPointerDown = false; });
     }
 
     // --- Toggle button → open/close virtual keyboard ---
