@@ -9,12 +9,24 @@ const numbersContainer = document.getElementById("numbers-container");
 const generateBtn = document.getElementById("generate-btn");
 const clearBtn = document.getElementById("clear-btn");
 const evaluateBtn = document.getElementById("evaluate-btn");
+const resultActions = document.getElementById("result-actions");
+const shareImgBtn = document.getElementById("share-img-btn");
+const shareModal = document.getElementById("share-modal");
+const shareModalImg = document.getElementById("share-modal-img");
+const closeShareModal = document.getElementById("close-share-modal");
+const shareModalDownloadBtn = document.getElementById("share-modal-download-btn");
+const shareModalCopyBtn = document.getElementById("share-modal-copy-btn");
 const difficultySelect = document.getElementById("difficulty-select");
 
 // Custom numbers section elements
 const customNumbersSection = document.getElementById("custom-numbers-section");
 const applyCustomBtn = document.getElementById("apply-custom-btn");
 const customDigitInputs = document.querySelectorAll(".custom-digit-input");
+
+// Help Modal Elements
+const helpBtn = document.getElementById("help-btn");
+const helpModal = document.getElementById("help-modal");
+const closeHelpBtn = document.getElementById("close-help-btn");
 
 // Settings Modal Elements
 const settingsBtn = document.getElementById("settings-btn");
@@ -31,7 +43,7 @@ const langSelect = document.getElementById("lang-select");
 let targetNumbers = [1, 2, 3, 4];
 let gameDifficulty = "medium";
 let apiKey = "";
-const backendUrl = "https://your-backend.example.com"; // hardcoded backend URL
+const backendUrl = "http://localhost:8000"; // hardcoded backend URL
 let sortNumbers = false;
 let currentLang = "ja";
 let settingsSnapshot = null;
@@ -62,16 +74,15 @@ const SPECIAL_POOLS = {
         [3, 3, 7, 7], // (3 + 3/7) * 7 = 24. 
     ],
     hard: [
-        [1, 1, 1, 1], // (1+1+1)! + 1! + 1! + 1! + 1! = 10? No, 4 digits: (1+1+1)! + 1! + 1! + 1! No, digits must be 1,1,1,1: (1+1+1)! + 1! = 3! + 1 = 7. How to make 10 with 1,1,1,1? (1+1+1+1)! = 24. How about 10 = \int_1^1? No. What about: (1+1)! + (1+1)! = 4. How about: (1+1+1)! + (1+1)! = 8? We only have four 1s.
-        // Actually, with 1,1,1,1: (1+1+1)! + (1+1)!? No, that uses five 1s. 
-        // With 1,1,1,1: (1+1+1)! + 1 + 1? No, four 1s: (1+1+1)! + 1? No, 3!+1=7. 
-        // Oh: (1+1+1)! + 1? Wait, what about (1+1+1)! + (1+1+1)!? 
-        // Let's use: [2, 2, 2, 2], [3, 3, 3, 3], etc.
         [3, 4, 5, 6], // 5 + 6 - 3 + \sqrt{4} = 10
-        [5, 5, 5, 5], // 5 + 5 + 5 - 5 = 10
-        [2, 2, 2, 2], // 2^2 * 2 + 2 = 10 (Easy, but also can do other ways)
-        [9, 9, 9, 9]  /* (9 + 9) / 9 + \sqrt{9}! = 2 + 6 = 8? No, \sqrt{9} = 3. 3! = 6. (9*9 - 9)/9? (81-9)/9 = 72/9 = 8.
-                         With 9,9,9,9: 9 + 9/9 - (9-9) = 10. (Easy) */
+        [4, 4, 4, 4], // 4 + 4 + 4 - \sqrt{4} = 10
+        [2, 3, 3, 4], // 3! + 3! + 2 - 4 = 10
+        [1, 2, 7, 7], // \sqrt{7+2} + 7 * 1 = 10
+        [1, 3, 7, 9], // (9 - 7) * (3! - 1) = 10
+        [1, 1, 9, 9], // (\sqrt{9})! + (\sqrt{9})! - 1 - 1 = 10
+        [2, 3, 5, 5], // \sqrt{5*5}! / (3! * 2) = 10
+        [2, 2, 8, 9], // \sqrt{9} * 2 + 8 / 2 = 10
+        [4, 4, 7, 7]  // 7 + 7 - \sqrt{4} - \sqrt{4} = 10
     ]
 };
 
@@ -82,7 +93,7 @@ const TRANSLATIONS = {
         settings_btn_aria: "設定を開く",
         close_settings_btn_aria: "設定を閉じる",
         difficulty_label: "難易度",
-        easy: "Easy (四則演算)",
+        easy: "Easy (簡単)",
         medium: "Medium (標準)",
         hard: "Hard (難問)",
         random_mode: "Random (完全ランダム)",
@@ -95,7 +106,7 @@ const TRANSLATIONS = {
         clear_btn: "クリア",
         evaluate_btn: "判定する",
         current_value_label: "現在の値",
-        debug_info: "詳細情報 (デバッグ)",
+        debug_info: "詳細情報",
         latex_expr: "LaTeX 表現:",
         eval_engine: "評価エンジン:",
         settings_title: "ゲーム設定",
@@ -126,14 +137,43 @@ const TRANSLATIONS = {
         msg_eval_failed: "数式の評価に失敗しました: {explanation}",
         msg_backend_offline: "エラー: バックエンドサーバーに接続できません。サーバーの起動状態を確認してください。",
         err_label: "エラー",
-        alert_custom_invalid: "0から9の範囲で4つの数字を入力してください。"
+        alert_custom_invalid: "0から9の範囲で4つの数字を入力してください。",
+        share_img_btn: "結果を画像で保存",
+        share_modal_title: "画像を保存する",
+        share_modal_help: "画像を長押し、または右クリックして保存してください。",
+        share_modal_copy: "画像をコピー",
+        share_modal_download: "直接ダウンロード",
+        copied: "コピーしました！",
+        help_btn: "ヘルプ",
+        help_btn_aria: "ヘルプを開く",
+        close_help_btn_aria: "ヘルプを閉じる",
+        help_title: "Make10++ の遊び方",
+        help_section_rules: "基本ルール",
+        help_rule_1: "提示された4つの数字をすべて1回ずつ使い、計算結果が「10」になる数式を作ります。",
+        help_rule_2: "通常の四則演算（＋, －, ×, ÷）だけでなく、平方根や階乗などの数学記号を使うことも可能です。",
+        help_section_symbols: "使用できる記号一覧",
+        help_sym_arith: "四則演算",
+        help_sym_paren: "カッコ（優先計算）",
+        help_sym_frac: "分数",
+        help_sym_pow: "べき乗",
+        help_sym_sqrt: "平方根",
+        help_sym_nroot: "累乗根",
+        help_sym_abs: "絶対値",
+        help_sym_fact: "階乗 (例: 3! = 6)",
+        help_sym_comb: "組合せ・順列",
+        help_sym_trig: "三角関数",
+        help_sym_log: "対数",
+        help_sym_calc: "総和・積分",
+        help_section_tips: "ヒント",
+        help_tip_1: "数字カードをタップすると、その数字が数式入力欄に自動で挿入されます。",
+        help_tip_2: "難易度「Hard」は、四則演算だけでは絶対に解けません。積極的に「√」や「!」などを使いましょう！"
     },
     en: {
         settings_btn: "Settings",
         settings_btn_aria: "Open settings",
         close_settings_btn_aria: "Close settings",
         difficulty_label: "Difficulty",
-        easy: "Easy (Basic Ops)",
+        easy: "Easy (Simple)",
         medium: "Medium (Standard)",
         hard: "Hard (Advanced)",
         random_mode: "Random (Full Random)",
@@ -146,7 +186,7 @@ const TRANSLATIONS = {
         clear_btn: "Clear",
         evaluate_btn: "Evaluate",
         current_value_label: "Current Value",
-        debug_info: "Detailed Info (Debug)",
+        debug_info: "Detailed Info",
         latex_expr: "LaTeX Expression:",
         eval_engine: "Evaluation Engine:",
         settings_title: "Game Settings",
@@ -176,14 +216,43 @@ const TRANSLATIONS = {
         msg_digits_also_invalid: " And digits are used incorrectly.",
         msg_eval_failed: "Failed to evaluate formula: {explanation}",
         msg_backend_offline: "Error: Cannot connect to the backend server. Please check the server status.",
-        alert_custom_invalid: "Please enter 4 digits between 0 and 9."
+        alert_custom_invalid: "Please enter 4 digits between 0 and 9.",
+        share_img_btn: "Save Result as Image",
+        share_modal_title: "Save Image",
+        share_modal_help: "Long-press or right-click the image to save.",
+        share_modal_copy: "Copy Image",
+        share_modal_download: "Direct Download",
+        copied: "Copied!",
+        help_btn: "Help",
+        help_btn_aria: "Open help",
+        close_help_btn_aria: "Close help",
+        help_title: "How to Play Make10++",
+        help_section_rules: "Basic Rules",
+        help_rule_1: "Use all 4 given numbers exactly once to create a formula that equals 10.",
+        help_rule_2: "You can use basic math (+, -, *, /) as well as advanced symbols like square roots and factorials.",
+        help_section_symbols: "Supported Symbols",
+        help_sym_arith: "Arithmetic",
+        help_sym_paren: "Parentheses",
+        help_sym_frac: "Fraction",
+        help_sym_pow: "Power",
+        help_sym_sqrt: "Square Root",
+        help_sym_nroot: "N-th Root",
+        help_sym_abs: "Absolute Value",
+        help_sym_fact: "Factorial (e.g. 3! = 6)",
+        help_sym_comb: "nCr / nPr",
+        help_sym_trig: "Trigonometry",
+        help_sym_log: "Logarithm",
+        help_sym_calc: "Sum / Integral",
+        help_section_tips: "Tips",
+        help_tip_1: "Tap a digit card to automatically insert it into the formula field.",
+        help_tip_2: "Hard difficulty cannot be solved with basic arithmetic. Try using '√' or '!' symbols!"
     },
     zh: {
         settings_btn: "设置",
         settings_btn_aria: "打开设置",
         close_settings_btn_aria: "关闭设置",
         difficulty_label: "难度",
-        easy: "简单 (基本运算)",
+        easy: "简单 (容易)",
         medium: "中等 (标准)",
         hard: "困难 (高级)",
         random_mode: "随机 (完全随机)",
@@ -196,7 +265,7 @@ const TRANSLATIONS = {
         clear_btn: "清除",
         evaluate_btn: "评判",
         current_value_label: "当前值",
-        debug_info: "详细信息 (调试)",
+        debug_info: "详细信息",
         latex_expr: "LaTeX 表达式:",
         eval_engine: "评估引擎:",
         settings_title: "游戏设置",
@@ -225,14 +294,43 @@ const TRANSLATIONS = {
         msg_eval_failed: "公式评估失败: {explanation}",
         msg_backend_offline: "错误：无法连接到后端服务器。请检查服务器启动状态。",
         err_label: "错误",
-        alert_custom_invalid: "请输入0到9之间的4个数字。"
+        alert_custom_invalid: "请输入0到9之间的4个数字。",
+        share_img_btn: "保存结果为图片",
+        share_modal_title: "保存图片",
+        share_modal_help: "长按或右键单击图片进行保存。",
+        share_modal_copy: "复制图片",
+        share_modal_download: "直接下载",
+        copied: "已复制！",
+        help_btn: "帮助",
+        help_btn_aria: "打开帮助",
+        close_help_btn_aria: "关闭帮助",
+        help_title: "Make10++ 玩法说明",
+        help_section_rules: "基本规则",
+        help_rule_1: "使用给出的4个数字各一次，构造出计算结果为10的算式。",
+        help_rule_2: "不仅可以使用基本四则运算，还可以使用平方根、阶乘等高级数学符号。",
+        help_section_symbols: "可用符号",
+        help_sym_arith: "四则运算",
+        help_sym_paren: "括号",
+        help_sym_frac: "分数",
+        help_sym_pow: "幂次",
+        help_sym_sqrt: "平方根",
+        help_sym_nroot: "方根",
+        help_sym_abs: "绝对值",
+        help_sym_fact: "阶乘 (例: 3! = 6)",
+        help_sym_comb: "组合/排列",
+        help_sym_trig: "三角函数",
+        help_sym_log: "对数",
+        help_sym_calc: "求和/积分",
+        help_section_tips: "提示",
+        help_tip_1: "点击数字卡片可以自动将其插入输入框中。",
+        help_tip_2: "“困难”难度无法仅通过四则运算解决，尝试使用“√”或“!”等符号吧！"
     },
     ko: {
         settings_btn: "설정",
         settings_btn_aria: "설정 열기",
         close_settings_btn_aria: "설정 닫기",
         difficulty_label: "난이도",
-        easy: "쉬움 (기본 연산)",
+        easy: "쉬움 (간단)",
         medium: "보통 (표준)",
         hard: "어려움 (고급)",
         random_mode: "무작위 (완전 랜덤)",
@@ -245,7 +343,7 @@ const TRANSLATIONS = {
         clear_btn: "지우기",
         evaluate_btn: "판정하기",
         current_value_label: "현재 값",
-        debug_info: "상세 정보 (디버그)",
+        debug_info: "상세 정보",
         latex_expr: "LaTeX 표현식:",
         eval_engine: "평가 엔진:",
         settings_title: "게임 설정",
@@ -274,14 +372,43 @@ const TRANSLATIONS = {
         msg_eval_failed: "수식 평가 실패: {explanation}",
         msg_backend_offline: "오류: 백엔드 서버에 연결할 수 없습니다. 서버의 기동 상태를 확인하세요.",
         err_label: "오류",
-        alert_custom_invalid: "0에서 9 사이의 4자리 숫자를 입력해 주세요."
+        alert_custom_invalid: "0에서 9 사이의 4자리 숫자를 입력해 주세요.",
+        share_img_btn: "결과를 이미지로 저장",
+        share_modal_title: "이미지 저장",
+        share_modal_help: "이미지를 길게 누르거나 우클릭하여 저장하세요.",
+        share_modal_copy: "이미지 복사",
+        share_modal_download: "직접 다운로드",
+        copied: "복사되었습니다!",
+        help_btn: "도움말",
+        help_btn_aria: "도움말 열기",
+        close_help_btn_aria: "도움말 닫기",
+        help_title: "Make10++ 게임 방법",
+        help_section_rules: "기본 규칙",
+        help_rule_1: "주어진 4개의 숫자를 각각 한 번씩 사용하여 계산 결과가 10이 되는 수식을 만듭니다.",
+        help_rule_2: "사칙연산뿐만 아니라 제곱근, 팩토리얼 등 고급 수학 기호를 사용할 수 있습니다.",
+        help_section_symbols: "사용 가능한 기호",
+        help_sym_arith: "사칙연산",
+        help_sym_paren: "괄호",
+        help_sym_frac: "분수",
+        help_sym_pow: "거듭제곱",
+        help_sym_sqrt: "제곱근",
+        help_sym_nroot: "거듭제곱근",
+        help_sym_abs: "절댓값",
+        help_sym_fact: "팩토리얼 (예: 3! = 6)",
+        help_sym_comb: "조합/순열",
+        help_sym_trig: "삼각함수",
+        help_sym_log: "로그",
+        help_sym_calc: "합/적분",
+        help_section_tips: "팁",
+        help_tip_1: "숫자 카드를 탭하면 입력 필드에 자동으로 삽입됩니다.",
+        help_tip_2: "Hard 난이도는 사칙연산만으로 풀 수 없습니다. '√'나 '!' 기호를 사용해 보세요!"
     },
     es: {
         settings_btn: "Configuración",
         settings_btn_aria: "Abrir configuración",
         close_settings_btn_aria: "Cerrar configuración",
         difficulty_label: "Dificultad",
-        easy: "Fácil (Ops. Básicas)",
+        easy: "Fácil (Simple)",
         medium: "Medio (Estándar)",
         hard: "Difícil (Avanzado)",
         random_mode: "Aleatorio (Totalmente Aleatorio)",
@@ -294,7 +421,7 @@ const TRANSLATIONS = {
         clear_btn: "Limpiar",
         evaluate_btn: "Evaluar",
         current_value_label: "Valor Actual",
-        debug_info: "Información Detallada (Depuración)",
+        debug_info: "Información Detallada",
         latex_expr: "Expresión LaTeX:",
         eval_engine: "Motor de Evaluación:",
         settings_title: "Configuración del Juego",
@@ -323,14 +450,43 @@ const TRANSLATIONS = {
         msg_eval_failed: "Error al evaluar la fórmula: {explanation}",
         msg_backend_offline: "Error: No se puede conectar al servidor backend. Verifica el estado del servidor.",
         err_label: "Error",
-        alert_custom_invalid: "Introduce 4 dígitos entre 0 y 9."
+        alert_custom_invalid: "Introduce 4 dígitos entre 0 y 9.",
+        share_img_btn: "Guardar resultado como imagen",
+        share_modal_title: "Guardar imagen",
+        share_modal_help: "Mantén pulsada o haz clic derecho en la imagen para guardar.",
+        share_modal_copy: "Copiar imagen",
+        share_modal_download: "Descarga directa",
+        copied: "¡Copiado!",
+        help_btn: "Ayuda",
+        help_btn_aria: "Abrir ayuda",
+        close_help_btn_aria: "Cerrar ayuda",
+        help_title: "Cómo jugar a Make10++",
+        help_section_rules: "Reglas Básicas",
+        help_rule_1: "Usa los 4 números dados exactamente una vez para obtener un resultado de 10.",
+        help_rule_2: "Puedes usar operaciones básicas y símbolos avanzados como raíces o factoriales.",
+        help_section_symbols: "Símbolos Disponibles",
+        help_sym_arith: "Aritmética",
+        help_sym_paren: "Paréntesis",
+        help_sym_frac: "Fracción",
+        help_sym_pow: "Potencia",
+        help_sym_sqrt: "Raíz Cuadrada",
+        help_sym_nroot: "Raíz N",
+        help_sym_abs: "Valor Absoluto",
+        help_sym_fact: "Factorial (ej: 3! = 6)",
+        help_sym_comb: "nCr / nPr",
+        help_sym_trig: "Trigonometría",
+        help_sym_log: "Logaritmo",
+        help_sym_calc: "Suma / Integral",
+        help_section_tips: "Consejos",
+        help_tip_1: "Toca una tarjeta de número para insertarla en el campo de entrada.",
+        help_tip_2: "La dificultad difícil no se puede resolver solo con aritmética. ¡Prueba con '√' o '!'!"
     },
     fr: {
         settings_btn: "Paramètres",
         settings_btn_aria: "Ouvrir les paramètres",
         close_settings_btn_aria: "Fermer les paramètres",
         difficulty_label: "Difficulté",
-        easy: "Facile (Op. de base)",
+        easy: "Facile (Simple)",
         medium: "Moyen (Standard)",
         hard: "Difficile (Avancé)",
         random_mode: "Aléatoire (Complètement Aléatoire)",
@@ -343,7 +499,7 @@ const TRANSLATIONS = {
         clear_btn: "Effacer",
         evaluate_btn: "Évaluer",
         current_value_label: "Valeur Actuelle",
-        debug_info: "Infos Détaillées (Débogage)",
+        debug_info: "Infos Détaillées",
         latex_expr: "Expression LaTeX :",
         eval_engine: "Moteur d'Évaluation :",
         settings_title: "Paramètres du Jeu",
@@ -372,14 +528,43 @@ const TRANSLATIONS = {
         msg_eval_failed: "Échec de l'évaluation : {explanation}",
         msg_backend_offline: "Erreur : Connexion impossible au serveur backend. Veuillez vérifier son état.",
         err_label: "Erreur",
-        alert_custom_invalid: "Veuillez entrer 4 chiffres entre 0 et 9."
+        alert_custom_invalid: "Veuillez entrer 4 chiffres entre 0 et 9.",
+        share_img_btn: "Enregistrer le résultat en image",
+        share_modal_title: "Enregistrer l'image",
+        share_modal_help: "Appuyez longuement ou faites un clic droit sur l'image pour l'enregistrer.",
+        share_modal_copy: "Copier l'image",
+        share_modal_download: "Téléchargement direct",
+        copied: "Copié !",
+        help_btn: "Aide",
+        help_btn_aria: "Ouvrir l'aide",
+        close_help_btn_aria: "Fermer l'aide",
+        help_title: "Comment jouer à Make10++",
+        help_section_rules: "Règles de Base",
+        help_rule_1: "Utilisez les 4 nombres donnés une seule fois pour obtenir un résultat de 10.",
+        help_rule_2: "Vous pouvez utiliser l'arithmétique de base et des symboles avancés comme les racines ou factorielles.",
+        help_section_symbols: "Symboles Supportés",
+        help_sym_arith: "Arithmétique",
+        help_sym_paren: "Parenthèses",
+        help_sym_frac: "Fraction",
+        help_sym_pow: "Puissance",
+        help_sym_sqrt: "Racine Carrée",
+        help_sym_nroot: "Racine N-ième",
+        help_sym_abs: "Valeur Absolue",
+        help_sym_fact: "Factorielle (ex: 3! = 6)",
+        help_sym_comb: "nCr / nPr",
+        help_sym_trig: "Trigonométrie",
+        help_sym_log: "Logarithme",
+        help_sym_calc: "Somme / Intégrale",
+        help_section_tips: "Astuces",
+        help_tip_1: "Appuyez sur une carte de nombre pour l'insérer dans la zone de saisie.",
+        help_tip_2: "La difficulté difficile ne peut être résolue avec l'arithmétique seule. Essayez les symboles '√' ou '!'!"
     },
     de: {
         settings_btn: "Einstellungen",
         settings_btn_aria: "Einstellungen öffnen",
         close_settings_btn_aria: "Einstellungen schließen",
         difficulty_label: "Schwierigkeit",
-        easy: "Einfach (Grundrechenarten)",
+        easy: "Einfach (Simpel)",
         medium: "Mittel (Standard)",
         hard: "Schwer (Fortgeschritten)",
         random_mode: "Zufällig (Vollständig Zufällig)",
@@ -392,7 +577,7 @@ const TRANSLATIONS = {
         clear_btn: "Löschen",
         evaluate_btn: "Auswerten",
         current_value_label: "Aktueller Wert",
-        debug_info: "Detailinfos (Debug)",
+        debug_info: "Detailinfos",
         latex_expr: "LaTeX-Ausdruck:",
         eval_engine: "Evaluierungs-Engine:",
         settings_title: "Spiel-Einstellungen",
@@ -421,7 +606,36 @@ const TRANSLATIONS = {
         msg_eval_failed: "Formelauswertung fehlgeschlagen: {explanation}",
         msg_backend_offline: "Fehler: Keine Verbindung zum Backend-Server. Bitte prüfen Sie den Serverstatus.",
         err_label: "Fehler",
-        alert_custom_invalid: "Bitte geben Sie 4 Ziffern zwischen 0 und 9 ein."
+        alert_custom_invalid: "Bitte geben Sie 4 Ziffern zwischen 0 und 9 ein.",
+        share_img_btn: "Ergebnis als Bild speichern",
+        share_modal_title: "Bild speichern",
+        share_modal_help: "Bild gedrückt halten oder rechtsklicken, um es zu speichern.",
+        share_modal_copy: "Bild kopieren",
+        share_modal_download: "Direkter Download",
+        copied: "Kopiert!",
+        help_btn: "Hilfe",
+        help_btn_aria: "Hilfe öffnen",
+        close_help_btn_aria: "Hilfe schließen",
+        help_title: "Spielanleitung für Make10++",
+        help_section_rules: "Grundregeln",
+        help_rule_1: "Verwende alle 4 gegebenen Zahlen genau einmal, um das Ergebnis 10 zu erhalten.",
+        help_rule_2: "Du kannst Grundrechenarten sowie fortgeschrittene Symbole wie Wurzeln oder Fakultäten verwenden.",
+        help_section_symbols: "Unterstützte Symbole",
+        help_sym_arith: "Arithmetik",
+        help_sym_paren: "Klammern",
+        help_sym_frac: "Bruch",
+        help_sym_pow: "Potenz",
+        help_sym_sqrt: "Quadratwurzel",
+        help_sym_nroot: "N-te Wurzel",
+        help_sym_abs: "Betrag",
+        help_sym_fact: "Fakultät (z.B. 3! = 6)",
+        help_sym_comb: "nCr / nPr",
+        help_sym_trig: "Trigonometrie",
+        help_sym_log: "Logarithmus",
+        help_sym_calc: "Summe / Integral",
+        help_section_tips: "Tipps",
+        help_tip_1: "Tippe auf eine Zahlenkarte, um sie automatisch in das Eingabefeld einzufügen.",
+        help_tip_2: "Die Schwierigkeit 'Schwer' kann nicht nur mit Arithmetik gelöst werden. Versuche '√' oder '!'!"
     }
 };
 
@@ -498,9 +712,17 @@ function initSettings() {
     }
     applyLanguage(savedLang);
 
+    // Difficulty initialization
+    const savedDifficulty = localStorage.getItem("game_difficulty") || "medium";
+    gameDifficulty = savedDifficulty;
+    if (difficultySelect) {
+        difficultySelect.value = savedDifficulty;
+    }
+
     // Configure math-field options
     mf.menuItems = [];
-    mf.virtualKeyboardMode = "onfocus";
+    mf.mathVirtualKeyboardPolicy = "manual";
+    mf.setAttribute("math-virtual-keyboard-policy", "manual");
 
     // Add custom inline shortcuts for ceil and floor functions
     mf.inlineShortcuts = {
@@ -509,32 +731,33 @@ function initSettings() {
         'floor': '\\lfloor #? \\rfloor'
     };
 
-    // Focus: show keyboard-visible class and explicitly show MathLive keyboard (critical for mobile)
-    mf.addEventListener("focus", () => {
-        document.body.classList.add("keyboard-visible");
-        // Ensure custom layout is applied (timing-safe)
-        updateVirtualKeyboard();
-        // Explicitly show the virtual keyboard (required on some mobile browsers)
-        if (window.mathVirtualKeyboard) {
-            window.mathVirtualKeyboard.show();
+
+
+    // Listen to virtual keyboard visibility changes to adapt page layout
+    function setupKeyboardListeners() {
+        if (!window.mathVirtualKeyboard) {
+            setTimeout(setupKeyboardListeners, 100);
+            return;
         }
-    });
-
-    mf.addEventListener("blur", () => {
-        document.body.classList.remove("keyboard-visible");
-    });
-
-    // Click / tap: ensure focus
-    mf.addEventListener("click", () => { mf.focus(); });
-
-    // Mobile touch: prevent native keyboard, show MathLive keyboard instead
-    mf.addEventListener("touchend", (e) => {
-        e.preventDefault();
-        mf.focus();
-        if (window.mathVirtualKeyboard) {
-            window.mathVirtualKeyboard.show();
-        }
-    }, { passive: false });
+        const handleKeyboardVisibility = () => {
+            if (window.mathVirtualKeyboard.visible) {
+                document.body.classList.add("keyboard-visible");
+                // Refocus math-field to prevent focus loss from layout shifts
+                setTimeout(() => {
+                    mf.focus();
+                    const container = document.querySelector(".math-field-container");
+                    if (container) {
+                        container.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }
+                }, 80);
+            } else {
+                document.body.classList.remove("keyboard-visible");
+            }
+        };
+        window.mathVirtualKeyboard.addEventListener("geometrychange", handleKeyboardVisibility);
+        window.mathVirtualKeyboard.addEventListener("virtual-keyboard-toggle", handleKeyboardVisibility);
+    }
+    setupKeyboardListeners();
 
     updateVirtualKeyboard();
 }
@@ -742,6 +965,7 @@ function hasBasicSolve(nums) {
 // Generate new game numbers based on difficulty
 function generateNewGame() {
     gameDifficulty = difficultySelect.value;
+    localStorage.setItem("game_difficulty", gameDifficulty);
 
     if (gameDifficulty === "custom") {
         customNumbersSection.classList.remove("hidden");
@@ -987,6 +1211,12 @@ async function evaluateFinal() {
             feedbackMsg.textContent = TRANSLATIONS[currentLang].msg_backend_offline;
         }
     }
+    // Show the result sharing action container if evaluation completed (success or error)
+    if (resultActions) {
+        resultActions.classList.remove("hidden");
+        // Pre-prepare the share image Blob so downloads are synchronous and user-triggered
+        setTimeout(prepareShareImage, 100);
+    }
 }
 
 // Trigger simple confetti
@@ -1042,7 +1272,7 @@ function updateVirtualKeyboard() {
                         { label: '√',   latex: '\\sqrt{#?}' },
                         {
                             label: 'ⁿ√',
-                            latex: '\\sqrt[#?]{#?}',
+                            latex: '\\sqrt[\\begin{pmatrix} #? & #? \\\\ #? & #? \\end{pmatrix}]{#?}',
                             variants: [
                                 { label: '³√', latex: '\\sqrt[3]{#?}' },
                                 { label: '⁴√', latex: '\\sqrt[4]{#?}' },
@@ -1050,13 +1280,26 @@ function updateVirtualKeyboard() {
                                 { label: '⁶√', latex: '\\sqrt[6]{#?}' },
                                 { label: '⁷√', latex: '\\sqrt[7]{#?}' },
                                 { label: '⁸√', latex: '\\sqrt[8]{#?}' },
-                                { label: '⁹√', latex: '\\sqrt[9]{#?}' }
+                                { label: '⁹√', latex: '\\sqrt[9]{#?}' },
+                                { label: 'ⁿ√', latex: '\\sqrt[#?]{#?}' }
                             ]
                         },
                         { label: '|x|', latex: '\\left|#?\\right|' },
-                        { label: '!',   latex: '!' },
+                        {
+                            label: '!',
+                            latex: '!',
+                            variants: [
+                                { label: '!!', latex: '!!' }
+                            ]
+                        },
                         { label: '.',   latex: '.' },
-                        { label: 'nCr', latex: '\\binom{#?}{#?}' }
+                        {
+                            label: 'nCr',
+                            latex: '\\binom{#?}{#?}',
+                            variants: [
+                                { label: 'nPr', latex: '^{#?}\\text{P}_{#?}' }
+                            ]
+                        }
                     ],
                     // Row 4: Auxiliary digits + cursor navigation
                     [
@@ -1096,13 +1339,15 @@ function updateVirtualKeyboard() {
                         { label: '10ˣ',   latex: '10^{#?}' },
                         { label: 'exp',   latex: '\\exp\\left(#?\\right)' }
                     ],
-                    // Rounding / discrete (5 keys)
+                    // Rounding / discrete (7 keys)
                     [
                         { label: '⌈x⌉', latex: '\\lceil #? \\rceil' },
                         { label: '⌊x⌋', latex: '\\lfloor #? \\rfloor' },
                         { label: 'mod',  latex: '\\bmod' },
                         { label: 'gcd',  latex: '\\gcd\\left(#?,#?\\right)' },
-                        { label: 'lcm',  latex: '\\text{lcm}\\left(#?,#?\\right)' }
+                        { label: 'lcm',  latex: '\\text{lcm}\\left(#?,#?\\right)' },
+                        { label: 'det',  latex: '\\det\\left(\\begin{pmatrix} #? & #? \\\\ #? & #? \\end{pmatrix}\\right)' },
+                        { label: 'Mat',  latex: '\\begin{pmatrix} #? & #? \\\\ #? & #? \\end{pmatrix}' }
                     ],
                     // Max / min / hyperbolic (5 keys)
                     [
@@ -1189,6 +1434,9 @@ function resetGame() {
     feedbackMsg.textContent = TRANSLATIONS[currentLang].msg_enter_formula;
     statusCard.className = "result-card";
     engineUsed.textContent = "Compute Engine (Local)";
+    if (resultActions) {
+        resultActions.classList.add("hidden");
+    }
     renderDigitCards();
 
     // Trigger live input handler to reset digit highlight cards properly
@@ -1250,22 +1498,29 @@ settingsBtn.addEventListener("click", () => {
         lang: localStorage.getItem("app_lang") || "ja",
         theme: localStorage.getItem("color_theme") || "system",
         sort: (localStorage.getItem("sort_numbers") === "true"),
-        apiKey: localStorage.getItem("gemini_api_key") || "",
-        backendUrl: localStorage.getItem("backend_url") || "http://localhost:8000"
+        apiKey: localStorage.getItem("gemini_api_key") || ""
     };
     settingsModal.classList.remove("hidden");
 });
 
-closeSettingsBtn.addEventListener("click", () => {
+const discardSettingsAndClose = () => {
     // Discard changes: restore snapshot values to UI inputs
     if (settingsSnapshot) {
         if (langSelect) langSelect.value = settingsSnapshot.lang;
         if (themeSelect) themeSelect.value = settingsSnapshot.theme;
         if (sortNumbersCheckbox) sortNumbersCheckbox.checked = settingsSnapshot.sort;
         if (apiKeyInput) apiKeyInput.value = settingsSnapshot.apiKey;
-        // backend URL input removed
     }
     settingsModal.classList.add("hidden");
+};
+
+closeSettingsBtn.addEventListener("click", discardSettingsAndClose);
+
+// Close settings modal on backdrop click, discarding changes
+settingsModal.addEventListener("click", (e) => {
+    if (e.target === settingsModal) {
+        discardSettingsAndClose();
+    }
 });
 
 saveSettingsBtn.addEventListener("click", () => {
@@ -1299,25 +1554,1117 @@ saveSettingsBtn.addEventListener("click", () => {
     settingsModal.classList.add("hidden");
 });
 
+// Help Modal Event Listeners
+if (helpBtn) {
+    helpBtn.addEventListener("click", () => {
+        helpModal.classList.remove("hidden");
+    });
+}
+if (closeHelpBtn) {
+    closeHelpBtn.addEventListener("click", () => {
+        helpModal.classList.add("hidden");
+    });
+}
+if (helpModal) {
+    helpModal.addEventListener("click", (e) => {
+        if (e.target === helpModal) {
+            helpModal.classList.add("hidden");
+        }
+    });
+}
+
 
 
 // Initialization
 initSettings();
 generateNewGame();
 
-// Space key triggers new game if not focusing on input fields
+// Global shortcut listener (Space key triggers new game, '/' key focuses math-field)
 document.addEventListener("keydown", (e) => {
+    const activeEl = document.activeElement;
+    const isFocusOnInput = activeEl && (
+        activeEl.tagName === "INPUT" || 
+        activeEl.tagName === "TEXTAREA" || 
+        activeEl.tagName === "MATH-FIELD" ||
+        activeEl.isContentEditable
+    );
+
+    if (isFocusOnInput) {
+        return;
+    }
+
     if (e.code === "Space") {
-        const activeEl = document.activeElement;
-        if (activeEl && (
-            activeEl.tagName === "INPUT" || 
-            activeEl.tagName === "TEXTAREA" || 
-            activeEl.tagName === "MATH-FIELD" ||
-            activeEl.isContentEditable
-        )) {
-            return;
-        }
         e.preventDefault();
         generateNewGame();
+        return;
+    }
+
+    if (e.key === "/") {
+        e.preventDefault();
+        mf.focus();
+        if (mf.select) {
+            mf.select();
+        }
+        return;
     }
 });
+
+// Convert LaTeX math to human-readable text for sharing
+function latexToReadableText(latex) {
+    let text = latex;
+
+    // Replace \begin{pmatrix} a & b \\ c & d \end{pmatrix} -> [[a, b], [c, d]]
+    text = text.replace(/\\begin{pmatrix}\s*(.*?)\s*\\end{pmatrix}/gs, (match, content) => {
+        const rows = content.split(/\\\\/);
+        const cleanedRows = rows.map(row => {
+            const cells = row.split(/&/).map(cell => cell.trim());
+            return `[${cells.join(",")}]`;
+        });
+        return `[${cleanedRows.join(",")}]`;
+    });
+
+    // Replace integrals \int_{a}^{b} -> ∫(a to b)
+    text = text.replace(/\\int_\{([^}]+)\}\^\{([^}]+)\}/g, "∫($1 to $2) ");
+    text = text.replace(/\\int_([0-9a-zA-Z])\^([0-9a-zA-Z])/g, "∫($1 to $2) ");
+    text = text.replace(/\\int\s*/g, "∫ ");
+
+    // Replace fractions \frac{a}{b} -> (a)/(b)
+    while (text.includes("\\frac")) {
+        text = text.replace(/\\frac\s*{(.*?)}{(.*?)}/g, "($1)/($2)");
+    }
+
+    // Replace square root \sqrt{x} -> √(x)
+    text = text.replace(/\\sqrt\s*{(.*?)}/g, "√($1)");
+    // Replace n-th root \sqrt[n]{x} -> n√(x)
+    text = text.replace(/\\sqrt\s*\[(.*?)\]\s*{(.*?)}/g, "($1)√($2)");
+
+    // Combinations and Permutations
+    // ^{n}\text{C}_{r} -> nCr
+    text = text.replace(/\^{(.*?)}\\text\{[CP]}\_{(.*?)}/g, (match, n, r) => {
+        const op = match.includes("C") ? "C" : "P";
+        return `${n}${op}${r}`;
+    });
+
+    // Replace logs \log_{b}(x) -> log_b(x)
+    text = text.replace(/\\log_{?(.*?)}/g, "log_$1");
+
+    // Replace standard symbols
+    text = text.replace(/\\times/g, " × ");
+    text = text.replace(/\\div/g, " ÷ ");
+    text = text.replace(/\\cdot/g, " · ");
+    text = text.replace(/\\left\(/g, "(").replace(/\\right\)/g, ")");
+    text = text.replace(/\\left\[/g, "[").replace(/\\right\]/g, ")");
+    text = text.replace(/\\left\\{/g, "{").replace(/\\right\\}/g, "}");
+    text = text.replace(/\\pi/g, "π");
+    text = text.replace(/\\infty/g, "∞");
+    text = text.replace(/\\theta/g, "θ");
+    text = text.replace(/\\lceil\s*(.*?)\s*\\rceil/g, "⌈$1⌉");
+    text = text.replace(/\\lfloor\s*(.*?)\s*\\rfloor/g, "⌊$1⌋");
+
+    // Clean up braces and backslashes
+    text = text.replace(/\\/g, "");
+    text = text.replace(/{(.*?)}/g, "$1");
+
+    return text.trim();
+}
+
+// Helper to draw wrapped text on Canvas (handles CJK and Western text wrapping)
+function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
+    const hasCJK = /[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/.test(text);
+    
+    let tokens = hasCJK ? text.split("") : text.split(" ");
+    let line = "";
+    let currentY = y;
+    
+    for (let n = 0; n < tokens.length; n++) {
+        let nextTok = tokens[n];
+        let testLine = line + (hasCJK || line === "" ? "" : " ") + nextTok;
+        let metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+            ctx.fillText(line, x, currentY);
+            line = nextTok;
+            currentY += lineHeight;
+        } else {
+            line = testLine;
+        }
+    }
+    ctx.fillText(line, x, currentY);
+}
+
+// Preprocess LaTeX for rendering
+function preprocessLatex(latex) {
+    let text = latex;
+    text = text.replace(/\\left\(/g, "(").replace(/\\right\)/g, ")");
+    text = text.replace(/\\left\[/g, "[").replace(/\\right\]/g, "]");
+    text = text.replace(/\\left\\{/g, "{").replace(/\\right\\}/g, "}");
+    text = text.replace(/\\text\{C\}/g, "C").replace(/\\text\{P\}/g, "P");
+    text = text.replace(/\\text\{([a-zA-Z\s]+)\}/g, "$1");
+    text = text.replace(/\\mathrm\{([a-zA-Z\s]+)\}/g, "$1");
+    text = text.replace(/\\mathrm/g, "");
+    return text;
+}
+
+// Parse LaTeX arithmetic to simple node tree
+function parseLatex(latex) {
+    let index = 0;
+    
+    function parseExpression() {
+        const nodes = [];
+        while (index < latex.length) {
+            // Skip whitespace
+            if (/\s/.test(latex[index])) {
+                index++;
+                continue;
+            }
+            
+            // Check for end of group
+            if (latex[index] === '}' || latex[index] === ')') {
+                break;
+            }
+            
+            // Operators: \sum, \prod, \lim
+            let opChar = null;
+            let opSkip = 0;
+            if (latex.startsWith('\\sum', index)) { opChar = '∑'; opSkip = 4; }
+            else if (latex.startsWith('\\prod', index)) { opChar = '∏'; opSkip = 5; }
+            else if (latex.startsWith('\\lim', index)) { opChar = 'lim'; opSkip = 4; }
+            
+            if (opChar) {
+                index += opSkip;
+                let subNode = null;
+                let supNode = null;
+                
+                while (index < latex.length) {
+                    if (latex[index] === '_') {
+                        index++;
+                        if (latex[index] === '{') {
+                            index++;
+                            subNode = parseExpression();
+                            if (latex[index] === '}') index++;
+                        } else {
+                            subNode = [{ type: 'text', value: latex[index] }];
+                            index++;
+                        }
+                    } else if (latex[index] === '^') {
+                        index++;
+                        if (latex[index] === '{') {
+                            index++;
+                            supNode = parseExpression();
+                            if (latex[index] === '}') index++;
+                        } else {
+                            supNode = [{ type: 'text', value: latex[index] }];
+                            index++;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                
+                nodes.push({ type: 'operator', char: opChar, sub: subNode, sup: supNode });
+                continue;
+            }
+
+            // Integrals: \int
+            if (latex.startsWith('\\int', index)) {
+                index += 4; // skip \int
+                let subNode = null;
+                let supNode = null;
+                
+                while (index < latex.length) {
+                    if (latex[index] === '_') {
+                        index++; // skip _
+                        if (latex[index] === '{') {
+                            index++; // skip {
+                            subNode = parseExpression();
+                            if (latex[index] === '}') index++;
+                        } else {
+                            subNode = [{ type: 'text', value: latex[index] }];
+                            index++;
+                        }
+                    } else if (latex[index] === '^') {
+                        index++; // skip ^
+                        if (latex[index] === '{') {
+                            index++; // skip {
+                            supNode = parseExpression();
+                            if (latex[index] === '}') index++;
+                        } else {
+                            supNode = [{ type: 'text', value: latex[index] }];
+                            index++;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                
+                nodes.push({ type: 'integral', sub: subNode, sup: supNode });
+                continue;
+            }
+
+            // Fractions: \frac{num}{den}
+            if (latex.startsWith('\\frac', index)) {
+                index += 5; // skip \frac
+                // Expect {
+                if (latex[index] === '{') {
+                    index++; // skip {
+                    const num = parseExpression();
+                    if (latex[index] === '}') {
+                        index++; // skip }
+                    }
+                    
+                    if (latex[index] === '{') {
+                        index++; // skip {
+                        const den = parseExpression();
+                        if (latex[index] === '}') {
+                            index++; // skip }
+                        }
+                        nodes.push({ type: 'fraction', num, den });
+                    }
+                }
+                continue;
+            }
+            
+            // Roots: \sqrt{content}
+            if (latex.startsWith('\\sqrt', index)) {
+                index += 5; // skip \sqrt
+                let rootIndex = null;
+                if (latex[index] === '[') {
+                    index++; // skip [
+                    rootIndex = parseExpression();
+                    if (latex[index] === ']') {
+                        index++; // skip ]
+                    }
+                }
+                if (latex[index] === '{') {
+                    index++; // skip {
+                    const content = parseExpression();
+                    if (latex[index] === '}') {
+                        index++; // skip }
+                    }
+                    nodes.push({ type: 'root', content, rootIndex });
+                }
+                continue;
+            }
+            
+            // Parentheses group
+            if (latex[index] === '(') {
+                index++; // skip (
+                const content = parseExpression();
+                if (latex[index] === ')') {
+                    index++; // skip )
+                }
+                nodes.push({ type: 'parentheses', content });
+                continue;
+            }
+
+            // Braces group (general grouping)
+            if (latex[index] === '{') {
+                index++; // skip {
+                const content = parseExpression();
+                if (latex[index] === '}') {
+                    index++; // skip }
+                }
+                nodes.push({ type: 'group', content });
+                continue;
+            }
+            
+            // Text tokens (numbers, standard symbols, operations)
+            let char = latex[index];
+            if (char === '\\') {
+                // Command
+                let cmd = "";
+                index++; // skip \
+                while (index < latex.length && /[a-zA-Z]/.test(latex[index])) {
+                    cmd += latex[index];
+                    index++;
+                }
+                // Translate commands to pretty symbols or upright words
+                if (cmd === "times") char = "×";
+                else if (cmd === "div") char = "÷";
+                else if (cmd === "cdot") char = "·";
+                else if (cmd === "pi") char = "π";
+                else if (cmd === "infty") char = "∞";
+                else if (cmd === "to" || cmd === "rightarrow") char = "→";
+                else if (cmd === "alpha") char = "α";
+                else if (cmd === "beta") char = "β";
+                else if (cmd === "gamma") char = "γ";
+                else if (cmd === "delta") char = "δ";
+                else if (cmd === "lambda") char = "λ";
+                else if (cmd === "mu") char = "μ";
+                else if (cmd === "sigma") char = "σ";
+                else if (cmd === "partial") char = "∂";
+                else if (cmd === "nabla") char = "∇";
+                else if (["log", "ln", "sin", "cos", "tan", "lim"].includes(cmd)) char = cmd;
+                else char = cmd;
+            } else {
+                index++;
+            }
+            
+            const textNode = { type: 'text', value: char };
+            nodes.push(textNode);
+            
+            // Check if followed by subscript _
+            if (index < latex.length && latex[index] === '_') {
+                index++; // skip _
+                let subNode;
+                if (latex[index] === '{') {
+                    index++; // skip {
+                    subNode = parseExpression();
+                    if (latex[index] === '}') {
+                        index++; // skip }
+                    }
+                } else {
+                    subNode = [{ type: 'text', value: latex[index] }];
+                    index++;
+                }
+                
+                nodes.pop();
+                const baseNode = textNode;
+                nodes.push({ type: 'sub', base: baseNode, sub: subNode });
+                continue;
+            }
+
+            // Check if followed by superscript ^
+            if (index < latex.length && latex[index] === '^') {
+                index++; // skip ^
+                let expNode;
+                if (latex[index] === '{') {
+                    index++; // skip {
+                    expNode = parseExpression();
+                    if (latex[index] === '}') {
+                        index++; // skip }
+                    }
+                } else {
+                    expNode = [{ type: 'text', value: latex[index] }];
+                    index++;
+                }
+                
+                nodes.pop();
+                const baseNode = textNode;
+                nodes.push({ type: 'sup', base: baseNode, exp: expNode });
+                continue;
+            }
+        }
+        return nodes;
+    }
+    
+    return parseExpression();
+}
+
+// Measure nodes sizes recursively
+function measureNodes(ctx, nodes, fontSize) {
+    let totalWidth = 0;
+    let maxHeightAbove = 0;
+    let maxHeightBelow = 0;
+    
+    nodes.forEach(node => {
+        ctx.font = `${fontSize}px 'Outfit', -apple-system, sans-serif`;
+        
+        ctx.font = `${fontSize}px 'KaTeX_Main', 'Outfit', -apple-system, sans-serif`;
+        
+        if (node.type === 'text') {
+            const isVariable = /^[a-zA-Z]$/.test(node.value);
+            ctx.font = isVariable 
+                ? `italic ${fontSize}px 'KaTeX_Math', 'Outfit', -apple-system, sans-serif`
+                : `${fontSize}px 'KaTeX_Main', 'Outfit', -apple-system, sans-serif`;
+            const metrics = ctx.measureText(node.value);
+            node.width = metrics.width;
+            node.heightAbove = fontSize * 0.75;
+            node.heightBelow = fontSize * 0.15;
+        } 
+        else if (node.type === 'integral') {
+            const intWidth = fontSize * 0.4;
+            const subDim = node.sub ? measureNodes(ctx, node.sub, fontSize * 0.55) : { width: 0, heightAbove: 0, heightBelow: 0 };
+            const supDim = node.sup ? measureNodes(ctx, node.sup, fontSize * 0.55) : { width: 0, heightAbove: 0, heightBelow: 0 };
+            
+            node.width = intWidth * 1.1 + Math.max(subDim.width, supDim.width) + 4;
+            node.heightAbove = fontSize * 1.05;
+            node.heightBelow = fontSize * 0.35;
+        } 
+        else if (node.type === 'operator') {
+            const opFontSize = node.char === 'lim' ? fontSize : fontSize * 1.35;
+            ctx.font = `${opFontSize}px 'KaTeX_Main', 'Outfit', -apple-system, sans-serif`;
+            const opMetrics = ctx.measureText(node.char);
+            const opWidth = opMetrics.width;
+            
+            const limitFontSize = fontSize * 0.5;
+            const subDim = node.sub ? measureNodes(ctx, node.sub, limitFontSize) : { width: 0, heightAbove: 0, heightBelow: 0 };
+            const supDim = node.sup ? measureNodes(ctx, node.sup, limitFontSize) : { width: 0, heightAbove: 0, heightBelow: 0 };
+            
+            node.width = Math.max(opWidth, subDim.width, supDim.width) + 4;
+            
+            const gap = fontSize * 0.1;
+            node.heightAbove = fontSize * 0.75 + (node.sup ? supDim.heightAbove + supDim.heightBelow + gap : 0);
+            node.heightBelow = fontSize * 0.15 + (node.sub ? subDim.heightAbove + subDim.heightBelow + gap : 0);
+        }
+        else if (node.type === 'fraction') {
+            const numDim = measureNodes(ctx, node.num, fontSize * 0.85);
+            const denDim = measureNodes(ctx, node.den, fontSize * 0.85);
+            node.width = Math.max(numDim.width, denDim.width) + 8;
+            
+            const gap = fontSize * 0.15;
+            node.heightAbove = numDim.heightAbove + numDim.heightBelow + gap;
+            node.heightBelow = denDim.heightAbove + denDim.heightBelow + gap;
+        } 
+        else if (node.type === 'root') {
+            const contentDim = measureNodes(ctx, node.content, fontSize);
+            node.width = contentDim.width + fontSize * 0.45;
+            node.heightAbove = contentDim.heightAbove + fontSize * 0.15;
+            node.heightBelow = contentDim.heightBelow;
+        } 
+        else if (node.type === 'parentheses') {
+            const contentDim = measureNodes(ctx, node.content, fontSize);
+            node.width = contentDim.width + fontSize * 0.4;
+            node.heightAbove = contentDim.heightAbove + fontSize * 0.05;
+            node.heightBelow = contentDim.heightBelow + fontSize * 0.05;
+        }
+        else if (node.type === 'group') {
+            const contentDim = measureNodes(ctx, node.content, fontSize);
+            node.width = contentDim.width;
+            node.heightAbove = contentDim.heightAbove;
+            node.heightBelow = contentDim.heightBelow;
+        }
+        else if (node.type === 'sub') {
+            const baseDim = measureNodes(ctx, [node.base], fontSize);
+            const subDim = measureNodes(ctx, node.sub, fontSize * 0.65);
+            node.width = baseDim.width + subDim.width + 2;
+            node.heightAbove = baseDim.heightAbove;
+            node.heightBelow = Math.max(baseDim.heightBelow, subDim.heightAbove + subDim.heightBelow);
+        }
+        else if (node.type === 'sup') {
+            const baseDim = measureNodes(ctx, [node.base], fontSize);
+            const expDim = measureNodes(ctx, node.exp, fontSize * 0.65);
+            node.width = baseDim.width + expDim.width + 2;
+            
+            node.heightAbove = Math.max(baseDim.heightAbove, baseDim.heightAbove * 0.6 + expDim.heightAbove + expDim.heightBelow);
+            node.heightBelow = baseDim.heightBelow;
+        }
+        
+        totalWidth += node.width;
+        maxHeightAbove = Math.max(maxHeightAbove, node.heightAbove);
+        maxHeightBelow = Math.max(maxHeightBelow, node.heightBelow);
+    });
+    
+    return {
+        width: totalWidth,
+        heightAbove: maxHeightAbove,
+        heightBelow: maxHeightBelow,
+        totalHeight: maxHeightAbove + maxHeightBelow
+    };
+}
+
+// Draw typeset LaTeX math nodes recursively
+function drawNodes(ctx, nodes, x, y, fontSize, color) {
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    
+    let currentX = x;
+    
+    nodes.forEach(node => {
+        if (node.type === 'text') {
+            const isVariable = /^[a-zA-Z]$/.test(node.value);
+            ctx.font = isVariable 
+                ? `italic ${fontSize}px 'KaTeX_Math', 'Outfit', -apple-system, sans-serif`
+                : `${fontSize}px 'KaTeX_Main', 'Outfit', -apple-system, sans-serif`;
+            ctx.textAlign = "left";
+            ctx.textBaseline = "alphabetic";
+            ctx.fillText(node.value, currentX, y);
+            currentX += node.width;
+        } 
+        else if (node.type === 'integral') {
+            const w = fontSize * 0.4;
+            const h = fontSize * 1.3;
+            
+            ctx.save();
+            ctx.lineWidth = fontSize * 0.085;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.strokeStyle = color;
+            
+            ctx.beginPath();
+            ctx.moveTo(currentX + w * 0.85, y - h * 0.42);
+            ctx.bezierCurveTo(currentX + w * 0.75, y - h * 0.5, currentX + w * 0.55, y - h * 0.5, currentX + w * 0.52, y - h * 0.3);
+            ctx.lineTo(currentX + w * 0.48, y + h * 0.3);
+            ctx.bezierCurveTo(currentX + w * 0.45, y + h * 0.5, currentX + w * 0.25, y + h * 0.5, currentX + w * 0.15, y + h * 0.42);
+            ctx.stroke();
+            ctx.restore();
+            
+            const limitFontSize = fontSize * 0.55;
+            
+            if (node.sub) {
+                const subX = currentX + w * 0.7;
+                const subY = y + h * 0.38;
+                drawNodes(ctx, node.sub, subX, subY, limitFontSize, color);
+            }
+            if (node.sup) {
+                const supX = currentX + w * 1.1;
+                const supY = y - h * 0.38;
+                drawNodes(ctx, node.sup, supX, supY, limitFontSize, color);
+            }
+            
+            currentX += node.width;
+        } 
+        else if (node.type === 'operator') {
+            const opFontSize = node.char === 'lim' ? fontSize : fontSize * 1.35;
+            ctx.font = `${opFontSize}px 'KaTeX_Main', 'Outfit', -apple-system, sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            
+            const limitFontSize = fontSize * 0.5;
+            const subDim = node.sub ? measureNodes(ctx, node.sub, limitFontSize) : { width: 0, heightAbove: 0, heightBelow: 0 };
+            const supDim = node.sup ? measureNodes(ctx, node.sup, limitFontSize) : { width: 0, heightAbove: 0, heightBelow: 0 };
+            
+            const centerX = currentX + node.width / 2;
+            const opY = y - fontSize * 0.15;
+            
+            ctx.fillStyle = color;
+            ctx.fillText(node.char, centerX, opY);
+            
+            const gap = fontSize * 0.08;
+            if (node.sub) {
+                const subY = opY + (opFontSize * 0.45) + subDim.heightAbove + gap;
+                drawNodes(ctx, node.sub, centerX - subDim.width / 2, subY, limitFontSize, color);
+            }
+            if (node.sup) {
+                const supY = opY - (opFontSize * 0.45) - supDim.heightBelow - gap;
+                drawNodes(ctx, node.sup, centerX - supDim.width / 2, supY, limitFontSize, color);
+            }
+            
+            ctx.textAlign = "left";
+            currentX += node.width;
+        }
+        else if (node.type === 'fraction') {
+            const numDim = measureNodes(ctx, node.num, fontSize * 0.85);
+            const denDim = measureNodes(ctx, node.den, fontSize * 0.85);
+            
+            const numX = currentX + (node.width - numDim.width) / 2;
+            const denX = currentX + (node.width - denDim.width) / 2;
+            
+            const gap = fontSize * 0.15;
+            const numY = y - gap - numDim.heightBelow - fontSize * 0.3;
+            const denY = y + gap + denDim.heightAbove - fontSize * 0.1;
+            
+            drawNodes(ctx, node.num, numX, numY, fontSize * 0.85, color);
+            drawNodes(ctx, node.den, denX, denY, fontSize * 0.85, color);
+            
+            ctx.lineWidth = Math.max(1, fontSize * 0.05);
+            ctx.beginPath();
+            const lineY = y - fontSize * 0.25;
+            ctx.moveTo(currentX, lineY);
+            ctx.lineTo(currentX + node.width, lineY);
+            ctx.stroke();
+            
+            currentX += node.width;
+        } 
+        else if (node.type === 'root') {
+            const contentDim = measureNodes(ctx, node.content, fontSize);
+            const symbolWidth = fontSize * 0.4;
+            
+            ctx.lineWidth = Math.max(1.5, fontSize * 0.05);
+            ctx.beginPath();
+            
+            const startY = y - fontSize * 0.2;
+            const dipY = y;
+            const topY = y - contentDim.heightAbove - fontSize * 0.05;
+            
+            ctx.moveTo(currentX, startY);
+            ctx.lineTo(currentX + symbolWidth * 0.3, dipY);
+            ctx.lineTo(currentX + symbolWidth * 0.7, topY);
+            ctx.lineTo(currentX + node.width, topY);
+            ctx.stroke();
+            
+            drawNodes(ctx, node.content, currentX + symbolWidth, y, fontSize, color);
+            currentX += node.width;
+        } 
+        else if (node.type === 'parentheses') {
+            const contentDim = measureNodes(ctx, node.content, fontSize);
+            ctx.lineWidth = Math.max(1.5, fontSize * 0.05);
+            
+            const bracketWidth = fontSize * 0.15;
+            const topY = y - contentDim.heightAbove;
+            const bottomY = y + contentDim.heightBelow;
+            
+            // Draw open parenthesis
+            ctx.beginPath();
+            ctx.arc(currentX + bracketWidth * 1.5, (topY + bottomY) / 2, (bottomY - topY) / 2, Math.PI * 0.75, Math.PI * 1.25);
+            ctx.stroke();
+            
+            drawNodes(ctx, node.content, currentX + bracketWidth * 1.5, y, fontSize, color);
+            
+            // Draw close parenthesis
+            ctx.beginPath();
+            ctx.arc(currentX + node.width - bracketWidth * 1.5, (topY + bottomY) / 2, (bottomY - topY) / 2, Math.PI * 1.75, Math.PI * 2.25);
+            ctx.stroke();
+            
+            currentX += node.width;
+        }
+        else if (node.type === 'group') {
+            drawNodes(ctx, node.content, currentX, y, fontSize, color);
+            currentX += node.width;
+        }
+        else if (node.type === 'sub') {
+            const baseDim = measureNodes(ctx, [node.base], fontSize);
+            const subFontSize = fontSize * 0.65;
+            
+            drawNodes(ctx, [node.base], currentX, y, fontSize, color);
+            
+            const subY = y + baseDim.heightBelow * 0.8 + subFontSize * 0.1;
+            drawNodes(ctx, node.sub, currentX + baseDim.width, subY, subFontSize, color);
+            
+            currentX += node.width;
+        }
+        else if (node.type === 'sup') {
+            const baseDim = measureNodes(ctx, [node.base], fontSize);
+            
+            drawNodes(ctx, [node.base], currentX, y, fontSize, color);
+            
+            const expY = y - baseDim.heightAbove * 0.45;
+            drawNodes(ctx, node.exp, currentX + baseDim.width, expY, fontSize * 0.65, color);
+            
+            currentX += node.width;
+        }
+    });
+}
+
+// Global variable to keep the current canvas blob URL and actual Blob object
+let currentShareImgUrl = null;
+let currentShareImgBlob = null;
+
+// Prepare the share image beforehand (called after evaluation is done)
+function prepareShareImage() {
+    currentShareImgUrl = null;
+    currentShareImgBlob = null;
+    const modalContent = document.getElementById("share-modal-content");
+    if (modalContent) {
+        modalContent.classList.add("loading");
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = 1200;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(2, 2);
+
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+
+    // Theme Colors matching style.css exactly
+    const bgColor = isDark ? "#0b0f19" : "#f9fafb";
+    const panelBg = isDark ? "#111827" : "#ffffff";
+    const borderColor = isDark ? "rgba(255, 255, 255, 0.08)" : "#e5e7eb";
+    const textColor = isDark ? "#f8fafc" : "#1e293b";
+    const textMuted = isDark ? "#94a3b8" : "#64748b";
+    const accentColor = isDark ? "#60a5fa" : "#3b82f6";
+    const primaryColor = isDark ? "#3b82f6" : "#2563eb";
+
+    // Used Digit Card Colors
+    const cardUsedBg = isDark ? "rgba(255, 255, 255, 0.05)" : "#f3f4f6";
+    const cardUsedBorder = isDark ? "rgba(255, 255, 255, 0.05)" : "#e5e7eb";
+    const cardUsedText = isDark ? "#4b5563" : "#d1d5db";
+
+    // 1. Draw page background
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, 600, 600);
+
+    // Helper for rounded rectangles
+    function roundRect(c, x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        c.beginPath();
+        c.moveTo(x + r, y);
+        c.arcTo(x + w, y, x + w, y + h, r);
+        c.arcTo(x + w, y + h, x, y + h, r);
+        c.arcTo(x, y + h, x, y, r);
+        c.arcTo(x, y, x + w, y, r);
+        c.closePath();
+    }
+
+    // 2. Draw Header (Logo)
+    ctx.fillStyle = textColor;
+    ctx.font = "bold 26px 'Outfit', -apple-system, sans-serif";
+    ctx.fillText("Make10", 40, 52);
+    ctx.fillStyle = primaryColor;
+    ctx.font = "bold 26px 'Outfit', -apple-system, sans-serif";
+    ctx.fillText("++", 136, 52);
+
+    // 3. Draw Game Board (.glass-panel)
+    ctx.shadowColor = isDark ? "rgba(0, 0, 0, 0.4)" : "rgba(0, 0, 0, 0.03)";
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetY = 4;
+    ctx.fillStyle = panelBg;
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1;
+    roundRect(ctx, 30, 80, 540, 440, 16); // Compact 440 height to fit new layout perfectly
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowColor = "transparent"; // reset
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    // 4. Available Digits Section (Medium cards)
+    ctx.fillStyle = textMuted;
+    ctx.font = "bold 14px 'Outfit', -apple-system, sans-serif";
+    ctx.fillText(TRANSLATIONS[currentLang].available_digits || "使える数字", 60, 118);
+
+    const digitGap = 14;
+    const digitSize = 76; // Medium size digits
+    const startX = 127; // centered: (540 - (4*76 + 3*14))/2 + 30 = 127
+    const startY = 132;
+
+    targetNumbers.forEach((num, index) => {
+        const x = startX + index * (digitSize + digitGap);
+
+        ctx.fillStyle = panelBg;
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, x, startY, digitSize, digitSize, 10);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = textColor;
+
+        ctx.font = "bold 28px 'Outfit', -apple-system, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(num.toString(), x + digitSize / 2, startY + digitSize / 2);
+    });
+
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+
+    // 5. Formula Input Section (Much Larger and LaTeX rendered)
+    ctx.fillStyle = textMuted;
+    ctx.font = "bold 14px 'Outfit', -apple-system, sans-serif";
+    ctx.fillText(TRANSLATIONS[currentLang].formula_input || "数式入力", 60, 240);
+
+    const inputX = 60;
+    const inputY = 255;
+    const inputW = 480;
+    const inputH = 120; // Height 120 for prominent, large formula layout
+
+    ctx.fillStyle = panelBg;
+    ctx.strokeStyle = accentColor;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, inputX, inputY, inputW, inputH, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    // Parse and render math formula inside input box as real LaTeX typeset
+    const rawLatex = mf.value || "";
+    
+    if (window.MathJax && window.MathJax.tex2svg) {
+        try {
+            const svgWrapper = window.MathJax.tex2svg(rawLatex);
+            const svgElement = svgWrapper.querySelector("svg");
+            
+            if (svgElement) {
+                // Set text color matching theme
+                svgElement.setAttribute("color", textColor);
+                svgElement.style.color = textColor;
+                svgElement.style.background = "transparent";
+                
+                // Get viewBox dimensions
+                const viewBox = svgElement.getAttribute("viewBox").split(" ");
+                const vbWidth = parseFloat(viewBox[2]);
+                const vbHeight = parseFloat(viewBox[3]);
+                
+                // Containment fit calculation to make formula fill the box space as much as possible
+                const maxW = inputW - 20;  // 460px (minimizing horizontal margins)
+                const maxH = inputH - 12;  // 108px (minimizing vertical margins)
+                
+                // Calculate scales for width and height constraints
+                const scaleX = maxW / vbWidth;
+                const scaleY = maxH / vbHeight;
+                let scale = Math.min(scaleX, scaleY);
+                
+                // Cap height to 104px (maximizes the formula size with a tight 8px padding top/bottom)
+                const maxRenderH = 104;
+                if (vbHeight * scale > maxRenderH) {
+                    scale = maxRenderH / vbHeight;
+                }
+                
+                let renderWidth = vbWidth * scale;
+                let renderHeight = vbHeight * scale;
+                
+                // Explicitly set 2x width and height on SVG element for high-res rasterization
+                svgElement.setAttribute("width", renderWidth * 2);
+                svgElement.setAttribute("height", renderHeight * 2);
+                
+                const svgString = new XMLSerializer().serializeToString(svgElement);
+                const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+                const url = URL.createObjectURL(svgBlob);
+                
+                const img = new Image();
+                img.onload = () => {
+                    const drawX = inputX + (inputW - renderWidth) / 2;
+                    const drawY = inputY + (inputH - renderHeight) / 2;
+                    ctx.drawImage(img, drawX, drawY, renderWidth, renderHeight);
+                    URL.revokeObjectURL(url);
+                    
+                    // Proceed to draw results card and watermark
+                    completeShareImageDrawing(canvas, ctx, isDark, textColor, textMuted, borderColor, primaryColor);
+                };
+                img.onerror = (e) => {
+                    console.error("Failed to load MathJax SVG image, falling back to custom renderer:", e);
+                    URL.revokeObjectURL(url);
+                    runFallbackRenderer();
+                };
+                img.src = url;
+                return; // asynchronous flow handles the rest
+            }
+        } catch (err) {
+            console.error("MathJax rendering failed, falling back:", err);
+        }
+    }
+    
+    // Fallback renderer if MathJax is not loaded or fails
+    runFallbackRenderer();
+    
+    function runFallbackRenderer() {
+        const cleanLatex = preprocessLatex(rawLatex);
+        const parsedNodes = parseLatex(cleanLatex);
+
+        let formulaFontSize = 44;
+        let formulaDim = measureNodes(ctx, parsedNodes, formulaFontSize);
+        while (formulaDim.width > inputW - 40 && formulaFontSize > 14) {
+            formulaFontSize -= 2;
+            formulaDim = measureNodes(ctx, parsedNodes, formulaFontSize);
+        }
+
+        const formulaStartX = inputX + (inputW - formulaDim.width) / 2;
+        const formulaY = inputY + inputH / 2 + formulaFontSize * 0.18;
+
+        drawNodes(ctx, parsedNodes, formulaStartX, formulaY, formulaFontSize, textColor);
+        
+        completeShareImageDrawing(canvas, ctx, isDark, textColor, textMuted, borderColor, primaryColor);
+    }
+}
+
+// Draw the rest of the canvas (results section, watermark, convert to Blob)
+function completeShareImageDrawing(canvas, ctx, isDark, textColor, textMuted, borderColor, primaryColor) {
+    const valText = currentValue.textContent.trim();
+    const isSuccess = statusCard.classList.contains("success-card");
+    const isError = statusCard.classList.contains("error-card");
+    const badgeX = 60;
+    const badgeY = 410;
+    const badgeW = 480;
+    const badgeH = 80;
+
+    let resultCardBg, resultCardBorder, resultLabelColor, resultValueColor, feedbackTextColor;
+    
+    if (isSuccess) {
+        resultCardBg = isDark ? "rgba(6, 78, 59, 0.15)" : "#ecfdf5";
+        resultCardBorder = isDark ? "rgba(16, 185, 129, 0.25)" : "#a7f3d0";
+        resultLabelColor = isDark ? "#34d399" : "#047857";
+        resultValueColor = isDark ? "#ffffff" : "#065f46";
+        feedbackTextColor = isDark ? "#34d399" : "#065f46";
+    } else if (isError) {
+        resultCardBg = isDark ? "rgba(127, 29, 29, 0.15)" : "#fef2f2";
+        resultCardBorder = isDark ? "rgba(239, 68, 68, 0.25)" : "#fecaca";
+        resultLabelColor = isDark ? "#f87171" : "#b91c1c";
+        resultValueColor = isDark ? "#ffffff" : "#991b1b";
+        feedbackTextColor = isDark ? "#f87171" : "#991b1b";
+    } else {
+        resultCardBg = isDark ? "rgba(255, 255, 255, 0.02)" : "#f9fafb";
+        resultCardBorder = borderColor;
+        resultLabelColor = textMuted;
+        resultValueColor = textColor;
+        feedbackTextColor = textColor;
+    }
+
+    ctx.fillStyle = resultCardBg;
+    ctx.strokeStyle = resultCardBorder;
+    ctx.lineWidth = 1;
+    
+    function roundRect(c, x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        c.beginPath();
+        c.moveTo(x + r, y);
+        c.arcTo(x + w, y, x + w, y + h, r);
+        c.arcTo(x + w, y + h, x, y + h, r);
+        c.arcTo(x, y + h, x, y, r);
+        c.arcTo(x, y, x + w, y, r);
+        c.closePath();
+    }
+
+    roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = resultLabelColor;
+    ctx.font = "500 13px 'Outfit', -apple-system, sans-serif";
+    ctx.fillText(TRANSLATIONS[currentLang].current_value_label || "現在の値", badgeX + 20, badgeY + 28);
+
+    ctx.fillStyle = resultValueColor;
+    ctx.font = "bold 22px 'JetBrains Mono', monospace";
+    ctx.textAlign = "right";
+    ctx.fillText(valText, badgeX + badgeW - 20, badgeY + 30);
+
+    ctx.textAlign = "left";
+    ctx.fillStyle = feedbackTextColor;
+    ctx.font = "bold 13px 'Outfit', -apple-system, sans-serif";
+    
+    function drawWrappedText(c, text, x, y, maxWidth, lineHeight) {
+        const hasCJK = /[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/.test(text);
+        let tokens = hasCJK ? text.split("") : text.split(" ");
+        let line = "";
+        let currentY = y;
+        
+        for (let n = 0; n < tokens.length; n++) {
+            let nextTok = tokens[n];
+            let testLine = line + (hasCJK || line === "" ? "" : " ") + nextTok;
+            let metrics = c.measureText(testLine);
+            if (metrics.width > maxWidth && n > 0) {
+                c.fillText(line, x, currentY);
+                line = nextTok;
+                currentY += lineHeight;
+            } else {
+                line = testLine;
+            }
+        }
+        c.fillText(line, x, currentY);
+    }
+
+    drawWrappedText(ctx, feedbackMsg.textContent, badgeX + 20, badgeY + 54, badgeW - 40, 16);
+
+    // 7. Watermark
+    ctx.fillStyle = textMuted;
+    ctx.font = "12px 'Outfit', sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText("make10.app", 570, 560);
+
+    function onShareImageReady() {
+        const modalContent = document.getElementById("share-modal-content");
+        if (modalContent) {
+            modalContent.classList.remove("loading");
+        }
+    }
+
+    // 8. Convert to Blob
+    try {
+        if (typeof canvas.toBlob === "function") {
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    currentShareImgBlob = blob;
+                    if (currentShareImgUrl && currentShareImgUrl.startsWith("blob:")) {
+                        URL.revokeObjectURL(currentShareImgUrl);
+                    }
+                    currentShareImgUrl = URL.createObjectURL(blob);
+                    if (shareModalImg) {
+                        shareModalImg.src = currentShareImgUrl;
+                    }
+                    onShareImageReady();
+                } else {
+                    useDataURLFallback();
+                }
+            }, "image/png");
+        } else {
+            useDataURLFallback();
+        }
+    } catch (e) {
+        console.warn("toBlob failed in preparation, falling back to dataURL:", e);
+        useDataURLFallback();
+    }
+
+    function useDataURLFallback() {
+        try {
+            currentShareImgUrl = canvas.toDataURL("image/png");
+            if (shareModalImg) {
+                shareModalImg.src = currentShareImgUrl;
+            }
+            onShareImageReady();
+        } catch (err) {
+            console.error("DataURL fallback failed in preparation:", err);
+            onShareImageReady(); // hide loading anyway on error
+        }
+    }
+}
+
+// Generate beautiful share card canvas and open the modal (no auto-download)
+function downloadShareImage() {
+    if (!currentShareImgUrl) {
+        prepareShareImage();
+    }
+    
+    // Open the modal first as requested by user
+    if (shareModal) {
+        shareModal.classList.add("active");
+    }
+}
+
+// Close Share Modal Function
+function closeShareModalOverlay() {
+    if (shareModal) {
+        shareModal.classList.remove("active");
+    }
+}
+
+// Trigger Direct File Download (synchronous link click)
+function triggerDirectDownload() {
+    if (!currentShareImgUrl) return;
+    try {
+        const link = document.createElement("a");
+        link.download = `make10-result-${targetNumbers.join("")}.png`;
+        link.href = currentShareImgUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+        console.error("Direct download failed, opening in new tab:", e);
+        window.open(currentShareImgUrl, "_blank");
+    }
+}
+
+// Copy generated share image to clipboard (using Clipboard API)
+async function copyShareImageToClipboard() {
+    try {
+        let blobToCopy = currentShareImgBlob;
+        if (!blobToCopy && currentShareImgUrl) {
+            const response = await fetch(currentShareImgUrl);
+            blobToCopy = await response.blob();
+        }
+        
+        if (!blobToCopy) {
+            alert("画像のコピーに失敗しました。画像の作成が完了していません。");
+            return;
+        }
+        
+        const item = new ClipboardItem({ "image/png": blobToCopy });
+        await navigator.clipboard.write([item]);
+        
+        if (shareModalCopyBtn) {
+            const originalText = shareModalCopyBtn.textContent;
+            shareModalCopyBtn.textContent = TRANSLATIONS[currentLang].copied || "コピーしました！";
+            shareModalCopyBtn.style.backgroundColor = "#10b981"; // Success green
+            shareModalCopyBtn.style.borderColor = "#10b981";
+            shareModalCopyBtn.style.color = "#ffffff";
+            setTimeout(() => {
+                shareModalCopyBtn.textContent = originalText;
+                shareModalCopyBtn.style.backgroundColor = ""; // Reset
+                shareModalCopyBtn.style.borderColor = "";
+                shareModalCopyBtn.style.color = "";
+            }, 2000);
+        }
+    } catch (err) {
+        console.error("Clipboard copy failed:", err);
+        alert("画像のコピーに失敗しました。ブラウザのセキュリティ制限または非対応環境（一部のアプリ内ブラウザ等）の可能性があります。画像を長押しして直接保存してください。");
+    }
+}
+
+// Bind Share Modal Event Listeners
+if (shareImgBtn) {
+    shareImgBtn.addEventListener("click", downloadShareImage);
+}
+if (closeShareModal) {
+    closeShareModal.addEventListener("click", closeShareModalOverlay);
+}
+if (shareModal) {
+    shareModal.addEventListener("click", (e) => {
+        if (e.target === shareModal) {
+            closeShareModalOverlay();
+        }
+    });
+}
+if (shareModalDownloadBtn) {
+    shareModalDownloadBtn.addEventListener("click", triggerDirectDownload);
+}
+if (shareModalCopyBtn) {
+    shareModalCopyBtn.addEventListener("click", copyShareImageToClipboard);
+}

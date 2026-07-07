@@ -1,0 +1,24 @@
+{
+  "name": "Make10++",
+  "short_name": "Make10++",
+  "description": "四則演算から積分・微分まで、どんな数学記号を使っても10が作れる！知的で美しい数学パズルゲーム。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b0f19",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

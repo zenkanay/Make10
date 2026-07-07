@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Netlify local development files
+.netlify/
+
+# OS templates
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

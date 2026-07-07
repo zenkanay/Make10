@@ -5,38 +5,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Make10++</title>
-  <meta name="description" content="Make10++: 四則演算から積分・微分まで、どんな数式を使っても「10」を作る新感覚数学パズルゲーム！">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="manifest" href="manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#4f46e5">
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Make10++ - 数式で10を作る新感覚数学パズル">
-  <meta property="og:description" content="四則演算から積分・微分まで、どんな数学記号を使っても10が作れる！知的で美しい数学パズルゲーム。">
-  <meta property="og:image" content="apple-touch-icon.png">
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:title" content="Make10++ - 数式で10を作る新感覚数学パズル">
-  <meta property="twitter:description" content="四則演算から積分・微分まで、どんな数学記号を使っても10が作れる！知的で美しい数学パズルゲーム。">
-  <meta property="twitter:image" content="apple-touch-icon.png">
-
   <!-- Google Fonts: Outfit & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=52">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
-  <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
+  <link rel="stylesheet" href="css/style.css?v=15">
+  <!-- MathLive & Compute Engine -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.98.0/dist/mathlive.min.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
-  <!-- MathJax for vector LaTeX SVG rendering -->
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" defer></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 </head>
@@ -44,29 +22,21 @@
 <body>
   <div class="app-container">
     <header class="app-header">
-      <a href="./" class="logo" aria-label="Make10++ Home">
+      <div class="logo">
         <span class="logo-math">Make10</span>
         <span class="logo-make10">++</span>
-      </a>
-      <div class="header-actions">
-        <button id="help-btn" class="secondary-btn api-settings-btn" aria-label="ヘルプ" data-i18n-aria-label="help_btn_aria">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-        </button>
-        <button id="settings-btn" class="secondary-btn api-settings-btn" aria-label="設定" data-i18n-aria-label="settings_btn_aria">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path
-              d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z">
-            </path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-        </button>
       </div>
+      <button id="settings-btn" class="secondary-btn api-settings-btn" aria-label="設定" data-i18n-aria-label="settings_btn_aria">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          style="margin-right: 6px;">
+          <path
+            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z">
+          </path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <span data-i18n="settings_btn">設定</span>
+      </button>
     </header>
 
     <main class="game-board glass-panel">
@@ -75,7 +45,7 @@
         <div class="mode-select-wrapper">
           <label for="difficulty-select" class="control-label" data-i18n="difficulty_label">難易度</label>
           <select id="difficulty-select" class="custom-select">
-            <option value="easy" data-i18n="easy">Easy (簡単)</option>
+            <option value="easy" data-i18n="easy">Easy (四則演算)</option>
             <option value="medium" selected data-i18n="medium">Medium (標準)</option>
             <option value="hard" data-i18n="hard">Hard (難問)</option>
             <option value="random" data-i18n="random_mode">Random (完全ランダム)</option>
@@ -134,17 +104,6 @@
             <span id="current-value" class="result-value">---</span>
           </div>
           <div id="feedback-msg" class="feedback-msg" data-i18n="msg_enter_formula">数式を入力してください</div>
-        </div>
-
-        <div id="result-actions" class="result-actions hidden">
-          <button id="share-img-btn" class="secondary-btn share-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              style="margin-right: 6px; vertical-align: middle;">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
-            </svg>
-            <span data-i18n="share_img_btn">結果を画像で保存</span>
-          </button>
         </div>
 
         <div class="details-accordion">
@@ -207,7 +166,11 @@
             APIキーを設定すると、SymPyで計算できない超複雑な数式（一部の極限、解析的に解けない積分、任意の特殊関数など）をGeminiが正しく判定できるようになります。
             ※キーはブラウザのLocalStorageにのみ保存されます。
           </p>
-      </div>
+        </div>
+        <div class="setting-group">
+          <label for="backend-url-input" class="setting-label" data-i18n="backend_url_label">バックエンドサーバー URL</label>
+          <input type="text" id="backend-url-input" value="http://localhost:8000" class="text-input">
+        </div>
       </div>
       <div class="modal-footer">
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
@@ -215,56 +178,7 @@
     </div>
   </div>
 
-  <!-- ヘルプモーダル -->
-  <div id="help-modal" class="modal-overlay hidden">
-    <div class="modal-content glass-panel">
-      <div class="modal-header">
-        <h3 data-i18n="help_title">Make10++ の遊び方</h3>
-        <button id="close-help-btn" class="modal-close-btn" aria-label="閉じる" data-i18n-aria-label="close_help_btn_aria">✕</button>
-      </div>
-      <div class="modal-body help-modal-body">
-        <section class="help-section">
-          <h4 data-i18n="help_section_rules">基本ルール</h4>
-          <p data-i18n="help_rule_1">提示された4つの数字をすべて1回ずつ使い、計算結果が「10」になる数式を作ります。</p>
-          <p data-i18n="help_rule_2">通常の四則演算（＋, －, ×, ÷）だけでなく、平方根や階乗などの数学記号を使うことも可能です。</p>
-        </section>
-        <section class="help-section">
-        <section class="help-section">
-          <h4 data-i18n="help_section_tips">Tips</h4>
-          <p data-i18n="help_tip_1">数字カードをタップすると、その数字が数式入力欄に自動で挿入されます。</p>
-          <p data-i18n="help_tip_2">難易度「Hard」は、四則演算だけでは絶対に解けません。積極的に「√」や「!」などを使いましょう！</p>
-        </section>
-      </div>
-    </div>
-  </div>
-
-  <!-- 画像シェアモーダル -->
-  <div id="share-modal" class="share-modal-overlay">
-    <div id="share-modal-content" class="share-modal-content">
-      <button id="close-share-modal" class="close-share-modal">&times;</button>
-      <h3 class="share-modal-title" data-i18n="share_modal_title">画像を保存する</h3>
-      <div class="share-modal-img-wrapper">
-        <img id="share-modal-img" class="share-modal-img" alt="Make10 Result">
-        <div class="spinner"></div>
-      </div>
-      <p class="share-modal-help" data-i18n="share_modal_help">画像を長押し、または右クリックして保存してください。</p>
-      <div class="share-modal-buttons">
-        <button id="share-modal-copy-btn" class="secondary-btn" data-i18n="share_modal_copy">画像をコピー</button>
-        <button id="share-modal-download-btn" class="primary-btn" data-i18n="share_modal_download">直接ダウンロード</button>
-      </div>
-    </div>
-  </div>
-
-  <script type="module" src="js/script.js?v=52"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=52')
-          .then(reg => console.log('Service Worker registered successfully.', reg.scope))
-          .catch(err => console.error('Service Worker registration failed.', err));
-      });
-    }
-  </script>
+  <script type="module" src="js/script.js?v=21"></script>
 </body>
 
 </html>
