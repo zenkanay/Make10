@@ -853,7 +853,8 @@ function initSettings() {
                 }
                 setKeyboardMode('standard');
                 
-                // Add visual focus class and trigger focus
+                // Disable readonly to allow typing, add focus styles and trigger focus
+                mf.readOnly = false;
                 mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             }
@@ -889,11 +890,13 @@ function initSettings() {
                 // Close virtual KB → no keyboard (don't open standard KB)
                 window.mathVirtualKeyboard.hide();
                 setKeyboardMode('none');
+                mf.readOnly = true;
                 if (mathContainer) mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             } else {
                 // Open virtual KB → close standard KB first
                 setKeyboardMode('none');
+                mf.readOnly = false;
                 mf.blur();
                 setTimeout(() => {
                     window.mathVirtualKeyboard.show();
@@ -915,9 +918,10 @@ function initSettings() {
             
             if (goingToMf) return;
 
-            // 完全にはずれた場合のみ青枠を消す
-            if (!goingToToggle && mathContainer) {
-                mathContainer.classList.remove('focused');
+            // 完全にはずれた場合のみ青枠を消し、読み取り専用に戻す
+            if (!goingToToggle) {
+                mf.readOnly = true;
+                if (mathContainer) mathContainer.classList.remove('focused');
             }
 
             if (goingToToggle) return;
@@ -1659,6 +1663,7 @@ function resetGame() {
     } else {
         mf.value = "";
     }
+    mf.readOnly = true;
     clickedIndices = [];
     latexCode.textContent = "";
     currentValue.textContent = "---";
@@ -2855,9 +2860,7 @@ function completeShareImageDrawing(canvas, ctx, isDark, textColor, textMuted, bo
 
 // Generate beautiful share card canvas and open the modal (no auto-download)
 function downloadShareImage() {
-    if (!currentShareImgUrl) {
-        prepareShareImage();
-    }
+    prepareShareImage();
     
     // Open the modal first as requested by user
     if (shareModal) {
