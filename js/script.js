@@ -732,43 +732,53 @@ function initSettings() {
     };
 
     // --- Standard OS keyboard support ---
-    // MathLive forces inputmode="none" on its internal textarea, preventing the OS keyboard.
-    // We use setInterval to continuously override it when the virtual keyboard is NOT visible.
-    let osKeyboardInterval = null;
+    // MathLive internally calls textarea.setAttribute("inputmode", "none") to block the OS keyboard.
+    // We override setAttribute on the shadow DOM textarea to intercept and block this call
+    // when the virtual keyboard is not open.
+    let allowInputmodeNone = false;
 
-    function startOSKeyboardMode() {
-        stopOSKeyboardMode(); // clear any existing interval
-        osKeyboardInterval = setInterval(() => {
-            const textarea = mf.shadowRoot?.querySelector('textarea');
-            if (textarea && textarea.getAttribute('inputmode') !== 'text') {
-                textarea.setAttribute('inputmode', 'text');
-                textarea.inputMode = 'text';
-            }
-        }, 30);
-        // Also force immediately
+    function patchShadowTextarea() {
         const textarea = mf.shadowRoot?.querySelector('textarea');
-        if (textarea) {
-            textarea.setAttribute('inputmode', 'text');
-            textarea.inputMode = 'text';
+        if (!textarea || textarea.__patched) return;
+        textarea.__patched = true;
+
+        const origSetAttr = textarea.setAttribute.bind(textarea);
+        textarea.setAttribute = function(name, value) {
+            if (name === 'inputmode' && value === 'none' && !allowInputmodeNone) {
+                // Block MathLive from disabling the OS keyboard
+                origSetAttr('inputmode', 'text');
+                return;
+            }
+            origSetAttr(name, value);
+        };
+
+        // Also intercept the inputMode property setter
+        const proto = Object.getPrototypeOf(textarea);
+        const descriptor = Object.getOwnPropertyDescriptor(proto, 'inputMode');
+        if (descriptor) {
+            Object.defineProperty(textarea, 'inputMode', {
+                get: () => textarea.getAttribute('inputmode') || 'text',
+                set: (val) => {
+                    if (val === 'none' && !allowInputmodeNone) {
+                        textarea.setAttribute('inputmode', 'text');
+                    } else {
+                        descriptor.set?.call(textarea, val);
+                    }
+                },
+                configurable: true
+            });
         }
+
+        // Set initial value
+        origSetAttr('inputmode', 'text');
     }
 
-    function stopOSKeyboardMode() {
-        if (osKeyboardInterval !== null) {
-            clearInterval(osKeyboardInterval);
-            osKeyboardInterval = null;
-        }
+    // Patch as soon as shadow DOM is ready
+    if (mf.shadowRoot) {
+        patchShadowTextarea();
+    } else {
+        setTimeout(patchShadowTextarea, 200);
     }
-
-    mf.addEventListener("focus", () => {
-        if (!window.mathVirtualKeyboard?.visible) {
-            startOSKeyboardMode();
-        }
-    });
-
-    mf.addEventListener("blur", () => {
-        stopOSKeyboardMode();
-    });
 
     // Custom virtual keyboard toggle button
     const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
@@ -780,9 +790,12 @@ function initSettings() {
 
             if (window.mathVirtualKeyboard.visible) {
                 window.mathVirtualKeyboard.hide();
-                setTimeout(startOSKeyboardMode, 50);
+                allowInputmodeNone = false;
+                // Restore OS keyboard mode
+                const textarea = mf.shadowRoot?.querySelector('textarea');
+                if (textarea) textarea.setAttribute('inputmode', 'text');
             } else {
-                stopOSKeyboardMode();
+                allowInputmodeNone = true;
                 window.mathVirtualKeyboard.show();
             }
             mf.focus();
