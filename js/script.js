@@ -723,6 +723,7 @@ function initSettings() {
     mf.menuItems = [];
     mf.mathVirtualKeyboardPolicy = "manual";
     mf.setAttribute("math-virtual-keyboard-policy", "manual");
+    mf.setAttribute("inputmode", "text"); // Default to standard OS keyboard
 
     // Add custom inline shortcuts for ceil and floor functions
     mf.inlineShortcuts = {
@@ -730,6 +731,34 @@ function initSettings() {
         'ceil': '\\lceil #? \\rceil',
         'floor': '\\lfloor #? \\rfloor'
     };
+
+    // Custom virtual keyboard toggle (triggered on click/pointerup instead of pointerdown)
+    const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
+    if (customKeyboardToggle) {
+        customKeyboardToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!window.mathVirtualKeyboard) return;
+
+            if (window.mathVirtualKeyboard.visible) {
+                window.mathVirtualKeyboard.hide();
+                mf.setAttribute("inputmode", "text"); // Re-enable standard keyboard
+            } else {
+                mf.setAttribute("inputmode", "none"); // Prevent standard keyboard overlap
+                window.mathVirtualKeyboard.show();
+            }
+            mf.focus();
+        });
+    }
+
+    // Scroll reset on focus loss to fix mobile viewport layout shifts
+    mf.addEventListener("blur", () => {
+        setTimeout(() => {
+            if (!window.mathVirtualKeyboard || !window.mathVirtualKeyboard.visible) {
+                window.scrollTo(0, 0);
+            }
+        }, 100);
+    });
 
 
 
@@ -742,6 +771,7 @@ function initSettings() {
         const handleKeyboardVisibility = () => {
             if (window.mathVirtualKeyboard.visible) {
                 document.body.classList.add("keyboard-visible");
+                mf.setAttribute("inputmode", "none"); // Disable OS keyboard overlap
                 // Refocus math-field to prevent focus loss from layout shifts
                 setTimeout(() => {
                     mf.focus();
@@ -752,6 +782,11 @@ function initSettings() {
                 }, 80);
             } else {
                 document.body.classList.remove("keyboard-visible");
+                mf.setAttribute("inputmode", "text"); // Restore OS keyboard
+                // Scroll reset to fix mobile browser layout shift bugs (especially on iOS/Brave/Chrome)
+                setTimeout(() => {
+                    window.scrollTo(0, 0);
+                }, 100);
             }
         };
         window.mathVirtualKeyboard.addEventListener("geometrychange", handleKeyboardVisibility);

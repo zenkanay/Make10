@@ -507,6 +507,7 @@ math-field {
   outline: none;
   --keyboard-zindex: 1000;
   border: none;
+  padding-right: 40px; /* Prevents text overlap with custom keyboard toggle */
 }
 
 /* Results Section */
@@ -1050,9 +1051,38 @@ body.keyboard-visible {
   }
 }
 
-/* Ensure virtual keyboard toggle button is always reachable */
+/* Disable default virtual keyboard toggle button in MathLive */
 math-field::part(virtual-keyboard-toggle) {
-  display: flex !important;
+  display: none !important;
+}
+
+/* Custom virtual keyboard toggle button */
+.keyboard-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  z-index: 5;
+  transition: var(--transition);
+}
+
+.keyboard-toggle-btn:hover {
+  color: var(--primary);
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.keyboard-toggle-btn svg {
+  stroke: currentColor;
+  transition: var(--transition);
 }
 
 /* Result Actions & Share Button */
