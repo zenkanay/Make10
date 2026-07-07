@@ -732,20 +732,21 @@ function initSettings() {
     };
 
     // --- Standard OS keyboard support ---
-    // MathLive internally calls textarea.setAttribute("inputmode", "none") to block the OS keyboard.
-    // We override setAttribute on the shadow DOM textarea to intercept and block this call
-    // when the virtual keyboard is not open.
+    // MathLive uses a <span class="ML__keyboard-sink" contenteditable inputmode=none> in its shadow DOM.
+    // This element is created once and never recreated, so we just need to patch it once.
     let allowInputmodeNone = false;
 
-    function patchShadowTextarea() {
-        const textarea = mf.shadowRoot?.querySelector('textarea');
-        if (!textarea || textarea.__patched) return;
-        textarea.__patched = true;
+    function patchKeyboardSink() {
+        // Try both the shadow root and the light DOM
+        const sink = mf.shadowRoot?.querySelector('.ML__keyboard-sink')
+                  || mf.querySelector('.ML__keyboard-sink');
+        if (!sink || sink.__patched) return false;
+        sink.__patched = true;
 
-        const origSetAttr = textarea.setAttribute.bind(textarea);
-        textarea.setAttribute = function(name, value) {
+        // Override setAttribute to intercept inputmode="none"
+        const origSetAttr = sink.setAttribute.bind(sink);
+        sink.setAttribute = function(name, value) {
             if (name === 'inputmode' && value === 'none' && !allowInputmodeNone) {
-                // Block MathLive from disabling the OS keyboard
                 origSetAttr('inputmode', 'text');
                 return;
             }
@@ -753,32 +754,34 @@ function initSettings() {
         };
 
         // Also intercept the inputMode property setter
-        const proto = Object.getPrototypeOf(textarea);
+        const proto = Object.getPrototypeOf(sink);
         const descriptor = Object.getOwnPropertyDescriptor(proto, 'inputMode');
         if (descriptor) {
-            Object.defineProperty(textarea, 'inputMode', {
-                get: () => textarea.getAttribute('inputmode') || 'text',
+            Object.defineProperty(sink, 'inputMode', {
+                get: () => sink.getAttribute('inputmode') || 'text',
                 set: (val) => {
                     if (val === 'none' && !allowInputmodeNone) {
-                        textarea.setAttribute('inputmode', 'text');
+                        origSetAttr('inputmode', 'text');
                     } else {
-                        descriptor.set?.call(textarea, val);
+                        descriptor.set?.call(sink, val);
                     }
                 },
                 configurable: true
             });
         }
 
-        // Set initial value
+        // Set immediately
         origSetAttr('inputmode', 'text');
+        console.log('[Make10] Patched ML__keyboard-sink inputmode -> text');
+        return true;
     }
 
-    // Patch as soon as shadow DOM is ready
-    if (mf.shadowRoot) {
-        patchShadowTextarea();
-    } else {
-        setTimeout(patchShadowTextarea, 200);
+    // Try to patch immediately, then retry until found
+    function tryPatch(attempts = 0) {
+        if (patchKeyboardSink()) return;
+        if (attempts < 20) setTimeout(() => tryPatch(attempts + 1), 100);
     }
+    tryPatch();
 
     // Custom virtual keyboard toggle button
     const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
@@ -791,9 +794,10 @@ function initSettings() {
             if (window.mathVirtualKeyboard.visible) {
                 window.mathVirtualKeyboard.hide();
                 allowInputmodeNone = false;
-                // Restore OS keyboard mode
-                const textarea = mf.shadowRoot?.querySelector('textarea');
-                if (textarea) textarea.setAttribute('inputmode', 'text');
+                // Restore OS keyboard
+                const sink = mf.shadowRoot?.querySelector('.ML__keyboard-sink')
+                          || mf.querySelector('.ML__keyboard-sink');
+                if (sink) sink.setAttribute('inputmode', 'text');
             } else {
                 allowInputmodeNone = true;
                 window.mathVirtualKeyboard.show();
