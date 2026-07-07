@@ -10,12 +10,13 @@ const generateBtn = document.getElementById("generate-btn");
 const clearBtn = document.getElementById("clear-btn");
 const evaluateBtn = document.getElementById("evaluate-btn");
 const resultActions = document.getElementById("result-actions");
-const shareImgBtn = document.getElementById("share-img-btn");
+const headerShareBtn = document.getElementById("header-share-btn");
 const shareModal = document.getElementById("share-modal");
 const shareModalImg = document.getElementById("share-modal-img");
 const closeShareModal = document.getElementById("close-share-modal");
 const shareModalDownloadBtn = document.getElementById("share-modal-download-btn");
 const shareModalCopyBtn = document.getElementById("share-modal-copy-btn");
+const shareModalUrlBtn = document.getElementById("share-modal-url-btn");
 const difficultySelect = document.getElementById("difficulty-select");
 
 // Custom numbers section elements
@@ -138,11 +139,11 @@ const TRANSLATIONS = {
         msg_backend_offline: "エラー: バックエンドサーバーに接続できません。サーバーの起動状態を確認してください。",
         err_label: "エラー",
         alert_custom_invalid: "0から9の範囲で4つの数字を入力してください。",
-        share_img_btn: "結果を画像で保存",
-        share_modal_title: "画像を保存する",
-        share_modal_help: "画像を長押し、または右クリックして保存してください。",
+        share_modal_title: "結果の共有",
         share_modal_copy: "画像をコピー",
-        share_modal_download: "直接ダウンロード",
+        share_modal_download: "ダウンロード",
+        share_modal_url: "ゲームのURLをコピー",
+        msg_url_copied: "URLをコピーしました！",
         copied: "コピーしました！",
         help_btn: "ヘルプ",
         help_btn_aria: "ヘルプを開く",
@@ -218,11 +219,11 @@ const TRANSLATIONS = {
         msg_eval_failed: "Failed to evaluate formula: {explanation}",
         msg_backend_offline: "Error: Cannot connect to the backend server. Please check the server status.",
         alert_custom_invalid: "Please enter 4 digits between 0 and 9.",
-        share_img_btn: "Save Result as Image",
-        share_modal_title: "Save Image",
-        share_modal_help: "Long-press or right-click the image to save.",
+        share_modal_title: "Share Result",
         share_modal_copy: "Copy Image",
-        share_modal_download: "Direct Download",
+        share_modal_download: "Download",
+        share_modal_url: "Copy Game URL",
+        msg_url_copied: "URL Copied!",
         copied: "Copied!",
         help_btn: "Help",
         help_btn_aria: "Open help",
@@ -297,11 +298,11 @@ const TRANSLATIONS = {
         msg_backend_offline: "错误：无法连接到后端服务器。请检查服务器启动状态。",
         err_label: "错误",
         alert_custom_invalid: "请输入0到9之间的4个数字。",
-        share_img_btn: "保存结果为图片",
-        share_modal_title: "保存图片",
-        share_modal_help: "长按或右键单击图片进行保存。",
+        share_modal_title: "分享结果",
         share_modal_copy: "复制图片",
-        share_modal_download: "直接下载",
+        share_modal_download: "下载",
+        share_modal_url: "复制游戏链接",
+        msg_url_copied: "链接已复制！",
         copied: "已复制！",
         help_btn: "帮助",
         help_btn_aria: "打开帮助",
@@ -376,11 +377,11 @@ const TRANSLATIONS = {
         msg_backend_offline: "오류: 백엔드 서버에 연결할 수 없습니다. 서버의 기동 상태를 확인하세요.",
         err_label: "오류",
         alert_custom_invalid: "0에서 9 사이의 4자리 숫자를 입력해 주세요.",
-        share_img_btn: "결과를 이미지로 저장",
-        share_modal_title: "이미지 저장",
-        share_modal_help: "이미지를 길게 누르거나 우클릭하여 저장하세요.",
+        share_modal_title: "결과 공유",
         share_modal_copy: "이미지 복사",
-        share_modal_download: "직접 다운로드",
+        share_modal_download: "다운로드",
+        share_modal_url: "게임 URL 복사",
+        msg_url_copied: "URL 복사 완료!",
         copied: "복사되었습니다!",
         help_btn: "도움말",
         help_btn_aria: "도움말 열기",
@@ -455,11 +456,11 @@ const TRANSLATIONS = {
         msg_backend_offline: "Error: No se puede conectar al servidor backend. Verifica el estado del servidor.",
         err_label: "Error",
         alert_custom_invalid: "Introduce 4 dígitos entre 0 y 9.",
-        share_img_btn: "Guardar resultado como imagen",
-        share_modal_title: "Guardar imagen",
-        share_modal_help: "Mantén pulsada o haz clic derecho en la imagen para guardar.",
-        share_modal_copy: "Copiar imagen",
-        share_modal_download: "Descarga directa",
+        share_modal_title: "Compartir Resultado",
+        share_modal_copy: "Copiar Imagen",
+        share_modal_download: "Descargar",
+        share_modal_url: "Copiar enlace del juego",
+        msg_url_copied: "¡Enlace copiado!",
         copied: "¡Copiado!",
         help_btn: "Ayuda",
         help_btn_aria: "Abrir ayuda",
@@ -534,11 +535,11 @@ const TRANSLATIONS = {
         msg_backend_offline: "Erreur : Connexion impossible au serveur backend. Veuillez vérifier son état.",
         err_label: "Erreur",
         alert_custom_invalid: "Veuillez entrer 4 chiffres entre 0 et 9.",
-        share_img_btn: "Enregistrer le résultat en image",
-        share_modal_title: "Enregistrer l'image",
-        share_modal_help: "Appuyez longuement ou faites un clic droit sur l'image pour l'enregistrer.",
-        share_modal_copy: "Copier l'image",
-        share_modal_download: "Téléchargement direct",
+        share_modal_title: "Partager le Résultat",
+        share_modal_copy: "Copier l'Image",
+        share_modal_download: "Télécharger",
+        share_modal_url: "Copier le lien du jeu",
+        msg_url_copied: "Lien copié !",
         copied: "Copié !",
         help_btn: "Aide",
         help_btn_aria: "Ouvrir l'aide",
@@ -613,11 +614,11 @@ const TRANSLATIONS = {
         msg_backend_offline: "Fehler: Keine Verbindung zum Backend-Server. Bitte prüfen Sie den Serverstatus.",
         err_label: "Fehler",
         alert_custom_invalid: "Bitte geben Sie 4 Ziffern zwischen 0 und 9 ein.",
-        share_img_btn: "Ergebnis als Bild speichern",
-        share_modal_title: "Bild speichern",
-        share_modal_help: "Bild gedrückt halten oder rechtsklicken, um es zu speichern.",
+        share_modal_title: "Ergebnis teilen",
         share_modal_copy: "Bild kopieren",
-        share_modal_download: "Direkter Download",
+        share_modal_download: "Herunterladen",
+        share_modal_url: "Spiel-URL kopieren",
+        msg_url_copied: "URL kopiert!",
         copied: "Kopiert!",
         help_btn: "Hilfe",
         help_btn_aria: "Hilfe öffnen",
@@ -803,7 +804,7 @@ function initSettings() {
 
     // --- Tapping math field (pointerup/touchend) → switch to standard keyboard ---
     // Fires ONLY when the pointer is released on the math field without significant drag.
-    // We capture touchstart, mousedown, and pointerdown to completely suppress focus on press.
+    // This allows natural scrolling on mobile over the math field container.
     const mathContainer = document.querySelector('.math-field-container');
     if (mathContainer) {
         let touchStartX = 0;
@@ -811,40 +812,28 @@ function initSettings() {
         let touchStartTime = 0;
         let isPointerDown = false;
 
-        const handleStart = (clientX, clientY, target, preventFunc) => {
+        const handleStart = (clientX, clientY, target) => {
             if (target.closest('#custom-keyboard-toggle')) return;
             
             isPointerDown = true;
             touchStartX = clientX;
             touchStartY = clientY;
             touchStartTime = Date.now();
-
-            // 押した瞬間のフォーカス動作を完全にブロック
-            preventFunc();
         };
 
         mathContainer.addEventListener('pointerdown', (e) => {
-            handleStart(e.clientX, e.clientY, e.target, () => {
-                e.preventDefault();
-                e.stopPropagation();
-            });
-        }, true);
+            handleStart(e.clientX, e.clientY, e.target);
+        });
 
         mathContainer.addEventListener('touchstart', (e) => {
             if (e.touches.length > 0) {
-                handleStart(e.touches[0].clientX, e.touches[0].clientY, e.target, () => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                });
+                handleStart(e.touches[0].clientX, e.touches[0].clientY, e.target);
             }
-        }, { capture: true, passive: false });
+        }, { passive: true });
 
         mathContainer.addEventListener('mousedown', (e) => {
-            handleStart(e.clientX, e.clientY, e.target, () => {
-                e.preventDefault();
-                e.stopPropagation();
-            });
-        }, true);
+            handleStart(e.clientX, e.clientY, e.target);
+        });
 
         const handleEnd = (clientX, clientY, target) => {
             if (!isPointerDown) return;
@@ -863,6 +852,9 @@ function initSettings() {
                     window.mathVirtualKeyboard.hide();
                 }
                 setKeyboardMode('standard');
+                
+                // Add visual focus class and trigger focus
+                mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             }
         };
@@ -897,6 +889,7 @@ function initSettings() {
                 // Close virtual KB → no keyboard (don't open standard KB)
                 window.mathVirtualKeyboard.hide();
                 setKeyboardMode('none');
+                if (mathContainer) mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             } else {
                 // Open virtual KB → close standard KB first
@@ -904,6 +897,7 @@ function initSettings() {
                 mf.blur();
                 setTimeout(() => {
                     window.mathVirtualKeyboard.show();
+                    if (mathContainer) mathContainer.classList.add('focused');
                     mf.focus({ preventScroll: true });
                 }, 80);
             }
@@ -918,7 +912,15 @@ function initSettings() {
             const toggle = document.getElementById('custom-keyboard-toggle');
             const goingToToggle = toggle && (active === toggle || toggle.contains(active));
             const goingToMf = active === mf || mf.contains(active);
-            if (goingToToggle || goingToMf) return;
+            
+            if (goingToMf) return;
+
+            // 完全にはずれた場合のみ青枠を消す
+            if (!goingToToggle && mathContainer) {
+                mathContainer.classList.remove('focused');
+            }
+
+            if (goingToToggle) return;
 
             // それ以外（余白など）へのフォーカス移動 → 仮想KB・標準KB両方閉じる
             if (window.mathVirtualKeyboard?.visible) {
@@ -1444,12 +1446,8 @@ async function evaluateFinal() {
             feedbackMsg.textContent = TRANSLATIONS[currentLang].msg_backend_offline;
         }
     }
-    // Show the result sharing action container if evaluation completed (success or error)
-    if (resultActions) {
-        resultActions.classList.remove("hidden");
-        // Pre-prepare the share image Blob so downloads are synchronous and user-triggered
-        setTimeout(prepareShareImage, 100);
-    }
+    // Pre-prepare the share image Blob so downloads are synchronous and user-triggered
+    setTimeout(prepareShareImage, 100);
 }
 
 // Trigger simple confetti
@@ -1808,9 +1806,54 @@ if (helpModal) {
 
 
 
+function restoreGameFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const numsParam = params.get("nums");
+    const exprParam = params.get("expr");
+    const diffParam = params.get("diff");
+
+    let restored = false;
+
+    if (numsParam) {
+        const parsedNums = numsParam.split(",").map(Number);
+        if (parsedNums.length === 4 && parsedNums.every(n => !isNaN(n))) {
+            targetNumbers = parsedNums;
+            applySortIfEnabled();
+            restored = true;
+        }
+    }
+
+    if (diffParam) {
+        if (["easy", "medium", "hard"].includes(diffParam)) {
+            gameDifficulty = diffParam;
+            if (difficultySelect) {
+                difficultySelect.value = diffParam;
+            }
+        }
+    }
+
+    if (restored) {
+        resetGame();
+        if (exprParam) {
+            const decodedExpr = decodeURIComponent(exprParam);
+            if (mf.setValue) {
+                mf.setValue(decodedExpr);
+            } else {
+                mf.value = decodedExpr;
+            }
+            setTimeout(() => {
+                handleLiveInput();
+                evaluateFinal();
+            }, 300);
+        }
+    } else {
+        generateNewGame();
+    }
+}
+
 // Initialization
 initSettings();
-generateNewGame();
+restoreGameFromUrl();
 
 // Global shortcut listener (Space key triggers new game, '/' key focuses math-field)
 document.addEventListener("keydown", (e) => {
@@ -2881,9 +2924,40 @@ async function copyShareImageToClipboard() {
     }
 }
 
+// Copy game URL with query parameters
+function copyGameUrlToClipboard() {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const nums = targetNumbers.join(",");
+    const expr = encodeURIComponent(mf.value || "");
+    const diff = gameDifficulty;
+
+    const shareUrl = `${baseUrl}?nums=${nums}&expr=${expr}&diff=${diff}`;
+
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        if (shareModalUrlBtn) {
+            const successMsg = TRANSLATIONS[currentLang].msg_url_copied || "URL Copied!";
+            const origText = TRANSLATIONS[currentLang].share_modal_url || "ゲームのURLをコピー";
+            shareModalUrlBtn.textContent = successMsg;
+            shareModalUrlBtn.style.backgroundColor = "var(--success)";
+            shareModalUrlBtn.style.borderColor = "var(--success)";
+            shareModalUrlBtn.style.color = "#ffffff";
+
+            setTimeout(() => {
+                shareModalUrlBtn.textContent = origText;
+                shareModalUrlBtn.style.backgroundColor = "";
+                shareModalUrlBtn.style.borderColor = "";
+                shareModalUrlBtn.style.color = "";
+            }, 2000);
+        }
+    }).catch(err => {
+        console.error("Failed to copy URL:", err);
+        alert(currentLang === "ja" ? "URLのコピーに失敗しました。" : "Failed to copy URL.");
+    });
+}
+
 // Bind Share Modal Event Listeners
-if (shareImgBtn) {
-    shareImgBtn.addEventListener("click", downloadShareImage);
+if (headerShareBtn) {
+    headerShareBtn.addEventListener("click", downloadShareImage);
 }
 if (closeShareModal) {
     closeShareModal.addEventListener("click", closeShareModalOverlay);
@@ -2900,4 +2974,7 @@ if (shareModalDownloadBtn) {
 }
 if (shareModalCopyBtn) {
     shareModalCopyBtn.addEventListener("click", copyShareImageToClipboard);
+}
+if (shareModalUrlBtn) {
+    shareModalUrlBtn.addEventListener("click", copyGameUrlToClipboard);
 }

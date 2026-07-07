@@ -32,7 +32,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=72">
+  <link rel="stylesheet" href="css/style.css?v=73">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -56,6 +56,16 @@
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
             <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+        <button id="header-share-btn" class="secondary-btn api-settings-btn" aria-label="共有" data-i18n-aria-label="share_btn_aria">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
           </svg>
         </button>
         <button id="settings-btn" class="secondary-btn api-settings-btn" aria-label="設定" data-i18n-aria-label="settings_btn_aria">
@@ -143,17 +153,6 @@
             <span id="current-value" class="result-value">---</span>
           </div>
           <div id="feedback-msg" class="feedback-msg" data-i18n="msg_enter_formula">数式を入力してください</div>
-        </div>
-
-        <div id="result-actions" class="result-actions hidden">
-          <button id="share-img-btn" class="secondary-btn share-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              style="margin-right: 6px; vertical-align: middle;">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
-            </svg>
-            <span data-i18n="share_img_btn">結果を画像で保存</span>
-          </button>
         </div>
 
         <div class="details-accordion">
@@ -252,7 +251,7 @@
   <div id="share-modal" class="share-modal-overlay">
     <div id="share-modal-content" class="share-modal-content">
       <button id="close-share-modal" class="close-share-modal">&times;</button>
-      <h3 class="share-modal-title" data-i18n="share_modal_title">画像を保存する</h3>
+      <h3 class="share-modal-title" data-i18n="share_modal_title">結果の共有</h3>
       <div class="share-modal-img-wrapper">
         <img id="share-modal-img" class="share-modal-img" alt="Make10 Result">
         <div class="spinner"></div>
@@ -260,16 +259,19 @@
 
       <div class="share-modal-buttons">
         <button id="share-modal-copy-btn" class="secondary-btn" data-i18n="share_modal_copy">画像をコピー</button>
-        <button id="share-modal-download-btn" class="primary-btn" data-i18n="share_modal_download">直接ダウンロード</button>
+        <button id="share-modal-download-btn" class="primary-btn" data-i18n="share_modal_download">ダウンロード</button>
+      </div>
+      <div class="share-modal-url-section" style="width: 100%; border-top: 1px solid var(--border-color); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <button id="share-modal-url-btn" class="primary-btn" style="width: 100%;" data-i18n="share_modal_url">ゲームのURLをコピー</button>
       </div>
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=72"></script>
+  <script type="module" src="js/script.js?v=73"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=72')
+        navigator.serviceWorker.register('sw.js?v=73')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });
