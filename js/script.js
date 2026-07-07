@@ -799,8 +799,14 @@ function initSettings() {
     const mathContainer = document.querySelector('.math-field-container');
     if (mathContainer) {
         let pointerDownOnMf = false;
-        mathContainer.addEventListener('pointerdown', () => { pointerDownOnMf = true; });
+        mathContainer.addEventListener('pointerdown', (e) => {
+            // トグルボタンへのタップは除外（別のハンドラで処理）
+            if (e.target.closest('#custom-keyboard-toggle')) return;
+            pointerDownOnMf = true;
+        });
         mathContainer.addEventListener('pointerup', (e) => {
+            // トグルボタンへのタップは除外（伝播してきたイベントを無視）
+            if (e.target.closest('#custom-keyboard-toggle')) return;
             if (!pointerDownOnMf) return;
             pointerDownOnMf = false;
 
