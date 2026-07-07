@@ -929,18 +929,20 @@ function hasVariables(latex) {
 
 // Check digit usage in LaTeX, using clickedIndices to disambiguate duplicates
 function checkNumbersUsage(latex, numbers) {
-    // Count each digit value in the LaTeX expression
-    const rawDigits = latex.replace(/[^0-9]/g, "").split("");
-    const digitCount = {};
-    for (let d of rawDigits) digitCount[d] = (digitCount[d] || 0) + 1;
+    // Extract all NUMBER sequences from the LaTeX expression as whole integers.
+    // e.g. "13 + 5" → [13, 5]  (NOT [1, 3, 5])
+    // This prevents using "13" when only "1" and "3" are available as separate cards.
+    const rawNumbers = (latex.match(/\d+/g) || []).map(Number);
 
-    const targets = numbers.map(String);
+    const numberCount = {};
+    for (let n of rawNumbers) numberCount[n] = (numberCount[n] || 0) + 1;
+
+    const targets = numbers.map(Number);
     const usedIndices = new Array(targets.length).fill(false);
     const unmatched = [];
 
     // First pass: mark indices that were explicitly clicked, in click order
-    // Only honour a click if the value still appears in the LaTeX
-    const remaining = { ...digitCount };
+    const remaining = { ...numberCount };
     for (let idx of clickedIndices) {
         if (idx < targets.length) {
             const v = targets[idx];
@@ -951,12 +953,13 @@ function checkNumbersUsage(latex, numbers) {
         }
     }
 
-    // Second pass: handle any digits present in LaTeX that weren't covered by clicks
-    // (e.g. manually typed digits)
+    // Second pass: handle any numbers present in LaTeX that weren't covered by clicks
+    // (e.g. manually typed numbers)
     for (let v of Object.keys(remaining)) {
         let leftover = remaining[v];
+        const vNum = Number(v);
         for (let i = 0; i < targets.length && leftover > 0; i++) {
-            if (targets[i] === v && !usedIndices[i]) {
+            if (targets[i] === vNum && !usedIndices[i]) {
                 usedIndices[i] = true;
                 leftover--;
             }
@@ -973,7 +976,7 @@ function checkNumbersUsage(latex, numbers) {
     for (let idx of clickedIndices) {
         const v = targets[idx];
         usedCount[v] = (usedCount[v] || 0) + 1;
-        if (usedCount[v] <= (digitCount[v] || 0)) {
+        if (usedCount[v] <= (numberCount[v] || 0)) {
             validClicked.push(idx);
         }
     }

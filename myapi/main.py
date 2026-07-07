@@ -39,10 +39,11 @@ class EvaluateRequest(BaseModel):
     api_key: Optional[str] = None
 
 def check_digits(latex_str: str, target_numbers: List[int]) -> bool:
-    # Extract all digits 0-9
-    formula_digits = "".join(sorted(re.findall(r'[0-9]', latex_str)))
-    target_digits = "".join(sorted([str(n) for n in target_numbers]))
-    return formula_digits == target_digits
+    # Extract all NUMBER sequences (not individual digits) to prevent concatenation cheating.
+    # e.g. "13 + 5" → [13, 5], NOT [1, 3, 5]
+    formula_numbers = sorted([int(m) for m in re.findall(r'\d+', latex_str)])
+    target_sorted = sorted(target_numbers)
+    return formula_numbers == target_sorted
 
 def evaluate_with_sympy(latex_str: str):
     """Try parsing and evaluating LaTeX with SymPy / latex2sympy2"""
