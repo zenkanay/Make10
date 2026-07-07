@@ -725,6 +725,17 @@ function initSettings() {
     mf.setAttribute("math-virtual-keyboard-policy", "manual");
     mf.setAttribute("inputmode", "text"); // Default to standard OS keyboard
 
+    // Force standard OS keyboard on focus by overriding MathLive's internal inputmode="none"
+    mf.addEventListener("focus", () => {
+        setTimeout(() => {
+            const textarea = mf.shadowRoot?.querySelector('textarea');
+            if (textarea) {
+                textarea.setAttribute('inputmode', 'text');
+                textarea.inputMode = 'text';
+            }
+        }, 50);
+    });
+
     // Add custom inline shortcuts for ceil and floor functions
     mf.inlineShortcuts = {
         ...mf.inlineShortcuts,

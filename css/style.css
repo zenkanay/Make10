@@ -844,6 +844,11 @@ math-field {
 
 /* Mobile Optimization (max-width: 600px) */
 @media (max-width: 600px) {
+  body {
+    align-items: flex-start;
+    padding-top: 10px;
+  }
+
   .app-container {
     padding: 10px;
   }
@@ -1056,32 +1061,34 @@ math-field::part(virtual-keyboard-toggle) {
   display: none !important;
 }
 
-/* Custom virtual keyboard toggle button */
+/* Custom virtual keyboard toggle button (Styled like MathLive default blue button) */
 .keyboard-toggle-btn {
   position: absolute;
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  background: transparent;
+  background-color: var(--primary); /* Blue background */
   border: none;
-  color: var(--text-muted);
+  color: #ffffff; /* White icon */
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px; /* Rounded rectangle */
   z-index: 5;
   transition: var(--transition);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .keyboard-toggle-btn:hover {
-  color: var(--primary);
-  background-color: rgba(79, 70, 229, 0.1);
+  background-color: var(--primary-hover);
+  transform: translateY(-50%) scale(1.05);
 }
 
 .keyboard-toggle-btn svg {
-  stroke: currentColor;
+  stroke: #ffffff;
   transition: var(--transition);
 }
 
