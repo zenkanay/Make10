@@ -17,7 +17,7 @@ const closeShareModal = document.getElementById("close-share-modal");
 const shareModalDownloadBtn = document.getElementById("share-modal-download-btn");
 const shareModalCopyBtn = document.getElementById("share-modal-copy-btn");
 const shareModalUrlBtn = document.getElementById("share-modal-url-btn");
-const mfOverlayShield = document.getElementById("mf-overlay-shield");
+let mfOverlayShield = document.getElementById("mf-overlay-shield");
 const difficultySelect = document.getElementById("difficulty-select");
 
 // Custom numbers section elements
@@ -692,6 +692,7 @@ function applyLanguage(lang) {
 
 // Initialize Settings & Local Data
 function initSettings() {
+    mfOverlayShield = document.getElementById("mf-overlay-shield");
     const savedKey = localStorage.getItem("gemini_api_key");
     if (savedKey) {
         apiKey = savedKey;
@@ -807,7 +808,8 @@ function initSettings() {
     // Fires ONLY when the pointer is released on the transparent overlay shield without significant drag.
     // The transparent shield captures mobile swipes for fluid scrolling without triggering MathLive logic.
     const mathContainer = document.querySelector('.math-field-container');
-    if (mfOverlayShield && mathContainer) {
+    const shield = document.getElementById("mf-overlay-shield");
+    if (shield && mathContainer) {
         let touchStartX = 0;
         let touchStartY = 0;
         let touchStartTime = 0;
@@ -820,17 +822,17 @@ function initSettings() {
             touchStartTime = Date.now();
         };
 
-        mfOverlayShield.addEventListener('pointerdown', (e) => {
+        shield.addEventListener('pointerdown', (e) => {
             handleStart(e.clientX, e.clientY);
         });
 
-        mfOverlayShield.addEventListener('touchstart', (e) => {
+        shield.addEventListener('touchstart', (e) => {
             if (e.touches.length > 0) {
                 handleStart(e.touches[0].clientX, e.touches[0].clientY);
             }
         }, { passive: true });
 
-        mfOverlayShield.addEventListener('mousedown', (e) => {
+        shield.addEventListener('mousedown', (e) => {
             handleStart(e.clientX, e.clientY);
         });
 
@@ -851,28 +853,28 @@ function initSettings() {
                 setKeyboardMode('standard');
                 
                 // Disable shield so interactions pass through directly to math-field, then focus
-                mfOverlayShield.classList.add('disabled');
+                shield.classList.add('disabled');
                 mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             }
         };
 
-        mfOverlayShield.addEventListener('pointerup', (e) => {
+        shield.addEventListener('pointerup', (e) => {
             handleEnd(e.clientX, e.clientY);
         });
 
-        mfOverlayShield.addEventListener('touchend', (e) => {
+        shield.addEventListener('touchend', (e) => {
             if (e.changedTouches.length > 0) {
                 handleEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
             }
         });
 
-        mfOverlayShield.addEventListener('mouseup', (e) => {
+        shield.addEventListener('mouseup', (e) => {
             handleEnd(e.clientX, e.clientY);
         });
 
-        mfOverlayShield.addEventListener('pointercancel', () => { isPointerDown = false; });
-        mfOverlayShield.addEventListener('touchcancel', () => { isPointerDown = false; });
+        shield.addEventListener('pointercancel', () => { isPointerDown = false; });
+        shield.addEventListener('touchcancel', () => { isPointerDown = false; });
     }
 
     // --- Toggle button → open/close virtual keyboard ---
