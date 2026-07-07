@@ -32,7 +32,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=81">
+  <link rel="stylesheet" href="css/style.css?v=82">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -251,7 +251,7 @@
   <div id="share-modal" class="share-modal-overlay">
     <div id="share-modal-content" class="share-modal-content">
       <button id="close-share-modal" class="close-share-modal">&times;</button>
-      <h3 class="share-modal-title" data-i18n="share_modal_title">結果の共有</h3>
+      <h3 class="share-modal-title" data-i18n="share_modal_title">共有</h3>
       <div class="share-modal-img-wrapper">
         <img id="share-modal-img" class="share-modal-img" alt="Make10 Result">
         <div class="spinner"></div>
@@ -267,11 +267,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=81"></script>
+  <script type="module" src="js/script.js?v=82"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=81')
+        navigator.serviceWorker.register('sw.js?v=82')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });

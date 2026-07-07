@@ -1,8 +1,8 @@
-const CACHE_NAME = 'make10-cache-v81';
+const CACHE_NAME = 'make10-cache-v82';
 const ASSETS_TO_CACHE = [
   './index.html',
-  './css/style.css?v=81',
-  './js/script.js?v=81',
+  './css/style.css?v=82',
+  './js/script.js?v=82',
   './favicon.png',
   './apple-touch-icon.png',
   './manifest.json',
