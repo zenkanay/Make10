@@ -791,18 +791,27 @@ function initSettings() {
             e.stopPropagation();
             if (!window.mathVirtualKeyboard) return;
 
+            const getSink = () =>
+                mf.shadowRoot?.querySelector('.ML__keyboard-sink') || mf.querySelector('.ML__keyboard-sink');
+
             if (window.mathVirtualKeyboard.visible) {
+                // --- 仮想キーボードを閉じて、標準キーボードを有効化 ---
                 window.mathVirtualKeyboard.hide();
                 allowInputmodeNone = false;
-                // Restore OS keyboard
-                const sink = mf.shadowRoot?.querySelector('.ML__keyboard-sink')
-                          || mf.querySelector('.ML__keyboard-sink');
+                const sink = getSink();
                 if (sink) sink.setAttribute('inputmode', 'text');
+                setTimeout(() => mf.focus(), 50);
             } else {
+                // --- 標準キーボードを閉じてから、仮想キーボードを開く ---
                 allowInputmodeNone = true;
-                window.mathVirtualKeyboard.show();
+                const sink = getSink();
+                if (sink) sink.setAttribute('inputmode', 'none'); // 標準キーボードを非表示に
+                mf.blur(); // 一度フォーカスを外して標準キーボードを完全に閉じる
+                setTimeout(() => {
+                    window.mathVirtualKeyboard.show();
+                    mf.focus();
+                }, 80);
             }
-            mf.focus();
         });
     }
 
