@@ -721,8 +721,8 @@ function initSettings() {
 
     // Configure math-field options
     mf.menuItems = [];
-    mf.mathVirtualKeyboardPolicy = "off"; // Start with standard OS keyboard enabled
-    mf.setAttribute("math-virtual-keyboard-policy", "off");
+    mf.mathVirtualKeyboardPolicy = "manual"; // Keep manual so we control when virtual KB shows
+    mf.setAttribute("math-virtual-keyboard-policy", "manual");
 
     // Add custom inline shortcuts for ceil and floor functions
     mf.inlineShortcuts = {
@@ -731,7 +731,43 @@ function initSettings() {
         'floor': '\\lfloor #? \\rfloor'
     };
 
-    // Custom virtual keyboard toggle (triggered on click/pointerup instead of pointerdown)
+    // Use MutationObserver to override MathLive's internal inputmode="none" on its shadow textarea
+    // This forces the standard OS keyboard to appear when the virtual keyboard is NOT open
+    let osKeyboardObserver = null;
+    function startOSKeyboardMode() {
+        const textarea = mf.shadowRoot?.querySelector('textarea');
+        if (!textarea) return;
+        // Immediately set to text
+        textarea.setAttribute('inputmode', 'text');
+        // Watch for MathLive resetting it to "none" and override immediately
+        if (osKeyboardObserver) osKeyboardObserver.disconnect();
+        osKeyboardObserver = new MutationObserver(() => {
+            if (textarea.getAttribute('inputmode') !== 'text') {
+                textarea.setAttribute('inputmode', 'text');
+            }
+        });
+        osKeyboardObserver.observe(textarea, { attributes: true, attributeFilter: ['inputmode'] });
+    }
+
+    function stopOSKeyboardMode() {
+        if (osKeyboardObserver) {
+            osKeyboardObserver.disconnect();
+            osKeyboardObserver = null;
+        }
+        const textarea = mf.shadowRoot?.querySelector('textarea');
+        if (textarea) {
+            textarea.setAttribute('inputmode', 'none');
+        }
+    }
+
+    // Start OS keyboard mode when math-field is focused (and virtual KB is not open)
+    mf.addEventListener("focus", () => {
+        if (!window.mathVirtualKeyboard?.visible) {
+            setTimeout(startOSKeyboardMode, 30);
+        }
+    });
+
+    // Custom virtual keyboard toggle button
     const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
     if (customKeyboardToggle) {
         customKeyboardToggle.addEventListener("click", (e) => {
@@ -741,11 +777,11 @@ function initSettings() {
 
             if (window.mathVirtualKeyboard.visible) {
                 window.mathVirtualKeyboard.hide();
-                mf.mathVirtualKeyboardPolicy = "off";
-                mf.setAttribute("math-virtual-keyboard-policy", "off");
+                // Restore OS keyboard mode
+                setTimeout(startOSKeyboardMode, 50);
             } else {
-                mf.mathVirtualKeyboardPolicy = "manual";
-                mf.setAttribute("math-virtual-keyboard-policy", "manual");
+                // Stop OS keyboard mode and open virtual keyboard
+                stopOSKeyboardMode();
                 window.mathVirtualKeyboard.show();
             }
             mf.focus();
