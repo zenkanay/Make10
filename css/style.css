@@ -163,9 +163,11 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* コンテンツが長くてもスクロール可能にする */
+  padding-top: 20px;
+  padding-bottom: 60px; /* 下方向のスクロール余白 */
   transition: var(--transition);
-  overscroll-behavior: none; /* キーボード開閉時のバウンス・スクロール連鎖を防止 */
+  overscroll-behavior: none;
 }
 
 /* Container */
@@ -678,6 +680,18 @@ math-field {
   font-size: 0.85rem;
   margin: 0 0 6px 0;
   line-height: 1.5;
+  color: var(--text-color);
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 var(--border-color);
   color: var(--text-color);
 }
 

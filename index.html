@@ -32,7 +32,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=64">
+  <link rel="stylesheet" href="css/style.css?v=65">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -242,6 +242,7 @@
           <h4 data-i18n="help_section_tips">Tips</h4>
           <p data-i18n="help_tip_1">数字カードをタップすると、その数字が数式入力欄に自動で挿入されます。</p>
           <p data-i18n="help_tip_2">難易度「Hard」は、四則演算だけでは絶対に解けません。積極的に「√」や「!」などを使いましょう！</p>
+          <p data-i18n="help_tip_3">キーボードショートカット：<kbd>Space</kbd> キーで新しい問題を生成、<kbd>Enter</kbd> キーで判定ができます。</p>
         </section>
       </div>
     </div>
@@ -264,11 +265,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=64"></script>
+  <script type="module" src="js/script.js?v=65"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=64')
+        navigator.serviceWorker.register('sw.js?v=65')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });
