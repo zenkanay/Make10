@@ -926,30 +926,41 @@ function initSettings() {
         });
     }
 
-    // --- 仮想キーボードのタップ判定（ポインターダウンの監視） ---
-    let isTappingKeyboard = false;
-    window.addEventListener('pointerdown', (e) => {
+    // --- ドキュメント全体でのタップ監視によるインテリジェントなフォーカス/キーボード制御 ---
+    document.addEventListener('pointerdown', (e) => {
         const path = e.composedPath();
-        isTappingKeyboard = path.some(el => 
+        
+        // タップされた要素の属性をチェック
+        const isInsideInput = path.some(el => el === mathContainer);
+        const isInsideKeyboard = path.some(el => 
             el && (
                 el.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
                 (el.classList && el.classList.contains('ML__keyboard')) || 
                 el.id === 'math-virtual-keyboard'
             )
         );
+        const isInsideToggle = path.some(el => el && el.id === 'custom-keyboard-toggle');
+        const isInsideDigitCard = path.some(el => el && el.classList && el.classList.contains('digit-card'));
+        const isInsideActionButtons = path.some(el => el && el.id && (el.id === 'clear-btn' || el.id === 'evaluate-btn'));
+
+        // 入力操作に関連する要素をタップしている間は、フォーカスおよびキーボードを一切閉じない
+        if (isInsideInput || isInsideKeyboard || isInsideToggle || isInsideDigitCard || isInsideActionButtons) {
+            return;
+        }
+
+        // それ以外の領域（設定、ヘルプ、背景余白など）をタップした場合 ➔ 読み取り専用に戻してフォーカスを外し、キーボードを閉じる
+        mf.readOnly = true;
+        if (mathContainer) mathContainer.classList.remove('focused');
+        
+        if (window.mathVirtualKeyboard?.visible) {
+            window.mathVirtualKeyboard.hide();
+        }
+        setKeyboardMode('none');
     }, true);
 
     // --- フォーカスが外れたら仮想キーボードも閉じる ---
     mf.addEventListener('blur', () => {
         setTimeout(() => {
-            // キーボードのタップ中であれば、フォーカスを強制的に戻して終了
-            if (isTappingKeyboard) {
-                mf.focus({ preventScroll: true });
-                isTappingKeyboard = false;
-                return;
-            }
-
-            // フォーカスがトグルボタンやmf自身、または仮想キーボードに移った場合は閉じない
             const active = document.activeElement;
             const toggle = document.getElementById('custom-keyboard-toggle');
             const goingToToggle = toggle && (active === toggle || toggle.contains(active));
@@ -960,17 +971,14 @@ function initSettings() {
                 active.id === 'math-virtual-keyboard'
             );
             
-            if (goingToMf || goingToKeyboard) return;
+            // トグルボタンやキーボード自身、または入力欄にいる場合は何もしない
+            if (goingToMf || goingToKeyboard || goingToToggle) return;
 
             // 完全にはずれた場合のみ、青枠を消し、読み取り専用に戻す
-            if (!goingToToggle) {
-                mf.readOnly = true;
-                if (mathContainer) mathContainer.classList.remove('focused');
-            }
+            mf.readOnly = true;
+            if (mathContainer) mathContainer.classList.remove('focused');
 
-            if (goingToToggle) return;
-
-            // それ以外（余白など）へのフォーカス移動 → 仮想KB・標準KB両方閉じる
+            // 仮想キーボードを非表示にする
             if (window.mathVirtualKeyboard?.visible) {
                 window.mathVirtualKeyboard.hide();
             }
