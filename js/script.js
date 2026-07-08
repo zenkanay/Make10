@@ -1487,11 +1487,9 @@ function updateVirtualKeyboard() {
             label: "Basic",
             layers: [{
                 rows: [
-                    // Row 1: Game digits + delete
+                    // Row 1: Game digits
                     [
-                        ...targetDigitKeys,
-                        { class: 'separator w5' },
-                        { label: '⌫', command: 'deleteBackward', width: 2 }
+                        ...targetDigitKeys
                     ],
                     // Row 2: Operators + brackets + fraction (7 keys)
                     [
@@ -1545,8 +1543,8 @@ function updateVirtualKeyboard() {
                     // Row 5: Navigation
                     [
                         { label: '⌫', command: 'deleteBackward', width: 2 },
-                        { label: '←', command: 'moveBackward', width: 4 },
-                        { label: '→', command: 'moveForward', width: 4 }
+                        { label: '←', command: 'moveToPreviousChar', width: 4 },
+                        { label: '→', command: 'moveToNextChar', width: 4 }
                     ]
                 ]
             }]
@@ -1594,8 +1592,8 @@ function updateVirtualKeyboard() {
                     // Navigation
                     [
                         { label: '⌫', command: 'deleteBackward', width: 2 },
-                        { label: '←', command: 'moveBackward', width: 4 },
-                        { label: '→', command: 'moveForward', width: 4 }
+                        { label: '←', command: 'moveToPreviousChar', width: 4 },
+                        { label: '→', command: 'moveToNextChar', width: 4 }
                     ]
                 ]
             }]
@@ -1643,8 +1641,8 @@ function updateVirtualKeyboard() {
                     // Navigation
                     [
                         { label: '⌫', command: 'deleteBackward', width: 2 },
-                        { label: '←', command: 'moveBackward', width: 4 },
-                        { label: '→', command: 'moveForward', width: 4 }
+                        { label: '←', command: 'moveToPreviousChar', width: 4 },
+                        { label: '→', command: 'moveToNextChar', width: 4 }
                     ]
                 ]
             }]
