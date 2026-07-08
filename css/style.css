@@ -504,10 +504,10 @@ body {
 
 math-field {
   width: 100%;
-  min-height: 60px;
+  min-height: 80px; /* Desmos-like taller size */
   background: transparent;
   color: var(--text-color);
-  font-size: 1.4rem;
+  font-size: 2.2rem !important; /* Desmos-like huge text size */
   outline: none;
   --keyboard-zindex: 1000;
   border: none;
@@ -1288,4 +1288,33 @@ math-field::part(virtual-keyboard-toggle) {
 
 math-field.scrolling {
   caret-color: transparent !important;
+}
+
+/* Desmos-like Virtual Keyboard Custom Theme */
+math-virtual-keyboard, .ML__keyboard {
+  --keyboard-background: #18191d !important;
+  --keycap-background: #2a2c33 !important;
+  --keycap-background-active: #40434e !important;
+  --keycap-color: #ffffff !important;
+  --keycap-font-size: 1.3rem !important;
+  --keycap-height: 52px !important;
+  --keycap-gap: 5px !important;
+  --keyboard-padding: 8px !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Specific key styles for action buttons (delete, navigation) in MathLive virtual keyboard */
+math-virtual-keyboard .action, 
+math-virtual-keyboard [data-command*="delete"], 
+math-virtual-keyboard [data-command*="move"], 
+math-virtual-keyboard [data-command*="Char"] {
+  background-color: #3f424c !important;
+  font-weight: bold !important;
+}
+
+math-virtual-keyboard .action:active,
+math-virtual-keyboard [data-command*="delete"]:active, 
+math-virtual-keyboard [data-command*="move"]:active, 
+math-virtual-keyboard [data-command*="Char"]:active {
+  background-color: #555966 !important;
 }

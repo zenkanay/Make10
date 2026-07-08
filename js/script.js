@@ -864,6 +864,15 @@ function initSettings() {
 
             // Pure tap detection
             if (deltaX < 10 && deltaY < 10 && deltaTime < 500) {
+                // If standard keyboard is already focused/active, do not trigger focus refresh which may toggle the OS keyboard
+                const active = document.activeElement;
+                const isInputFocused = active === mf || mf.contains(active);
+                const isStandardKeyboardActive = allowInputmodeNone === false;
+
+                if (isInputFocused && isStandardKeyboardActive) {
+                    return;
+                }
+
                 if (window.mathVirtualKeyboard?.visible) {
                     window.mathVirtualKeyboard.hide();
                 }
@@ -917,9 +926,12 @@ function initSettings() {
         });
     }
 
-    // --- 仮想キーボード上の操作でフォーカスを失わせないための防衛策 ---
+    // --- ドキュメント全体でのタップ監視によるインテリジェントなフォーカス/キーボード制御 ---
     document.addEventListener('pointerdown', (e) => {
         const path = e.composedPath();
+        
+        // タップされた要素の属性をチェック
+        const isInsideInput = path.some(el => el === mathContainer);
         const isInsideKeyboard = path.some(el => 
             el && (
                 el === window.mathVirtualKeyboard?.element ||
@@ -929,11 +941,35 @@ function initSettings() {
                 el.id === 'math-virtual-keyboard'
             )
         );
+        const isInsideToggle = path.some(el => el && el.id === 'custom-keyboard-toggle');
+        const isInsideDigitCard = path.some(el => el && el.classList && el.classList.contains('digit-card'));
+        const isInsideActionButtons = path.some(el => el && el.id && (el.id === 'clear-btn' || el.id === 'evaluate-btn'));
+        const isInsideModals = path.some(el => 
+            el && (
+                el.id === 'settings-modal' || el.id === 'settings-btn' ||
+                el.id === 'help-modal' || el.id === 'help-btn' ||
+                el.id === 'share-modal'
+            )
+        );
 
-        if (isInsideKeyboard) {
+        // 1. 仮想キーボード上または数字カード上のタップの場合 ➔ フォーカス移動をブラウザレベルで防止しフォーカスを維持
+        if (isInsideKeyboard || isInsideDigitCard) {
             e.preventDefault();
             mf.focus({ preventScroll: true });
+            return;
         }
+
+        // 2. その他のゲーム関連エリア（入力欄、トグル、クリア/判定ボタン、モーダル）をタップしている間は何もしない
+        if (isInsideInput || isInsideToggle || isInsideActionButtons || isInsideModals) {
+            return;
+        }
+
+        // 3. それ以外の真の余白（背景など）をタップした場合 ➔ 安全にフォーカスを外してキーボードを閉じる
+        mf.blur();
+        if (window.mathVirtualKeyboard?.visible) {
+            window.mathVirtualKeyboard.hide();
+        }
+        setKeyboardMode('none');
     }, true);
 
     // --- スクロール防止: キーボード開閉時のビューポート変化で位置がずれないようにする ---
@@ -1104,15 +1140,16 @@ function renderDigitCards(usage = null) {
             // Disabled: no pointer events, no click
         } else {
             card.classList.add("active-digit");
-            // Click to insert number into the math field
-            card.addEventListener("click", () => {
+            // Pointerdown listener with preventDefault to prevent focus loss and keyboard dismissals
+            card.addEventListener("pointerdown", (e) => {
+                e.preventDefault();
                 // Record which index was pressed
                 clickedIndices.push(idx);
                 // Animate press
                 card.classList.add("pressing");
                 setTimeout(() => card.classList.remove("pressing"), 150);
-                mf.focus();
                 mf.insert(num.toString());
+                mf.focus({ preventScroll: true });
             });
         }
 
