@@ -504,10 +504,10 @@ body {
 
 math-field {
   width: 100%;
-  min-height: 80px; /* Desmos-like taller size */
+  min-height: 70px; /* Comfortable height */
   background: transparent;
   color: var(--text-color);
-  font-size: 2.2rem !important; /* Desmos-like huge text size */
+  font-size: 1.8rem !important; /* Comfortable medium text size */
   outline: none;
   --keyboard-zindex: 1000;
   border: none;

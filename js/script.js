@@ -934,26 +934,21 @@ function initSettings() {
         const isInsideInput = path.some(el => el === mathContainer);
         const isInsideKeyboard = path.some(el => 
             el && (
-                el === window.mathVirtualKeyboard?.element ||
-                window.mathVirtualKeyboard?.element?.contains?.(el) ||
                 el.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
-                (el.classList && el.classList.contains('ML__keyboard')) || 
-                el.id === 'math-virtual-keyboard'
+                el.id === 'math-virtual-keyboard' ||
+                (el.classList && (
+                    el.classList.contains('ML__keyboard') ||
+                    el.classList.contains('MLK__keyboard') ||
+                    el.classList.contains('ML__virtual-keyboard')
+                ))
             )
         );
         const isInsideToggle = path.some(el => el && el.id === 'custom-keyboard-toggle');
         const isInsideDigitCard = path.some(el => el && el.classList && el.classList.contains('digit-card'));
         const isInsideActionButtons = path.some(el => el && el.id && (el.id === 'clear-btn' || el.id === 'evaluate-btn'));
-        const isInsideModals = path.some(el => 
-            el && (
-                el.id === 'settings-modal' || el.id === 'settings-btn' ||
-                el.id === 'help-modal' || el.id === 'help-btn' ||
-                el.id === 'share-modal'
-            )
-        );
 
         // 1. 仮想キーボード、数字カード、その他入力エリアがタップされた場合は、キーボードを閉じずにそのまま処理を続行
-        if (isInsideInput || isInsideKeyboard || isInsideToggle || isInsideDigitCard || isInsideActionButtons || isInsideModals) {
+        if (isInsideInput || isInsideKeyboard || isInsideToggle || isInsideDigitCard || isInsideActionButtons) {
             return;
         }
 
