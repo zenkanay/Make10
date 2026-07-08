@@ -693,7 +693,6 @@ function applyLanguage(lang) {
 function initSettings() {
     // --- Keyboard State Machine ---
     let allowInputmodeNone = true; // start with no keyboard (changed when user taps mf)
-    let activeKeyboardType = 'standard'; // 'standard' or 'virtual'
 
     function setKeyboardMode(mode) {
         // mode: "standard" = OS keyboard, "virtual" = virtual KB only, "none" = no keyboard
@@ -712,16 +711,9 @@ function initSettings() {
 
         if (mode === 'standard') {
             allowInputmodeNone = false;
-            activeKeyboardType = 'standard';
             if (sink) sink.setAttribute('inputmode', 'text');
             mf.setAttribute('inputmode', 'text');
-        } else if (mode === 'virtual') {
-            allowInputmodeNone = true;
-            activeKeyboardType = 'virtual';
-            if (sink) sink.setAttribute('inputmode', 'none');
-            mf.setAttribute('inputmode', 'none');
         } else {
-            // mode === 'none' (closed) - keep activeKeyboardType to know what to restore on next tap
             allowInputmodeNone = true;
             if (sink) sink.setAttribute('inputmode', 'none');
             mf.setAttribute('inputmode', 'none');
@@ -866,11 +858,12 @@ function initSettings() {
             touchStartY = clientY;
             touchStartTime = Date.now();
 
-            // Set inputmode proactively on start of tap, to bypass mobile browser security constraints before focus
-            if (activeKeyboardType === 'standard') {
+            // Proactively set inputmode to "text" (standard keyboard) on pointerdown,
+            // unless the custom virtual keyboard is currently visible.
+            if (!window.mathVirtualKeyboard?.visible) {
                 setKeyboardMode('standard');
             } else {
-                setKeyboardMode('virtual');
+                setKeyboardMode('none');
             }
         };
 
