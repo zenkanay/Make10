@@ -1487,11 +1487,7 @@ function updateVirtualKeyboard() {
             label: "Basic",
             layers: [{
                 rows: [
-                    // Row 1: Game digits
-                    [
-                        ...targetDigitKeys
-                    ],
-                    // Row 2: Operators + brackets + fraction (7 keys)
+                    // Row 1: Operators + brackets + fraction (7 keys)
                     [
                         { label: '+',   latex: '+' },
                         { label: '−',   latex: '-' },
@@ -1501,7 +1497,7 @@ function updateVirtualKeyboard() {
                         { label: ')',   latex: ')' },
                         { label: 'a/b', latex: '\\frac{#@}{#?}' }
                     ],
-                    // Row 3: Power, roots, misc math (7 keys)
+                    // Row 2: Power, roots, misc math (7 keys)
                     [
                         { label: 'xⁿ',  latex: '#@^{#?}' },
                         { label: '√',   latex: '\\sqrt{#?}' },
@@ -1535,6 +1531,10 @@ function updateVirtualKeyboard() {
                                 { label: 'nPr', latex: '{}_{#?}\\mathrm{P}_{#?}' }
                             ]
                         }
+                    ],
+                    // Row 3: Auxiliary digits
+                    [
+                        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
                     ],
 
                     // Row 5: Navigation
