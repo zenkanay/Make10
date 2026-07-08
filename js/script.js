@@ -917,46 +917,7 @@ function initSettings() {
         });
     }
 
-    // --- ドキュメント全体でのタップ監視によるインテリジェントなフォーカス/キーボード制御 ---
-    document.addEventListener('pointerdown', (e) => {
-        const path = e.composedPath();
-        
-        // タップされた要素の属性をチェック
-        const isInsideInput = path.some(el => el === mathContainer);
-        const isInsideKeyboard = path.some(el => 
-            el && (
-                el === window.mathVirtualKeyboard?.element ||
-                (window.mathVirtualKeyboard?.element && window.mathVirtualKeyboard.element.contains(el)) ||
-                el.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
-                (el.classList && el.classList.contains('ML__keyboard')) || 
-                el.id === 'math-virtual-keyboard'
-            )
-        );
-        const isInsideToggle = path.some(el => el && el.id === 'custom-keyboard-toggle');
-        const isInsideDigitCard = path.some(el => el && el.classList && el.classList.contains('digit-card'));
-        const isInsideActionButtons = path.some(el => el && el.id && (el.id === 'clear-btn' || el.id === 'evaluate-btn'));
 
-        // 入力操作に関連する要素をタップしている間は、フォーカスおよびキーボードを一切閉じない
-        if (isInsideInput || isInsideKeyboard || isInsideToggle || isInsideDigitCard || isInsideActionButtons) {
-            return;
-        }
-
-        // それ以外の領域（設定、ヘルプ、背景余白など）をタップした場合 ➔ 安全にフォーカスを外す（blurさせる）
-        mf.blur();
-    }, true);
-
-    // --- フォーカスが外れた際のスタイルとキーボード制御 ---
-    mf.addEventListener('blur', () => {
-        if (mathContainer) mathContainer.classList.remove('focused');
-        if (window.mathVirtualKeyboard?.visible) {
-            window.mathVirtualKeyboard.hide();
-        }
-        setKeyboardMode('none');
-    });
-
-    mf.addEventListener('focus', () => {
-        if (mathContainer) mathContainer.classList.add('focused');
-    });
 
     // --- スクロール防止: キーボード開閉時のビューポート変化で位置がずれないようにする ---
     // Visual Viewport API: iOS/Android でキーボードが出たとき viewport がリサイズされるので、
@@ -1531,7 +1492,7 @@ function updateVirtualKeyboard() {
                         { label: '√',   latex: '\\sqrt{#?}' },
                         {
                             label: 'ⁿ√',
-                            latex: '\\sqrt[\\begin{pmatrix} #? & #? \\\\ #? & #? \\end{pmatrix}]{#?}',
+                            latex: '\\sqrt[#?]{#?}',
                             variants: [
                                 { label: '³√', latex: '\\sqrt[3]{#?}' },
                                 { label: '⁴√', latex: '\\sqrt[4]{#?}' },
