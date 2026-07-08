@@ -994,7 +994,16 @@ function initSettings() {
         }
 
         // 2. それ以外の真の余白（背景など）をタップした場合 ➔ 安全にフォーカスを外してキーボードを閉じる
+        // Force focus to document.body to completely strip focus from the math-field Shadow DOM and clear caret/cursors
+        try {
+            document.body.setAttribute('tabindex', '-1');
+            document.body.focus();
+            document.body.removeAttribute('tabindex');
+        } catch (err) {
+            console.error("Focus strip failed:", err);
+        }
         mf.blur();
+
         if (window.mathVirtualKeyboard?.visible) {
             window.mathVirtualKeyboard.hide();
         }
