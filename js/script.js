@@ -917,7 +917,24 @@ function initSettings() {
         });
     }
 
+    // --- 仮想キーボード上の操作でフォーカスを失わせないための防衛策 ---
+    document.addEventListener('pointerdown', (e) => {
+        const path = e.composedPath();
+        const isInsideKeyboard = path.some(el => 
+            el && (
+                el === window.mathVirtualKeyboard?.element ||
+                (window.mathVirtualKeyboard?.element && window.mathVirtualKeyboard.element.contains(el)) ||
+                el.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
+                (el.classList && el.classList.contains('ML__keyboard')) || 
+                el.id === 'math-virtual-keyboard'
+            )
+        );
 
+        if (isInsideKeyboard) {
+            e.preventDefault();
+            mf.focus({ preventScroll: true });
+        }
+    }, true);
 
     // --- スクロール防止: キーボード開閉時のビューポート変化で位置がずれないようにする ---
     // Visual Viewport API: iOS/Android でキーボードが出たとき viewport がリサイズされるので、
@@ -1549,13 +1566,11 @@ function updateVirtualKeyboard() {
                         { label: 'cos⁻¹', latex: '\\arccos\\left(#?\\right)' },
                         { label: 'tan⁻¹', latex: '\\arctan\\left(#?\\right)' }
                     ],
-                    // Log / exp (6 keys)
+                    // Log / exp (4 keys)
                     [
                         { label: 'ln',    latex: '\\ln\\left(#?\\right)' },
                         { label: 'log',   latex: '\\log\\left(#?\\right)' },
                         { label: 'log_b', latex: '\\log_{#?}\\left(#?\\right)' },
-                        { label: 'eˣ',    latex: 'e^{#?}' },
-                        { label: '10ˣ',   latex: '10^{#?}' },
                         { label: 'exp',   latex: '\\exp\\left(#?\\right)' }
                     ],
                     // Rounding / discrete (7 keys)
