@@ -1285,3 +1285,7 @@ math-field::part(virtual-keyboard-toggle) {
   white-space: nowrap !important;
   border: 0 !important;
 }
+
+math-field.scrolling {
+  caret-color: transparent !important;
+}

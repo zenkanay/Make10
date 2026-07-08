@@ -19,10 +19,6 @@ const shareModalCopyBtn = document.getElementById("share-modal-copy-btn");
 const shareModalUrlBtn = document.getElementById("share-modal-url-btn");
 const difficultySelect = document.getElementById("difficulty-select");
 
-if (mf) {
-    mf.readOnly = true;
-}
-
 // Custom numbers section elements
 const customNumbersSection = document.getElementById("custom-numbers-section");
 const applyCustomBtn = document.getElementById("apply-custom-btn");
@@ -745,8 +741,8 @@ function initSettings() {
         'ln': '\\ln\\left(#?\\right)',
         'gcd': '\\gcd\\left(#?, #?\\right)',
         'lcm': '\\mathrm{lcm}\\left(#?, #?\\right)',
-        'nCr': '{}^{#?}\\mathrm{C}_{#?}',
-        'nPr': '{}^{#?}\\mathrm{P}_{#?}'
+        'nCr': '{}_{#?}\\mathrm{C}_{#?}',
+        'nPr': '{}_{#?}\\mathrm{P}_{#?}'
     };
 
     // --- Keyboard State Machine ---
@@ -844,15 +840,17 @@ function initSettings() {
             handleStart(e.clientX, e.clientY, e.target);
         });
 
-        // Touchmove detector to identify mobile scrolling and immediately blur the field
+        // Touchmove: add .scrolling to temporarily hide cursor during scroll
         mathContainer.addEventListener('touchmove', () => {
-            if (isPointerDown) {
-                isPointerDown = false; // Cancel tap detection
-                if (document.activeElement === mf || mf.contains(document.activeElement)) {
-                    mf.blur();
-                }
-            }
+            isPointerDown = false; // Cancel tap detection
+            mf.classList.add('scrolling');
         }, { passive: true });
+
+        const resetScrolling = () => {
+            mf.classList.remove('scrolling');
+        };
+        mathContainer.addEventListener('touchend', resetScrolling);
+        mathContainer.addEventListener('touchcancel', resetScrolling);
 
         const handleEnd = (clientX, clientY, target) => {
             if (!isPointerDown) return;
@@ -864,17 +862,13 @@ function initSettings() {
             const deltaY = Math.abs(clientY - touchStartY);
             const deltaTime = Date.now() - touchStartTime;
 
-            // スクロールやドラッグ（10px以上の移動）ではなく、短時間（500ms以内）の純粋なタップ判定
+            // Pure tap detection
             if (deltaX < 10 && deltaY < 10 && deltaTime < 500) {
-                // Switch to standard keyboard mode
                 if (window.mathVirtualKeyboard?.visible) {
                     window.mathVirtualKeyboard.hide();
                 }
                 setKeyboardMode('standard');
-                
-                // Disable readonly to allow cursor and typing
-                mf.readOnly = false;
-                mathContainer.classList.add('focused');
+                if (mathContainer) mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             }
         };
@@ -894,7 +888,6 @@ function initSettings() {
         });
 
         mathContainer.addEventListener('pointercancel', () => { isPointerDown = false; });
-        mathContainer.addEventListener('touchcancel', () => { isPointerDown = false; });
     }
 
     // --- Toggle button → open/close virtual keyboard ---
@@ -906,16 +899,14 @@ function initSettings() {
             if (!window.mathVirtualKeyboard) return;
 
             if (window.mathVirtualKeyboard.visible) {
-                // Close virtual KB → no keyboard (don't open standard KB)
+                // Close virtual KB
                 window.mathVirtualKeyboard.hide();
                 setKeyboardMode('none');
-                mf.readOnly = true;
                 if (mathContainer) mathContainer.classList.add('focused');
                 mf.focus({ preventScroll: true });
             } else {
-                // Open virtual KB → close standard KB first
+                // Open virtual KB
                 setKeyboardMode('none');
-                mf.readOnly = false;
                 mf.blur();
                 setTimeout(() => {
                     window.mathVirtualKeyboard.show();
@@ -950,44 +941,21 @@ function initSettings() {
             return;
         }
 
-        // それ以外の領域（設定、ヘルプ、背景余白など）をタップした場合 ➔ 読み取り専用に戻してフォーカスを外し、キーボードを閉じる
-        mf.readOnly = true;
+        // それ以外の領域（設定、ヘルプ、背景余白など）をタップした場合 ➔ 安全にフォーカスを外す（blurさせる）
+        mf.blur();
+    }, true);
+
+    // --- フォーカスが外れた際のスタイルとキーボード制御 ---
+    mf.addEventListener('blur', () => {
         if (mathContainer) mathContainer.classList.remove('focused');
-        
         if (window.mathVirtualKeyboard?.visible) {
             window.mathVirtualKeyboard.hide();
         }
         setKeyboardMode('none');
-    }, true);
+    });
 
-    // --- フォーカスが外れたら仮想キーボードも閉じる ---
-    mf.addEventListener('blur', () => {
-        setTimeout(() => {
-            const active = document.activeElement;
-            const toggle = document.getElementById('custom-keyboard-toggle');
-            const goingToToggle = toggle && (active === toggle || toggle.contains(active));
-            const goingToMf = active === mf || mf.contains(active);
-            const goingToKeyboard = active && (
-                active === window.mathVirtualKeyboard?.element ||
-                (window.mathVirtualKeyboard?.element && window.mathVirtualKeyboard.element.contains(active)) ||
-                active.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
-                active.closest('math-virtual-keyboard') || 
-                active.id === 'math-virtual-keyboard'
-            );
-            
-            // トグルボタンやキーボード自身、または入力欄にいる場合は何もしない
-            if (goingToMf || goingToKeyboard || goingToToggle) return;
-
-            // 完全にはずれた場合のみ、青枠を消し、読み取り専用に戻す
-            mf.readOnly = true;
-            if (mathContainer) mathContainer.classList.remove('focused');
-
-            // 仮想キーボードを非表示にする
-            if (window.mathVirtualKeyboard?.visible) {
-                window.mathVirtualKeyboard.hide();
-            }
-            setKeyboardMode('none');
-        }, 150);
+    mf.addEventListener('focus', () => {
+        if (mathContainer) mathContainer.classList.add('focused');
     });
 
     // --- スクロール防止: キーボード開閉時のビューポート変化で位置がずれないようにする ---
@@ -1586,9 +1554,9 @@ function updateVirtualKeyboard() {
                         { label: '.',   latex: '.' },
                         {
                             label: 'nCr',
-                            latex: '{}^{#?}\\mathrm{C}_{#?}',
+                            latex: '{}_{#?}\\mathrm{C}_{#?}',
                             variants: [
-                                { label: 'nPr', latex: '{}^{#?}\\mathrm{P}_{#?}' }
+                                { label: 'nPr', latex: '{}_{#?}\\mathrm{P}_{#?}' }
                             ]
                         }
                     ],
@@ -1682,7 +1650,7 @@ function updateVirtualKeyboard() {
                         { label: '∏',   latex: '\\prod_{#?=1}^{#?} #?' },
                         { label: '∏∞',  latex: '\\prod_{#?=1}^{\\infty} #?' },
                         { label: 'n!',  latex: '#@!' },
-                        { label: 'nCr', latex: '{}^{#?}\\mathrm{C}_{#?}' }
+                        { label: 'nCr', latex: '{}_{#?}\\mathrm{C}_{#?}' }
                     ],
                     // Constants + comparisons (10 keys)
                     [
@@ -1716,7 +1684,6 @@ function resetGame() {
     } else {
         mf.value = "";
     }
-    mf.readOnly = true;
     clickedIndices = [];
     latexCode.textContent = "";
     currentValue.textContent = "---";
@@ -1973,9 +1940,10 @@ function latexToReadableText(latex) {
     text = text.replace(/\\sqrt\s*\[(.*?)\]\s*{(.*?)}/g, "($1)√($2)");
 
     // Combinations and Permutations
-    // ^{n}\mathrm{C}_{r} or ^{n}\text{C}_{r} -> nCr
-    text = text.replace(/\^{(.*?)}\\(?:text|mathrm)\{[CP]}\_\{?(.*?)}?/g, (match, n, r) => {
-        const op = match.includes("C") ? "C" : "P";
+    // {}_{n}\mathrm{C}_{r} or ^{n}\mathrm{C}_{r} -> nCr
+    text = text.replace(/(?:\{\}?\_\{(.*?)\}|\^{(.*?)\})\\(?:text|mathrm)?\{?([CP])\}(?:\_\{(.*?)\}|\_?(.*?))/g, (match, n1, n2, op, r1, r2) => {
+        const n = n1 || n2 || "";
+        const r = r1 || r2 || "";
         const cleanR = r.replace(/}/g, "");
         return `${n}${op}${cleanR}`;
     });
