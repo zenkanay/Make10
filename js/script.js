@@ -1487,17 +1487,20 @@ function updateVirtualKeyboard() {
             label: "Basic",
             layers: [{
                 rows: [
-                    // Row 1: Operators + brackets + fraction (7 keys)
+                    // Row 1: Operators (4 keys)
                     [
                         { label: '+',   latex: '+' },
                         { label: '−',   latex: '-' },
                         { label: '×',   latex: '\\times' },
-                        { label: '÷',   latex: '\\div' },
+                        { label: '÷',   latex: '\\div' }
+                    ],
+                    // Row 2: Brackets + fraction (3 keys)
+                    [
                         { label: '(',   latex: '(' },
                         { label: ')',   latex: ')' },
                         { label: 'a/b', latex: '\\frac{#@}{#?}' }
                     ],
-                    // Row 2: Power, roots, misc math (7 keys)
+                    // Row 3: Power, roots, misc math (7 keys)
                     [
                         { label: 'xⁿ',  latex: '#@^{#?}' },
                         { label: '√',   latex: '\\sqrt{#?}' },
@@ -1532,7 +1535,7 @@ function updateVirtualKeyboard() {
                             ]
                         }
                     ],
-                    // Row 3: Auxiliary digits
+                    // Row 4: Auxiliary digits
                     [
                         '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
                     ],
