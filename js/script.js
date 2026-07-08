@@ -168,7 +168,7 @@ const TRANSLATIONS = {
         help_section_tips: "ヒント",
         help_tip_1: "数字カードをタップすると、その数字が数式入力欄に自動で挿入されます。",
         help_tip_2: "難易度「Hard」は、四則演算だけでは絶対に解けません。積極的に「√」や「!」などを使いましょう！",
-        help_tip_3: "キーボードショートカット：Space キーで新しい問題を生成、Enter キーで判定ができます。また、Shift キーで仮想キーボードを開きます。"
+        help_tip_3: "キーボードショートカット：Space キーで新しい問題を生成、Enter キーで判定ができます。また、Tab キーで仮想キーボードを開きます。"
     },
     en: {
         settings_btn: "Settings",
@@ -248,7 +248,7 @@ const TRANSLATIONS = {
         help_section_tips: "Tips",
         help_tip_1: "Tap a digit card to automatically insert it into the formula field.",
         help_tip_2: "Hard difficulty cannot be solved with basic arithmetic. Try using '√' or '!' symbols!",
-        help_tip_3: "Keyboard shortcuts: Press Space to generate a new problem, Enter to evaluate. Press Shift to open the virtual keyboard."
+        help_tip_3: "Keyboard shortcuts: Press Space to generate a new problem, Enter to evaluate. Press Tab to open the virtual keyboard."
     },
     zh: {
         settings_btn: "设置",
@@ -327,7 +327,7 @@ const TRANSLATIONS = {
         help_section_tips: "提示",
         help_tip_1: "点击数字卡片可以自动将其插入输入框中。",
         help_tip_2: "“困难”难度无法仅通过四则运算解决，尝试使用“√”或“!”等符号吧！",
-        help_tip_3: "快捷键：按 Space 键生成新题目，按 Enter 键进行判定。按 Shift 键打开虚拟键盘。"
+        help_tip_3: "快捷键：按 Space 键生成新题目，按 Enter 键进行判定。按 Tab 键打开虚拟键盘。"
     },
     ko: {
         settings_btn: "설정",
@@ -406,7 +406,7 @@ const TRANSLATIONS = {
         help_section_tips: "팁",
         help_tip_1: "숫자 카드를 탭하면 입력 필드에 자동으로 삽입됩니다.",
         help_tip_2: "Hard 난이도는 사칙연산만으로 풀 수 없습니다. '√'나 '!' 기호를 사용해 보세요!",
-        help_tip_3: "단축키: Space 키로 새 문제 생성, Enter 키로 판정. Shift 키로 가상 키보드 열기."
+        help_tip_3: "단축키: Space 키로 새 문제 생성, Enter 키로 판정. Tab 키로 가상 키보드 열기."
     },
     es: {
         settings_btn: "Configuración",
@@ -485,7 +485,7 @@ const TRANSLATIONS = {
         help_section_tips: "Consejos",
         help_tip_1: "Toca una tarjeta de número para insertarla en el campo de entrada.",
         help_tip_2: "La dificultad difícil no se puede resolver solo con aritmética. ¡Prueba con '√' o '!'!",
-        help_tip_3: "Atajos de teclado: Space para nueva pregunta, Enter para evaluar. Presione Shift para abrir el teclado virtual."
+        help_tip_3: "Atajos de teclado: Space para nueva pregunta, Enter para evaluar. Presione Tab para abrir el teclado virtual."
     },
     fr: {
         settings_btn: "Paramètres",
@@ -564,7 +564,7 @@ const TRANSLATIONS = {
         help_section_tips: "Astuces",
         help_tip_1: "Appuyez sur une carte de nombre pour l'insérer dans la zone de saisie.",
         help_tip_2: "La difficulté difficile ne peut être résolue avec l'arithmétique seule. Essayez les symboles '√' ou '!'!",
-        help_tip_3: "Raccourcis clavier : Space pour une nouvelle question, Enter pour évaluer. Appuyez sur Shift pour ouvrir le clavier virtuel."
+        help_tip_3: "Raccourcis clavier : Space pour une nouvelle question, Enter pour évaluer. Appuyez sur Tab pour ouvrir le clavier virtuel."
     },
     de: {
         settings_btn: "Einstellungen",
@@ -643,7 +643,7 @@ const TRANSLATIONS = {
         help_section_tips: "Tipps",
         help_tip_1: "Tippe auf eine Zahlenkarte, um sie automatisch in das Eingabefeld einzufügen.",
         help_tip_2: "Die Schwierigkeit 'Schwer' kann nicht nur mit Arithmetik gelöst werden. Versuche '√' oder '!'!",
-        help_tip_3: "Tastenkürzel: Space für neue Aufgabe, Enter zum Auswerten. Drücken Sie Shift, um die virtuelle Tastatur zu öffnen."
+        help_tip_3: "Tastenkürzel: Space für neue Aufgabe, Enter zum Auswerten. Drücken Sie Tab, um die virtuelle Tastatur zu öffnen."
     }
 };
 
@@ -1938,8 +1938,8 @@ restoreGameFromUrl();
 
 // Global shortcut listener (Space key triggers new game, '/' key focuses math-field)
 document.addEventListener("keydown", (e) => {
-    // 1. Shift key is handled globally (even when math-field/input is focused)
-    if (e.key === "Shift") {
+    // 1. Tab key is handled globally (even when math-field/input is focused)
+    if (e.key === "Tab") {
         e.preventDefault();
         const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
         if (customKeyboardToggle && window.mathVirtualKeyboard && !window.mathVirtualKeyboard.visible) {
