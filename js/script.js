@@ -1536,10 +1536,7 @@ function updateVirtualKeyboard() {
                             ]
                         }
                     ],
-                    // Row 4: Auxiliary digits + cursor navigation
-                    [
-                        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
-                    ],
+
                     // Row 5: Navigation
                     [
                         { label: '⌫', command: 'deleteBackward', width: 2 },
@@ -1617,13 +1614,12 @@ function updateVirtualKeyboard() {
                         { label: '∫∞',   latex: '\\int_{-\\infty}^{\\infty} #? \\, d#?' },
                         { label: '∬',    latex: '\\iint #? \\, dA' }
                     ],
-                    // Sums / products (5 keys)
+                    // Sums / products (4 keys)
                     [
                         { label: 'Σ',   latex: '\\sum_{#?=0}^{#?} #?' },
                         { label: 'Σ∞',  latex: '\\sum_{#?=0}^{\\infty} #?' },
                         { label: '∏',   latex: '\\prod_{#?=1}^{#?} #?' },
-                        { label: '∏∞',  latex: '\\prod_{#?=1}^{\\infty} #?' },
-                        { label: 'n!',  latex: '#@!' }
+                        { label: '∏∞',  latex: '\\prod_{#?=1}^{\\infty} #?' }
                     ],
                     // Constants + comparisons (10 keys)
                     [
