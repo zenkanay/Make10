@@ -935,7 +935,7 @@ function initSettings() {
         const isInsideKeyboard = path.some(el => 
             el && (
                 el === window.mathVirtualKeyboard?.element ||
-                (window.mathVirtualKeyboard?.element && window.mathVirtualKeyboard.element.contains(el)) ||
+                window.mathVirtualKeyboard?.element?.contains?.(el) ||
                 el.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
                 (el.classList && el.classList.contains('ML__keyboard')) || 
                 el.id === 'math-virtual-keyboard'
@@ -952,19 +952,12 @@ function initSettings() {
             )
         );
 
-        // 1. 仮想キーボード上または数字カード上のタップの場合 ➔ フォーカス移動をブラウザレベルで防止しフォーカスを維持
-        if (isInsideKeyboard || isInsideDigitCard) {
-            e.preventDefault();
-            mf.focus({ preventScroll: true });
+        // 1. 仮想キーボード、数字カード、その他入力エリアがタップされた場合は、キーボードを閉じずにそのまま処理を続行
+        if (isInsideInput || isInsideKeyboard || isInsideToggle || isInsideDigitCard || isInsideActionButtons || isInsideModals) {
             return;
         }
 
-        // 2. その他のゲーム関連エリア（入力欄、トグル、クリア/判定ボタン、モーダル）をタップしている間は何もしない
-        if (isInsideInput || isInsideToggle || isInsideActionButtons || isInsideModals) {
-            return;
-        }
-
-        // 3. それ以外の真の余白（背景など）をタップした場合 ➔ 安全にフォーカスを外してキーボードを閉じる
+        // 2. それ以外の真の余白（背景など）をタップした場合 ➔ 安全にフォーカスを外してキーボードを閉じる
         mf.blur();
         if (window.mathVirtualKeyboard?.visible) {
             window.mathVirtualKeyboard.hide();
