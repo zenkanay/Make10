@@ -698,13 +698,15 @@ function initSettings() {
         // mode: "standard" = OS keyboard, "virtual" = virtual KB only, "none" = no keyboard
         if (!mf) return;
 
+        // Keep policy strictly as "manual" so MathLive's built-in keyboard never auto-pops
+        mf.mathVirtualKeyboardPolicy = "manual";
+        mf.setAttribute("math-virtual-keyboard-policy", "manual");
+
         if (mode === 'standard') {
             allowInputmodeNone = false;
-            mf.mathVirtualKeyboardPolicy = "auto";
             mf.setAttribute('inputmode', 'text');
         } else {
             allowInputmodeNone = true;
-            mf.mathVirtualKeyboardPolicy = "manual";
             mf.setAttribute('inputmode', 'none');
         }
     }
