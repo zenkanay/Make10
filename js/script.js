@@ -1938,6 +1938,16 @@ restoreGameFromUrl();
 
 // Global shortcut listener (Space key triggers new game, '/' key focuses math-field)
 document.addEventListener("keydown", (e) => {
+    // 1. Shift key is handled globally (even when math-field/input is focused)
+    if (e.key === "Shift") {
+        e.preventDefault();
+        const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
+        if (customKeyboardToggle && window.mathVirtualKeyboard && !window.mathVirtualKeyboard.visible) {
+            customKeyboardToggle.click();
+        }
+        return;
+    }
+
     const activeEl = document.activeElement;
     const isFocusOnInput = activeEl && (
         activeEl.tagName === "INPUT" || 
@@ -1961,15 +1971,6 @@ document.addEventListener("keydown", (e) => {
         mf.focus();
         if (mf.select) {
             mf.select();
-        }
-        return;
-    }
-
-    if (e.key === "Shift") {
-        e.preventDefault();
-        const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
-        if (customKeyboardToggle && window.mathVirtualKeyboard && !window.mathVirtualKeyboard.visible) {
-            customKeyboardToggle.click();
         }
         return;
     }
