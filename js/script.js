@@ -702,14 +702,80 @@ function initSettings() {
         mf.mathVirtualKeyboardPolicy = "manual";
         mf.setAttribute("math-virtual-keyboard-policy", "manual");
 
+        const sink = mf.shadowRoot?.querySelector('.ML__keyboard-sink') || mf.querySelector('.ML__keyboard-sink');
+
         if (mode === 'standard') {
             allowInputmodeNone = false;
+            if (sink) sink.setAttribute('inputmode', 'text');
             mf.setAttribute('inputmode', 'text');
         } else {
             allowInputmodeNone = true;
+            if (sink) sink.setAttribute('inputmode', 'none');
             mf.setAttribute('inputmode', 'none');
         }
     }
+
+    function applyPatchToSink(sink) {
+        if (!sink || sink.__patched) return;
+        sink.__patched = true;
+
+        const origSetAttr = sink.setAttribute.bind(sink);
+        sink.setAttribute = function(name, value) {
+            if (name === 'inputmode' && value === 'none' && !allowInputmodeNone) {
+                origSetAttr('inputmode', 'text');
+                return;
+            }
+            origSetAttr(name, value);
+        };
+
+        const proto = Object.getPrototypeOf(sink);
+        const descriptor = Object.getOwnPropertyDescriptor(proto, 'inputMode');
+        if (descriptor) {
+            Object.defineProperty(sink, 'inputMode', {
+                get: () => sink.getAttribute('inputmode') || 'none',
+                set: (val) => {
+                    if (val === 'none' && !allowInputmodeNone) {
+                        origSetAttr('inputmode', 'text');
+                    } else {
+                        descriptor.set?.call(sink, val);
+                    }
+                },
+                configurable: true
+            });
+        }
+
+        // Apply current state immediately
+        if (!allowInputmodeNone) {
+            origSetAttr('inputmode', 'text');
+        } else {
+            origSetAttr('inputmode', 'none');
+        }
+    }
+
+    // Observe Shadow DOM for dynamically recreated keyboard-sink elements
+    function observeShadowDom() {
+        if (!mf) return;
+        if (!mf.shadowRoot) {
+            setTimeout(observeShadowDom, 50);
+            return;
+        }
+
+        const observer = new MutationObserver((mutations) => {
+            for (let mutation of mutations) {
+                if (mutation.type === 'childList') {
+                    const sink = mf.shadowRoot.querySelector('.ML__keyboard-sink');
+                    if (sink) applyPatchToSink(sink);
+                }
+            }
+        });
+
+        observer.observe(mf.shadowRoot, { childList: true, subtree: true });
+
+        // Initial check
+        const sink = mf.shadowRoot.querySelector('.ML__keyboard-sink');
+        if (sink) applyPatchToSink(sink);
+    }
+    observeShadowDom();
 
     // Set initial keyboard state: no keyboard until user explicitly taps mf
     setKeyboardMode('none');
