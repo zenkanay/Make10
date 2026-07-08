@@ -1017,12 +1017,17 @@ function hasVariables(latex) {
 function checkNumbersUsage(latex, numbers) {
     // 1. Check if the LaTeX contains decimal notation (e.g. 1.7 or 1\text{.}7)
     // Decimals are strictly prohibited in Make10 as they represent joining digits.
-    const hasDecimals = /\d+\s*(?:\.|\\text\{\.\})\s*\d+/.test(latex);
+    const decimalRegex = /\d+\s*(?:\.|\\text\{\.\})\s*\d+/g;
+    const hasDecimals = decimalRegex.test(latex);
 
-    // Extract all NUMBER sequences from the LaTeX expression as whole integers.
+    // 2. Remove decimals from the LaTeX string before extracting raw numbers,
+    // so they are not registered as consumed digit cards.
+    const cleanedLatex = latex.replace(decimalRegex, "");
+
+    // Extract all NUMBER sequences from the cleaned LaTeX expression as whole integers.
     // e.g. "13 + 5" → [13, 5]  (NOT [1, 3, 5])
     // This prevents using "13" when only "1" and "3" are available as separate cards.
-    const rawNumbers = (latex.match(/\d+/g) || []).map(Number);
+    const rawNumbers = (cleanedLatex.match(/\d+/g) || []).map(Number);
 
     const numberCount = {};
     for (let n of rawNumbers) numberCount[n] = (numberCount[n] || 0) + 1;
