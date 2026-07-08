@@ -934,6 +934,8 @@ function initSettings() {
         const isInsideInput = path.some(el => el === mathContainer);
         const isInsideKeyboard = path.some(el => 
             el && (
+                el === window.mathVirtualKeyboard?.element ||
+                (window.mathVirtualKeyboard?.element && window.mathVirtualKeyboard.element.contains(el)) ||
                 el.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
                 (el.classList && el.classList.contains('ML__keyboard')) || 
                 el.id === 'math-virtual-keyboard'
@@ -966,6 +968,8 @@ function initSettings() {
             const goingToToggle = toggle && (active === toggle || toggle.contains(active));
             const goingToMf = active === mf || mf.contains(active);
             const goingToKeyboard = active && (
+                active === window.mathVirtualKeyboard?.element ||
+                (window.mathVirtualKeyboard?.element && window.mathVirtualKeyboard.element.contains(active)) ||
                 active.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
                 active.closest('math-virtual-keyboard') || 
                 active.id === 'math-virtual-keyboard'
@@ -1592,10 +1596,11 @@ function updateVirtualKeyboard() {
                     [
                         '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
                     ],
-                    // Row 5: Cursor navigation
+                    // Row 5: Navigation
                     [
-                        { label: '←', command: 'moveBackward', width: 5 },
-                        { label: '→', command: 'moveForward', width: 5 }
+                        { label: '⌫', command: ['performWithFeedback', 'deleteBackward'], width: 2 },
+                        { label: '←', command: ['performWithFeedback', 'moveBackward'], width: 4 },
+                        { label: '→', command: ['performWithFeedback', 'moveForward'], width: 4 }
                     ]
                 ]
             }]
@@ -1644,9 +1649,9 @@ function updateVirtualKeyboard() {
                     ],
                     // Navigation
                     [
-                        { label: '⌫', command: 'deleteBackward', width: 2 },
-                        { label: '←', command: 'moveBackward', width: 2 },
-                        { label: '→', command: 'moveForward', width: 2 }
+                        { label: '⌫', command: ['performWithFeedback', 'deleteBackward'], width: 2 },
+                        { label: '←', command: ['performWithFeedback', 'moveBackward'], width: 4 },
+                        { label: '→', command: ['performWithFeedback', 'moveForward'], width: 4 }
                     ]
                 ]
             }]
@@ -1694,9 +1699,9 @@ function updateVirtualKeyboard() {
                     ],
                     // Navigation
                     [
-                        { label: '⌫', command: 'deleteBackward', width: 2 },
-                        { label: '←', command: 'moveBackward', width: 4 },
-                        { label: '→', command: 'moveForward', width: 4 }
+                        { label: '⌫', command: ['performWithFeedback', 'deleteBackward'], width: 2 },
+                        { label: '←', command: ['performWithFeedback', 'moveBackward'], width: 4 },
+                        { label: '→', command: ['performWithFeedback', 'moveForward'], width: 4 }
                     ]
                 ]
             }]
