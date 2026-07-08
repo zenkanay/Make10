@@ -1942,7 +1942,7 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Tab") {
         e.preventDefault();
         const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
-        if (customKeyboardToggle && window.mathVirtualKeyboard && !window.mathVirtualKeyboard.visible) {
+        if (customKeyboardToggle && window.mathVirtualKeyboard) {
             customKeyboardToggle.click();
         }
         return;
