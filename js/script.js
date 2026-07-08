@@ -745,8 +745,8 @@ function initSettings() {
         'ln': '\\ln\\left(#?\\right)',
         'gcd': '\\gcd\\left(#?, #?\\right)',
         'lcm': '\\mathrm{lcm}\\left(#?, #?\\right)',
-        'nCr': '^{#?}\\mathrm{C}_{#?}',
-        'nPr': '^{#?}\\mathrm{P}_{#?}'
+        'nCr': '{}^{#?}\\mathrm{C}_{#?}',
+        'nPr': '{}^{#?}\\mathrm{P}_{#?}'
     };
 
     // --- Keyboard State Machine ---
@@ -926,9 +926,29 @@ function initSettings() {
         });
     }
 
+    // --- 仮想キーボードのタップ判定（ポインターダウンの監視） ---
+    let isTappingKeyboard = false;
+    window.addEventListener('pointerdown', (e) => {
+        const path = e.composedPath();
+        isTappingKeyboard = path.some(el => 
+            el && (
+                el.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
+                (el.classList && el.classList.contains('ML__keyboard')) || 
+                el.id === 'math-virtual-keyboard'
+            )
+        );
+    }, true);
+
     // --- フォーカスが外れたら仮想キーボードも閉じる ---
     mf.addEventListener('blur', () => {
         setTimeout(() => {
+            // キーボードのタップ中であれば、フォーカスを強制的に戻して終了
+            if (isTappingKeyboard) {
+                mf.focus({ preventScroll: true });
+                isTappingKeyboard = false;
+                return;
+            }
+
             // フォーカスがトグルボタンやmf自身、または仮想キーボードに移った場合は閉じない
             const active = document.activeElement;
             const toggle = document.getElementById('custom-keyboard-toggle');
@@ -1554,9 +1574,9 @@ function updateVirtualKeyboard() {
                         { label: '.',   latex: '.' },
                         {
                             label: 'nCr',
-                            latex: '^{#?}\\mathrm{C}_{#?}',
+                            latex: '{}^{#?}\\mathrm{C}_{#?}',
                             variants: [
-                                { label: 'nPr', latex: '^{#?}\\mathrm{P}_{#?}' }
+                                { label: 'nPr', latex: '{}^{#?}\\mathrm{P}_{#?}' }
                             ]
                         }
                     ],
@@ -1649,7 +1669,7 @@ function updateVirtualKeyboard() {
                         { label: '∏',   latex: '\\prod_{#?=1}^{#?} #?' },
                         { label: '∏∞',  latex: '\\prod_{#?=1}^{\\infty} #?' },
                         { label: 'n!',  latex: '#@!' },
-                        { label: 'nCr', latex: '^{#?}\\mathrm{C}_{#?}' }
+                        { label: 'nCr', latex: '{}^{#?}\\mathrm{C}_{#?}' }
                     ],
                     // Constants + comparisons (10 keys)
                     [
