@@ -39,6 +39,10 @@ class EvaluateRequest(BaseModel):
     api_key: Optional[str] = None
 
 def check_digits(latex_str: str, target_numbers: List[int]) -> bool:
+    # 1. Decimals are prohibited to prevent decimal connection cheating (e.g. 1.7)
+    if re.search(r'\d+\s*(?:\.|\\text\{\.\})\s*\d+', latex_str):
+        return False
+
     # Extract all NUMBER sequences (not individual digits) to prevent concatenation cheating.
     # e.g. "13 + 5" → [13, 5], NOT [1, 3, 5]
     formula_numbers = sorted([int(m) for m in re.findall(r'\d+', latex_str)])

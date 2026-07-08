@@ -1015,6 +1015,10 @@ function hasVariables(latex) {
 
 // Check digit usage in LaTeX, using clickedIndices to disambiguate duplicates
 function checkNumbersUsage(latex, numbers) {
+    // 1. Check if the LaTeX contains decimal notation (e.g. 1.7 or 1\text{.}7)
+    // Decimals are strictly prohibited in Make10 as they represent joining digits.
+    const hasDecimals = /\d+\s*(?:\.|\\text\{\.\})\s*\d+/.test(latex);
+
     // Extract all NUMBER sequences from the LaTeX expression as whole integers.
     // e.g. "13 + 5" → [13, 5]  (NOT [1, 3, 5])
     // This prevents using "13" when only "1" and "3" are available as separate cards.
@@ -1072,7 +1076,7 @@ function checkNumbersUsage(latex, numbers) {
     const noExtra = unmatched.length === 0;
 
     return {
-        isValid: allUsed && noExtra,
+        isValid: allUsed && noExtra && !hasDecimals,
         usedIndices: usedIndices,
         unmatched: unmatched,
         hasMissing: !allUsed
