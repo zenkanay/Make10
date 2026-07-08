@@ -691,6 +691,27 @@ function applyLanguage(lang) {
 
 // Initialize Settings & Local Data
 function initSettings() {
+    // --- Keyboard State Machine ---
+    let allowInputmodeNone = true; // start with no keyboard (changed when user taps mf)
+
+    function setKeyboardMode(mode) {
+        // mode: "standard" = OS keyboard, "virtual" = virtual KB only, "none" = no keyboard
+        if (!mf) return;
+
+        if (mode === 'standard') {
+            allowInputmodeNone = false;
+            mf.mathVirtualKeyboardPolicy = "auto";
+            mf.setAttribute('inputmode', 'text');
+        } else {
+            allowInputmodeNone = true;
+            mf.mathVirtualKeyboardPolicy = "manual";
+            mf.setAttribute('inputmode', 'none');
+        }
+    }
+
+    // Set initial keyboard state: no keyboard until user explicitly taps mf
+    setKeyboardMode('none');
+
     const savedKey = localStorage.getItem("gemini_api_key");
     if (savedKey) {
         apiKey = savedKey;
@@ -745,68 +766,7 @@ function initSettings() {
         'nPr': '{}_{#?}\\mathrm{P}_{#?}'
     };
 
-    // --- Keyboard State Machine ---
-    // MathLive uses <span class="ML__keyboard-sink" inputmode=none> in its shadow DOM.
-    // We patch setAttribute to control whether the OS keyboard appears.
-    let allowInputmodeNone = true; // start with no keyboard (changed when user taps mf)
-
-    function getSink() {
-        return mf.shadowRoot?.querySelector('.ML__keyboard-sink')
-            || mf.querySelector('.ML__keyboard-sink');
-    }
-
-    function setKeyboardMode(mode) {
-        // mode: "standard" = OS keyboard, "virtual" = virtual KB only, "none" = no keyboard
-        const sink = getSink();
-        if (mode === 'standard') {
-            allowInputmodeNone = false;
-            if (sink) sink.setAttribute('inputmode', 'text');
-        } else {
-            allowInputmodeNone = true;
-            if (sink) sink.setAttribute('inputmode', 'none');
-        }
-    }
-
-    function patchKeyboardSink() {
-        const sink = getSink();
-        if (!sink || sink.__patched) return false;
-        sink.__patched = true;
-
-        const origSetAttr = sink.setAttribute.bind(sink);
-        sink.setAttribute = function(name, value) {
-            if (name === 'inputmode' && value === 'none' && !allowInputmodeNone) {
-                origSetAttr('inputmode', 'text');
-                return;
-            }
-            origSetAttr(name, value);
-        };
-
-        const proto = Object.getPrototypeOf(sink);
-        const descriptor = Object.getOwnPropertyDescriptor(proto, 'inputMode');
-        if (descriptor) {
-            Object.defineProperty(sink, 'inputMode', {
-                get: () => sink.getAttribute('inputmode') || 'none',
-                set: (val) => {
-                    if (val === 'none' && !allowInputmodeNone) {
-                        origSetAttr('inputmode', 'text');
-                    } else {
-                        descriptor.set?.call(sink, val);
-                    }
-                },
-                configurable: true
-            });
-        }
-
-        // Initial state: no keyboard until user explicitly taps mf
-        origSetAttr('inputmode', 'none');
-        return true;
-    }
-
-    function tryPatch(attempts = 0) {
-        if (patchKeyboardSink()) return;
-        if (attempts < 20) setTimeout(() => tryPatch(attempts + 1), 100);
-    }
-    tryPatch();
+    // Keyboard state machine and policy configuration handled above
 
     // --- Tapping math field (pointerup/touchend) → switch to standard keyboard ---
     // The events are bound directly to mathContainer. preventDefault() is NEVER called
