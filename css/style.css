@@ -821,9 +821,17 @@ kbd {
 
 .modal-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   border-top: 1px solid var(--border-color);
   padding-top: 12px;
+}
+
+.settings-version {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  opacity: 0.6;
 }
 
 /* Helpers */
