@@ -1545,8 +1545,8 @@ function updateVirtualKeyboard() {
                     // Row 5: Navigation
                     [
                         { label: '⌫', command: 'deleteBackward', width: 2 },
-                        { label: '←', command: 'moveLeft', width: 4 },
-                        { label: '→', command: 'moveRight', width: 4 }
+                        { label: '←', command: 'moveBackward', width: 4 },
+                        { label: '→', command: 'moveForward', width: 4 }
                     ]
                 ]
             }]
@@ -1594,8 +1594,8 @@ function updateVirtualKeyboard() {
                     // Navigation
                     [
                         { label: '⌫', command: 'deleteBackward', width: 2 },
-                        { label: '←', command: 'moveLeft', width: 4 },
-                        { label: '→', command: 'moveRight', width: 4 }
+                        { label: '←', command: 'moveBackward', width: 4 },
+                        { label: '→', command: 'moveForward', width: 4 }
                     ]
                 ]
             }]
@@ -1619,14 +1619,13 @@ function updateVirtualKeyboard() {
                         { label: '∫∞',   latex: '\\int_{-\\infty}^{\\infty} #? \\, d#?' },
                         { label: '∬',    latex: '\\iint #? \\, dA' }
                     ],
-                    // Sums / products (4 keys) + combinatorics (2 keys)
+                    // Sums / products (5 keys)
                     [
                         { label: 'Σ',   latex: '\\sum_{#?=0}^{#?} #?' },
                         { label: 'Σ∞',  latex: '\\sum_{#?=0}^{\\infty} #?' },
                         { label: '∏',   latex: '\\prod_{#?=1}^{#?} #?' },
                         { label: '∏∞',  latex: '\\prod_{#?=1}^{\\infty} #?' },
-                        { label: 'n!',  latex: '#@!' },
-                        { label: 'nCr', latex: '{}_{#?}\\mathrm{C}_{#?}' }
+                        { label: 'n!',  latex: '#@!' }
                     ],
                     // Constants + comparisons (10 keys)
                     [
@@ -1644,8 +1643,8 @@ function updateVirtualKeyboard() {
                     // Navigation
                     [
                         { label: '⌫', command: 'deleteBackward', width: 2 },
-                        { label: '←', command: 'moveLeft', width: 4 },
-                        { label: '→', command: 'moveRight', width: 4 }
+                        { label: '←', command: 'moveBackward', width: 4 },
+                        { label: '→', command: 'moveForward', width: 4 }
                     ]
                 ]
             }]
