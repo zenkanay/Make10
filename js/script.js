@@ -693,6 +693,7 @@ function applyLanguage(lang) {
 function initSettings() {
     // --- Keyboard State Machine ---
     let allowInputmodeNone = true; // start with no keyboard (changed when user taps mf)
+    let activeKeyboardType = 'standard'; // 'standard' or 'virtual'
 
     function setKeyboardMode(mode) {
         // mode: "standard" = OS keyboard, "virtual" = virtual KB only, "none" = no keyboard
@@ -704,11 +705,23 @@ function initSettings() {
 
         const sink = mf.shadowRoot?.querySelector('.ML__keyboard-sink') || mf.querySelector('.ML__keyboard-sink');
 
+        // Ensure the sink is patched IMMEDIATELY before we change modes or focus
+        if (sink) {
+            applyPatchToSink(sink);
+        }
+
         if (mode === 'standard') {
             allowInputmodeNone = false;
+            activeKeyboardType = 'standard';
             if (sink) sink.setAttribute('inputmode', 'text');
             mf.setAttribute('inputmode', 'text');
+        } else if (mode === 'virtual') {
+            allowInputmodeNone = true;
+            activeKeyboardType = 'virtual';
+            if (sink) sink.setAttribute('inputmode', 'none');
+            mf.setAttribute('inputmode', 'none');
         } else {
+            // mode === 'none' (closed) - keep activeKeyboardType to know what to restore on next tap
             allowInputmodeNone = true;
             if (sink) sink.setAttribute('inputmode', 'none');
             mf.setAttribute('inputmode', 'none');
@@ -852,6 +865,13 @@ function initSettings() {
             touchStartX = clientX;
             touchStartY = clientY;
             touchStartTime = Date.now();
+
+            // Set inputmode proactively on start of tap, to bypass mobile browser security constraints before focus
+            if (activeKeyboardType === 'standard') {
+                setKeyboardMode('standard');
+            } else {
+                setKeyboardMode('virtual');
+            }
         };
 
         mathContainer.addEventListener('pointerdown', (e) => {
@@ -938,12 +958,12 @@ function initSettings() {
             if (window.mathVirtualKeyboard.visible) {
                 // Close virtual KB
                 window.mathVirtualKeyboard.hide();
-                setKeyboardMode('none');
-                if (mathContainer) mathContainer.classList.add('focused');
-                mf.focus({ preventScroll: true });
+                setKeyboardMode('standard'); // Set activeKeyboardType to standard proactively for next tap
+                setKeyboardMode('none');     // But hide the keyboard for now
+                mf.blur();
             } else {
                 // Open virtual KB
-                setKeyboardMode('none');
+                setKeyboardMode('virtual');
                 mf.blur();
                 setTimeout(() => {
                     window.mathVirtualKeyboard.show();
