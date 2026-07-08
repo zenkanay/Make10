@@ -69,7 +69,10 @@ def evaluate_with_sympy(latex_str: str):
         # If it is a real number and can be converted to float
         if evaluated.is_real and evaluated.is_comparable:
             try:
-                return float(evaluated)
+                import math
+                val = float(evaluated)
+                if not math.isnan(val) and not math.isinf(val):
+                    return val
             except Exception:
                 pass
         else:
@@ -198,14 +201,6 @@ async def evaluate(req: EvaluateRequest):
         except Exception as gemini_err:
             explanation += f" | Gemini API invocation error: {str(gemini_err)}"
             
-    # 4. Final rescue: if everything failed but we have a symbolic expression from SymPy,
-    # show the symbolic expression as the result instead of a hard error.
-    if not success and symbolic_expression is not None:
-        value = symbolic_expression.replace('*I', 'i').replace('I', 'i')
-        success = True
-        explanation = "SymPy symbolic expression (Gemini fallback unavailable or failed)."
-        engine_used = "sympy"
-
     # 5. Check if Make 10 condition is met
     is_make10 = False
     if success and value is not None:

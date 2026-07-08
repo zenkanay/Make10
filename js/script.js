@@ -736,11 +736,17 @@ function initSettings() {
     mf.mathVirtualKeyboardPolicy = "manual";
     mf.setAttribute("math-virtual-keyboard-policy", "manual");
 
-    // Add custom inline shortcuts for ceil and floor functions
+    // Add custom inline shortcuts for mathematical functions and notation
     mf.inlineShortcuts = {
         ...mf.inlineShortcuts,
         'ceil': '\\lceil #? \\rceil',
-        'floor': '\\lfloor #? \\rfloor'
+        'floor': '\\lfloor #? \\rfloor',
+        'log': '\\log\\left(#?\\right)',
+        'ln': '\\ln\\left(#?\\right)',
+        'gcd': '\\gcd\\left(#?, #?\\right)',
+        'lcm': '\\mathrm{lcm}\\left(#?, #?\\right)',
+        'nCr': '^{#?}\\mathrm{C}_{#?}',
+        'nPr': '^{#?}\\mathrm{P}_{#?}'
     };
 
     // --- Keyboard State Machine ---
@@ -923,13 +929,18 @@ function initSettings() {
     // --- フォーカスが外れたら仮想キーボードも閉じる ---
     mf.addEventListener('blur', () => {
         setTimeout(() => {
-            // フォーカスがトグルボタンやmf自身に移った場合は閉じない
+            // フォーカスがトグルボタンやmf自身、または仮想キーボードに移った場合は閉じない
             const active = document.activeElement;
             const toggle = document.getElementById('custom-keyboard-toggle');
             const goingToToggle = toggle && (active === toggle || toggle.contains(active));
             const goingToMf = active === mf || mf.contains(active);
+            const goingToKeyboard = active && (
+                active.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
+                active.closest('math-virtual-keyboard') || 
+                active.id === 'math-virtual-keyboard'
+            );
             
-            if (goingToMf) return;
+            if (goingToMf || goingToKeyboard) return;
 
             // 完全にはずれた場合のみ、青枠を消し、読み取り専用に戻す
             if (!goingToToggle) {
@@ -1543,9 +1554,9 @@ function updateVirtualKeyboard() {
                         { label: '.',   latex: '.' },
                         {
                             label: 'nCr',
-                            latex: '\\binom{#?}{#?}',
+                            latex: '^{#?}\\mathrm{C}_{#?}',
                             variants: [
-                                { label: 'nPr', latex: '^{#?}\\text{P}_{#?}' }
+                                { label: 'nPr', latex: '^{#?}\\mathrm{P}_{#?}' }
                             ]
                         }
                     ],
@@ -1555,10 +1566,8 @@ function updateVirtualKeyboard() {
                     ],
                     // Row 5: Cursor navigation
                     [
-                        { label: '←', command: 'moveBackward', width: 2 },
-                        { label: '↑', command: 'moveUp', width: 2 },
-                        { label: '↓', command: 'moveDown', width: 2 },
-                        { label: '→', command: 'moveForward', width: 2 }
+                        { label: '←', command: 'moveBackward', width: 5 },
+                        { label: '→', command: 'moveForward', width: 5 }
                     ]
                 ]
             }]
@@ -1640,7 +1649,7 @@ function updateVirtualKeyboard() {
                         { label: '∏',   latex: '\\prod_{#?=1}^{#?} #?' },
                         { label: '∏∞',  latex: '\\prod_{#?=1}^{\\infty} #?' },
                         { label: 'n!',  latex: '#@!' },
-                        { label: 'nCr', latex: '\\binom{#?}{#?}' }
+                        { label: 'nCr', latex: '^{#?}\\mathrm{C}_{#?}' }
                     ],
                     // Constants + comparisons (10 keys)
                     [
@@ -1658,10 +1667,8 @@ function updateVirtualKeyboard() {
                     // Navigation
                     [
                         { label: '⌫', command: 'deleteBackward', width: 2 },
-                        { label: '←', command: 'moveBackward', width: 2 },
-                        { label: '↑', command: 'moveUp', width: 2 },
-                        { label: '↓', command: 'moveDown', width: 2 },
-                        { label: '→', command: 'moveForward', width: 2 }
+                        { label: '←', command: 'moveBackward', width: 4 },
+                        { label: '→', command: 'moveForward', width: 4 }
                     ]
                 ]
             }]
@@ -1933,10 +1940,11 @@ function latexToReadableText(latex) {
     text = text.replace(/\\sqrt\s*\[(.*?)\]\s*{(.*?)}/g, "($1)√($2)");
 
     // Combinations and Permutations
-    // ^{n}\text{C}_{r} -> nCr
-    text = text.replace(/\^{(.*?)}\\text\{[CP]}\_{(.*?)}/g, (match, n, r) => {
+    // ^{n}\mathrm{C}_{r} or ^{n}\text{C}_{r} -> nCr
+    text = text.replace(/\^{(.*?)}\\(?:text|mathrm)\{[CP]}\_\{?(.*?)}?/g, (match, n, r) => {
         const op = match.includes("C") ? "C" : "P";
-        return `${n}${op}${r}`;
+        const cleanR = r.replace(/}/g, "");
+        return `${n}${op}${cleanR}`;
     });
 
     // Replace logs \log_{b}(x) -> log_b(x)
