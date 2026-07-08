@@ -1527,9 +1527,9 @@ function updateVirtualKeyboard() {
                     ],
                     // Row 5: Navigation
                     [
-                        { label: '⌫', command: ['performWithFeedback', 'deleteBackward'], width: 2 },
-                        { label: '←', command: ['performWithFeedback', 'moveBackward'], width: 4 },
-                        { label: '→', command: ['performWithFeedback', 'moveForward'], width: 4 }
+                        { label: '⌫', command: 'deleteBackward', width: 2 },
+                        { label: '←', command: 'moveLeft', width: 4 },
+                        { label: '→', command: 'moveRight', width: 4 }
                     ]
                 ]
             }]
@@ -1578,9 +1578,9 @@ function updateVirtualKeyboard() {
                     ],
                     // Navigation
                     [
-                        { label: '⌫', command: ['performWithFeedback', 'deleteBackward'], width: 2 },
-                        { label: '←', command: ['performWithFeedback', 'moveBackward'], width: 4 },
-                        { label: '→', command: ['performWithFeedback', 'moveForward'], width: 4 }
+                        { label: '⌫', command: 'deleteBackward', width: 2 },
+                        { label: '←', command: 'moveLeft', width: 4 },
+                        { label: '→', command: 'moveRight', width: 4 }
                     ]
                 ]
             }]
@@ -1628,9 +1628,9 @@ function updateVirtualKeyboard() {
                     ],
                     // Navigation
                     [
-                        { label: '⌫', command: ['performWithFeedback', 'deleteBackward'], width: 2 },
-                        { label: '←', command: ['performWithFeedback', 'moveBackward'], width: 4 },
-                        { label: '→', command: ['performWithFeedback', 'moveForward'], width: 4 }
+                        { label: '⌫', command: 'deleteBackward', width: 2 },
+                        { label: '←', command: 'moveLeft', width: 4 },
+                        { label: '→', command: 'moveRight', width: 4 }
                     ]
                 ]
             }]
