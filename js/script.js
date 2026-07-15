@@ -3653,6 +3653,8 @@ if (shareModalUrlBtn) {
 (function initHandwriting() {
     const hwBtn         = document.getElementById('handwriting-btn');
     const hwClearBtn    = document.getElementById('hw-clear-btn');
+    const hwUndoBtn     = document.getElementById('hw-undo-btn');
+    const hwRedoBtn     = document.getElementById('hw-redo-btn');
     const hwInsertBtn   = document.getElementById('hw-insert-btn');
     const hwStatus      = document.getElementById('hw-status');
     const hwLatexPrev   = document.getElementById('hw-latex-preview');
@@ -3668,8 +3670,15 @@ if (shareModalUrlBtn) {
     const ctx = canvas.getContext('2d');
 
     let strokes = [];
+    let redoStrokes = [];
     let currentStroke = null;
     let recognizeTimer = null;
+    let hwCurrentLatex = '';
+
+    // リアルタイム同期用の状態変数
+    let hwSessionActive = false;
+    let hwOriginalValue = '';
+    let hwOriginalPosition = 0;
 
     function resizeCanvas() {
         const r = iinkContainer.getBoundingClientRect();
@@ -3704,13 +3713,35 @@ if (shareModalUrlBtn) {
         return { x: src.clientX - r.left, y: src.clientY - r.top };
     }
 
+    function startHwSession() {
+        if (hwSessionActive) return;
+        hwSessionActive = true;
+        hwOriginalValue = mf.value;
+        hwOriginalPosition = mf.position;
+    }
+
+    function applyHwResultToMf(latex) {
+        if (!hwSessionActive) return;
+        // 一旦、手書き開始前の状態に戻す
+        mf.value = hwOriginalValue;
+        mf.position = hwOriginalPosition;
+        // 新しい手書きの認識結果を挿入する
+        if (latex) {
+            mf.executeCommand(['insert', latex]);
+            handleLiveInput();
+        }
+    }
+
     function onDown(e) {
         e.preventDefault();
+        startHwSession(); // 手書き開始前の状態を記憶
         const p = getPos(e);
         currentStroke = { x: [p.x], y: [p.y] };
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
         iinkContainer.classList.add('active');
+        redoStrokes = [];
+        updateUndoRedoButtons();
     }
 
     function onMove(e) {
@@ -3734,6 +3765,7 @@ if (shareModalUrlBtn) {
         if (!currentStroke) return;
         strokes.push(currentStroke);
         currentStroke = null;
+        updateUndoRedoButtons();
         scheduleRecognize();
     }
 
@@ -3811,8 +3843,14 @@ if (shareModalUrlBtn) {
 
             const latex = (await res.text()).trim();
             hwCurrentLatex = latex;
-            hwLatexPrev.textContent = latex;
-            hwLatexPrev.classList.remove('hidden');
+            
+            // 直接 mf に同期反映
+            applyHwResultToMf(latex);
+
+            if (hwLatexPrev) {
+                hwLatexPrev.value = latex;
+                hwLatexPrev.classList.remove('hidden');
+            }
             hwStatus.textContent = t.handwriting_status_ready || '認識完了。挿入しますか？';
             hwStatus.className = 'hw-status ready';
             hwInsertBtn.disabled = false;
@@ -3860,28 +3898,84 @@ if (shareModalUrlBtn) {
         const lhw  = document.getElementById('layout-handwriting');
         if (lhw) lhw.classList.add('hidden');
         if (l123) l123.classList.remove('hidden');
+        hwSessionActive = false;
     }
 
     function clearCanvas() {
         strokes = [];
+        redoStrokes = [];
         currentStroke = null;
         hwCurrentLatex = '';
         if (recognizeTimer) clearTimeout(recognizeTimer);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         iinkContainer.classList.remove('active');
-        hwLatexPrev.classList.add('hidden');
+        if (hwLatexPrev) {
+            hwLatexPrev.value = '';
+            hwLatexPrev.classList.add('hidden');
+        }
         hwInsertBtn.disabled = true;
+
+        if (hwSessionActive) {
+            mf.value = hwOriginalValue;
+            mf.position = hwOriginalPosition;
+            handleLiveInput();
+            hwSessionActive = false;
+        }
+
         const t = TRANSLATIONS[currentLang];
         hwStatus.textContent = t.handwriting_status_draw || '数式を書いてください';
         hwStatus.className = 'hw-status';
+        updateUndoRedoButtons();
+    }
+
+    function updateUndoRedoButtons() {
+        if (hwUndoBtn) hwUndoBtn.disabled = (strokes.length === 0);
+        if (hwRedoBtn) hwRedoBtn.disabled = (redoStrokes.length === 0);
+    }
+
+    function undo() {
+        if (strokes.length === 0) return;
+        const s = strokes.pop();
+        redoStrokes.push(s);
+        redraw();
+        updateUndoRedoButtons();
+        if (strokes.length === 0) {
+            hwCurrentLatex = '';
+            if (hwLatexPrev) {
+                hwLatexPrev.value = '';
+                hwLatexPrev.classList.add('hidden');
+            }
+            if (hwSessionActive) {
+                mf.value = hwOriginalValue;
+                mf.position = hwOriginalPosition;
+                handleLiveInput();
+                hwSessionActive = false;
+            }
+            const t = TRANSLATIONS[currentLang];
+            hwStatus.textContent = t.handwriting_status_draw || '数式を書いてください';
+            hwStatus.className = 'hw-status';
+            hwInsertBtn.disabled = true;
+            if (recognizeTimer) clearTimeout(recognizeTimer);
+        } else {
+            scheduleRecognize();
+        }
+    }
+
+    function redo() {
+        if (redoStrokes.length === 0) return;
+        const s = redoStrokes.pop();
+        strokes.push(s);
+        redraw();
+        updateUndoRedoButtons();
+        scheduleRecognize();
     }
 
     function insertLatex() {
-        if (!hwCurrentLatex) return;
-        mf.executeCommand(['insert', hwCurrentLatex]);
+        hwSessionActive = false;
+        hwOriginalValue = '';
+        hwOriginalPosition = 0;
+        clearCanvas();
         mf.focus();
-        handleLiveInput();
-        hideHandwritingLayout();
     }
 
     // ── event bindings ────────────────────────────────────────────────
@@ -3910,6 +4004,8 @@ if (shareModalUrlBtn) {
         }
     });
     hwClearBtn.addEventListener('click', clearCanvas);
+    if (hwUndoBtn) hwUndoBtn.addEventListener('click', undo);
+    if (hwRedoBtn) hwRedoBtn.addEventListener('click', redo);
     hwInsertBtn.addEventListener('click', insertLatex);
 
     window.addEventListener('resize', () => {

@@ -1270,22 +1270,91 @@ math-field::part(virtual-keyboard-toggle) {
   border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 2px 4px;
-  font-family: var(--font-mono, monospace);
-  font-size: 0.72rem;
   color: var(--text-color);
-  word-break: break-all;
-  overflow-y: auto;
+  overflow: hidden;
   max-height: 54px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  outline: none !important;
+  box-shadow: none !important;
+  --background: transparent;
+  --caret-color: transparent;
+  --box-shadow: none !important;
+  --border-color: transparent;
+  --contains-highlight: transparent;
+}
+
+.hw-latex-preview::part(container) {
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+}
+
+.hw-latex-preview:focus,
+.hw-latex-preview:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .hw-action-buttons {
   display: flex;
   flex-direction: row;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.hw-action-buttons button {
+.hw-tools-row {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.hw-tool-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.hw-tool-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.05);
+}
+
+.hw-tool-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+}
+
+.hw-tool-btn:disabled {
+  background: rgba(120, 120, 120, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+body.light-theme .hw-tool-btn:disabled,
+html[data-theme='light'] .hw-tool-btn:disabled {
+  background: #ebebeb;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+#hw-insert-btn {
   flex: 1;
   height: 32px;
   font-size: 0.8rem !important;
@@ -1340,9 +1409,18 @@ math-field::part(virtual-keyboard-toggle) {
   .hw-action-buttons {
     flex-direction: row;
     width: 100%;
-    gap: 6px;
+    gap: 8px;
+    align-items: center;
   }
-  .hw-action-buttons button {
+  .hw-tools-row {
+    display: flex;
+    gap: 8px;
+  }
+  .hw-tools-row button.hw-tool-btn {
+    width: 38px;
+    height: 38px;
+  }
+  #hw-insert-btn {
     flex: 1;
     height: 38px;
     font-size: 0.85rem !important;
