@@ -1202,15 +1202,23 @@ math-field::part(virtual-keyboard-toggle) {
 
 /* ===== Keyboard Handwriting Layout ===== */
 .hw-keyboard-container {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 190px;
   box-sizing: border-box;
 }
 
-.hw-canvas-container {
+.hw-toolbar {
   width: 100%;
-  height: 100%;
+  height: 40px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.hw-canvas-container {
+  flex: 1;
+  width: 100%;
   border-radius: 8px;
   border: 1px dashed var(--border-color);
   background-color: var(--bg-color);
@@ -1234,8 +1242,8 @@ math-field::part(virtual-keyboard-toggle) {
 
 .hw-floating-controls {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 2px;
+  right: 2px;
   display: flex;
   gap: 8px;
   z-index: 20;
@@ -1309,12 +1317,9 @@ html[data-theme='light'] .hw-tool-btn:disabled {
   .hw-keyboard-container {
     height: 310px;
   }
-  .hw-canvas-container {
-    height: 250px;
-  }
   .hw-floating-controls {
-    top: 8px;
-    right: 8px;
+    top: 1px;
+    right: 1px;
     gap: 10px;
   }
   .hw-floating-controls button.hw-tool-btn {

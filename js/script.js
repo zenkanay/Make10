@@ -3912,6 +3912,10 @@ if (shareModalUrlBtn) {
             const latex = (await res.text()).trim();
             hwCurrentLatex = latex;
             
+            if (history[historyIndex]) {
+                history[historyIndex].latex = latex;
+            }
+
             // 直接 mf に同期反映
             applyHwResultToMf(latex);
 

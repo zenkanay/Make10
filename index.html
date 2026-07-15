@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=156">
+  <link rel="stylesheet" href="css/style.css?v=157">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -427,40 +427,42 @@
     <!-- 手書きレイアウト -->
     <div id="layout-handwriting" class="keyboard-layout hidden">
       <div class="hw-keyboard-container">
+        <div class="hw-toolbar">
+          <div class="hw-floating-controls">
+            <button id="hw-clear-btn" class="hw-tool-btn" title="消去" aria-label="消去">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                <path d="M3 6h18"></path>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
+            <button id="hw-undo-btn" class="hw-tool-btn" disabled title="元に戻す" aria-label="元に戻す">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                <path d="M7 8l-5 4 5 4"></path>
+                <path d="M2 12h12a5 5 0 0 1 0 10H9"></path>
+              </svg>
+            </button>
+            <button id="hw-redo-btn" class="hw-tool-btn" disabled title="やり直す" aria-label="やり直す">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                <path d="M17 8l5 4-5 4"></path>
+                <path d="M22 12H10a5 5 0 0 0 0 10h5"></path>
+              </svg>
+            </button>
+            <button id="hw-insert-btn" class="hw-tool-btn" disabled title="完了" aria-label="完了">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
         <div id="iink-editor" class="hw-canvas-container">
           <!-- APIキー未設定時の警告（インライン） -->
           <div id="hw-no-key-warning" class="hw-no-key-warning-inline hidden">
             <p data-i18n="handwriting_no_key">MyScript APIキーが設定されていません。設定でキーを入力してください。</p>
             <a href="https://developer.myscript.com/" target="_blank" rel="noopener" class="setting-link" data-i18n="handwriting_get_key">無料で取得する (developer.myscript.com)</a>
           </div>
-        </div>
-        <div class="hw-floating-controls">
-          <button id="hw-clear-btn" class="hw-tool-btn" title="消去" aria-label="消去">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
-              <path d="M3 6h18"></path>
-              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-              <line x1="10" y1="11" x2="10" y2="17"></line>
-              <line x1="14" y1="11" x2="14" y2="17"></line>
-            </svg>
-          </button>
-          <button id="hw-undo-btn" class="hw-tool-btn" disabled title="元に戻す" aria-label="元に戻す">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
-              <path d="M7 8l-5 4 5 4"></path>
-              <path d="M2 12h12a5 5 0 0 1 0 10H9"></path>
-            </svg>
-          </button>
-          <button id="hw-redo-btn" class="hw-tool-btn" disabled title="やり直す" aria-label="やり直す">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
-              <path d="M17 8l5 4-5 4"></path>
-              <path d="M22 12H10a5 5 0 0 0 0 10h5"></path>
-            </svg>
-          </button>
-          <button id="hw-insert-btn" class="hw-tool-btn" disabled title="完了" aria-label="完了">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </button>
         </div>
       </div>
     </div>
@@ -534,7 +536,7 @@
 
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v156</span>
+        <span class="settings-version">v157</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -585,11 +587,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=156"></script>
+  <script type="module" src="js/script.js?v=157"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=156')
+        navigator.serviceWorker.register('sw.js?v=157')
           .then(reg => {
             console.log('Service Worker registered successfully.', reg.scope);
             // Auto reload when a new service worker is installed
