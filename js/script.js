@@ -122,6 +122,9 @@ const TRANSLATIONS = {
         sort_label: "使える数字を小さい順に並べ替えて表示する",
         api_key_label: "Gemini API キー (任意)",
         api_key_help: "APIキーを設定すると、SymPyで計算できない超複雑な数式（一部の極限、解析的に解けない積分、任意の特殊関数など）をGeminiが正しく判定できるようになります。※キーはブラウザのLocalStorageにのみ保存されます。",
+        myscript_app_key_label: "MyScript Application Key (任意・手書き入力用)",
+        myscript_hmac_key_label: "MyScript HMAC Key (任意・手書き入力用)",
+        myscript_key_help: "手書き入力で数式を認識するためのAPIキーです。developer.myscript.com で無料取得できます（月2,000回まで無料）。キーはLocalStorageにのみ保存されます。",
         backend_url_label: "バックエンドサーバー URL",
         save_btn: "保存する",
         // placeholders
@@ -896,6 +899,12 @@ function initSettings() {
         apiKey = savedKey;
         apiKeyInput.value = savedKey;
     }
+
+    // Load MyScript API keys
+    const msAppKeyInput = document.getElementById('myscript-app-key-input');
+    const msHmacKeyInput = document.getElementById('myscript-hmac-key-input');
+    if (msAppKeyInput) msAppKeyInput.value = localStorage.getItem('myscript_app_key') || '';
+    if (msHmacKeyInput) msHmacKeyInput.value = localStorage.getItem('myscript_hmac_key') || '';
 
     // Backend URL configuration removed; using hardcoded URL
 
@@ -2286,6 +2295,12 @@ saveSettingsBtn.addEventListener("click", () => {
         apiKey = apiKeyInput.value.trim();
         localStorage.setItem("gemini_api_key", apiKey);
     }
+
+    // Save MyScript API keys
+    const msAppKeyInput = document.getElementById('myscript-app-key-input');
+    const msHmacKeyInput = document.getElementById('myscript-hmac-key-input');
+    if (msAppKeyInput) localStorage.setItem('myscript_app_key', msAppKeyInput.value.trim());
+    if (msHmacKeyInput) localStorage.setItem('myscript_hmac_key', msHmacKeyInput.value.trim());
 
     // Save and apply theme
     if (themeSelect) {

@@ -843,6 +843,31 @@ kbd {
   line-height: 1.35;
 }
 
+.setting-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.setting-link {
+  font-size: 0.75rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.setting-link:hover {
+  opacity: 0.75;
+}
+
+.setting-group--myscript {
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
 .modal-footer {
   display: flex;
   justify-content: space-between;
