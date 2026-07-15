@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=114">
+  <link rel="stylesheet" href="css/style.css?v=115">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -195,6 +195,158 @@
     </main>
   </div>
 
+  <!-- Desmos風自作仮想キーボード -->
+  <div id="desmos-keyboard" class="desmos-keyboard hidden">
+    <!-- 関数ポップアップメニュー -->
+    <div id="desmos-function-popup" class="desmos-function-popup hidden">
+      <div class="popup-tabs">
+        <button class="popup-tab-btn active" data-tab="trig" data-i18n="help_sym_trig">三角関数</button>
+        <button class="popup-tab-btn" data-tab="inv-trig">逆三角関数</button>
+        <button class="popup-tab-btn" data-tab="stats">統計学</button>
+      </div>
+      <div class="popup-tab-content">
+        <div class="tab-pane active" id="pane-trig">
+          <button class="func-key" data-insert="sin\left(#?\right)">sin</button>
+          <button class="func-key" data-insert="cos\left(#?\right)">cos</button>
+          <button class="func-key" data-insert="tan\left(#?\right)">tan</button>
+          <button class="func-key" data-insert="csc\left(#?\right)">csc</button>
+          <button class="func-key" data-insert="sec\left(#?\right)">sec</button>
+          <button class="func-key" data-insert="cot\left(#?\right)">cot</button>
+        </div>
+        <div class="tab-pane" id="pane-inv-trig">
+          <button class="func-key" data-insert="sin^{-1}\left(#?\right)">sin⁻¹</button>
+          <button class="func-key" data-insert="cos^{-1}\left(#?\right)">cos⁻¹</button>
+          <button class="func-key" data-insert="tan^{-1}\left(#?\right)">tan⁻¹</button>
+          <button class="func-key" data-insert="csc^{-1}\left(#?\right)">csc⁻¹</button>
+          <button class="func-key" data-insert="sec^{-1}\left(#?\right)">sec⁻¹</button>
+          <button class="func-key" data-insert="cot^{-1}\left(#?\right)">cot⁻¹</button>
+        </div>
+        <div class="tab-pane" id="pane-stats">
+          <button class="func-key" data-insert="mean\left(#?\right)">mean</button>
+          <button class="func-key" data-insert="median\left(#?\right)">median</button>
+          <button class="func-key" data-insert="min\left(#?, #?\right)">min</button>
+          <button class="func-key" data-insert="max\left(#?, #?\right)">max</button>
+          <button class="func-key" data-insert="stdev\left(#?\right)">stdev</button>
+          <button class="func-key" data-insert="var\left(#?\right)">var</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 123レイアウト -->
+    <div id="layout-123" class="keyboard-layout">
+      <!-- 左側の特殊記号・変数 (4x4) -->
+      <div class="layout-left">
+        <button class="key" data-insert="x">x</button>
+        <button class="key" data-insert="y">y</button>
+        <button class="key" data-insert="^2">a²</button>
+        <button class="key" data-insert="^{#?}">aᵇ</button>
+        
+        <button class="key" data-insert="(">(</button>
+        <button class="key" data-insert=")">)</button>
+        <button class="key" data-insert="<">&lt;</button>
+        <button class="key" data-insert=">">&gt;</button>
+        
+        <button class="key" data-insert="\left|#?\right|">|a|</button>
+        <button class="key" data-insert=",">,</button>
+        <button class="key" data-insert="\le">≤</button>
+        <button class="key" data-insert="\ge">≥</button>
+        
+        <button class="key action-key" id="btn-switch-abc">ABC</button>
+        <button class="key action-key" id="btn-speak-math">🔈</button>
+        <button class="key" data-insert="\sqrt{#?}">√</button>
+        <button class="key" data-insert="\pi">π</button>
+      </div>
+
+      <!-- 中央のテンキー (4x4) -->
+      <div class="layout-center">
+        <button class="key num-key" data-insert="7">7</button>
+        <button class="key num-key" data-insert="8">8</button>
+        <button class="key num-key" data-insert="9">9</button>
+        <button class="key num-key op-key" data-insert="/">&divide;</button>
+        
+        <button class="key num-key" data-insert="4">4</button>
+        <button class="key num-key" data-insert="5">5</button>
+        <button class="key num-key" data-insert="6">6</button>
+        <button class="key num-key op-key" data-insert="\times">&times;</button>
+        
+        <button class="key num-key" data-insert="1">1</button>
+        <button class="key num-key" data-insert="2">2</button>
+        <button class="key num-key" data-insert="3">3</button>
+        <button class="key num-key op-key" data-insert="-">&minus;</button>
+        
+        <button class="key num-key" data-insert="0">0</button>
+        <button class="key num-key" data-insert=".">.</button>
+        <button class="key num-key" data-insert="=">=</button>
+        <button class="key num-key op-key" data-insert="+">+</button>
+      </div>
+
+      <!-- 右側のアクションキー -->
+      <div class="layout-right">
+        <button class="key action-key" id="btn-toggle-function">関数</button>
+        <div class="arrow-keys">
+          <button class="key action-key" id="btn-arrow-left">←</button>
+          <button class="key action-key" id="btn-arrow-right">→</button>
+        </div>
+        <button class="key action-key" id="btn-backspace">⌫</button>
+        <button class="key enter-key" id="btn-enter">↵</button>
+      </div>
+    </div>
+
+    <!-- ABCレイアウト -->
+    <div id="layout-abc" class="keyboard-layout hidden">
+      <div class="qwerty-row">
+        <button class="key char-key" data-insert="q">q</button>
+        <button class="key char-key" data-insert="w">w</button>
+        <button class="key char-key" data-insert="e">e</button>
+        <button class="key char-key" data-insert="r">r</button>
+        <button class="key char-key" data-insert="t">t</button>
+        <button class="key char-key" data-insert="y">y</button>
+        <button class="key char-key" data-insert="u">u</button>
+        <button class="key char-key" data-insert="i">i</button>
+        <button class="key char-key" data-insert="o">o</button>
+        <button class="key char-key" data-insert="p">p</button>
+      </div>
+      <div class="qwerty-row">
+        <button class="key char-key" data-insert="a">a</button>
+        <button class="key char-key" data-insert="s">s</button>
+        <button class="key char-key" data-insert="d">d</button>
+        <button class="key char-key" data-insert="f">f</button>
+        <button class="key char-key" data-insert="g">g</button>
+        <button class="key char-key" data-insert="h">h</button>
+        <button class="key char-key" data-insert="j">j</button>
+        <button class="key char-key" data-insert="k">k</button>
+        <button class="key char-key" data-insert="l">l</button>
+        <button class="key char-key" data-insert="\theta">θ</button>
+      </div>
+      <div class="qwerty-row">
+        <button class="key action-key" id="btn-shift-toggle">⇧</button>
+        <button class="key char-key" data-insert="z">z</button>
+        <button class="key char-key" data-insert="x">x</button>
+        <button class="key char-key" data-insert="c">c</button>
+        <button class="key char-key" data-insert="v">v</button>
+        <button class="key char-key" data-insert="b">b</button>
+        <button class="key char-key" data-insert="n">n</button>
+        <button class="key char-key" data-insert="m">m</button>
+        <button class="key action-key" id="btn-abc-backspace">⌫</button>
+      </div>
+      <div class="qwerty-row bottom-row">
+        <button class="key action-key" id="btn-switch-123">1 2 3</button>
+        <button class="key" data-insert="_{#?}">a_b</button>
+        <button class="key" data-insert="!">!</button>
+        <button class="key" data-insert="%">%</button>
+        <button class="key" data-insert="[">[</button>
+        <button class="key" data-insert="]">]</button>
+        <button class="key" data-insert="\{">\{</button>
+        <button class="key" data-insert="\}">\}</button>
+        <button class="key" data-insert="\sim">~</button>
+        <button class="key" data-insert=":">:</button>
+        <button class="key" data-insert=",">,</button>
+        <button class="key" data-insert="'">'</button>
+        <button class="key enter-key" id="btn-abc-enter">↵</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 設定モーダル -->
   <div id="settings-modal" class="modal-overlay hidden">
     <div class="modal-content glass-panel">
@@ -239,7 +391,7 @@
       </div>
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v114</span>
+        <span class="settings-version">v115</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -289,11 +441,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=114"></script>
+  <script type="module" src="js/script.js?v=115"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=114')
+        navigator.serviceWorker.register('sw.js?v=115')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });

@@ -694,6 +694,8 @@ function initSettings() {
     // --- Keyboard State Machine ---
     let allowInputmodeNone = true; // start with no keyboard (changed when user taps mf)
 
+    const desmosKeyboard = document.getElementById("desmos-keyboard");
+
     function setKeyboardMode(mode) {
         // mode: "standard" = OS keyboard, "virtual" = virtual KB only, "none" = no keyboard
         if (!mf) return;
@@ -713,10 +715,26 @@ function initSettings() {
             allowInputmodeNone = false;
             if (sink) sink.setAttribute('inputmode', 'text');
             mf.setAttribute('inputmode', 'text');
+            if (desmosKeyboard) {
+                desmosKeyboard.classList.add('hidden');
+                document.body.classList.remove('keyboard-visible');
+            }
+        } else if (mode === 'virtual') {
+            allowInputmodeNone = true;
+            if (sink) sink.setAttribute('inputmode', 'none');
+            mf.setAttribute('inputmode', 'none');
+            if (desmosKeyboard) {
+                desmosKeyboard.classList.remove('hidden');
+                document.body.classList.add('keyboard-visible');
+            }
         } else {
             allowInputmodeNone = true;
             if (sink) sink.setAttribute('inputmode', 'none');
             mf.setAttribute('inputmode', 'none');
+            if (desmosKeyboard) {
+                desmosKeyboard.classList.add('hidden');
+                document.body.classList.remove('keyboard-visible');
+            }
         }
     }
 
@@ -826,18 +844,215 @@ function initSettings() {
     mf.mathVirtualKeyboardPolicy = "manual";
     mf.setAttribute("math-virtual-keyboard-policy", "manual");
 
-    // Add custom inline shortcuts for mathematical functions and notation
-    mf.inlineShortcuts = {
-        ...mf.inlineShortcuts,
-        'ceil': '\\lceil #? \\rceil',
-        'floor': '\\lfloor #? \\rfloor',
-        'log': '\\log\\left(#?\\right)',
-        'ln': '\\ln\\left(#?\\right)',
-        'gcd': '\\gcd\\left(#?, #?\\right)',
-        'lcm': '\\mathrm{lcm}\\left(#?, #?\\right)',
-        'nCr': '{}_{#?}\\mathrm{C}_{#?}',
-        'nPr': '{}_{#?}\\mathrm{P}_{#?}'
-    };
+
+
+    // --- Desmos-like Virtual Keyboard Controls ---
+    if (desmosKeyboard) {
+        // Tab switching in Function popup
+        const tabButtons = desmosKeyboard.querySelectorAll(".popup-tab-btn");
+        const tabPanes = desmosKeyboard.querySelectorAll(".tab-pane");
+        tabButtons.forEach(btn => {
+            btn.addEventListener("pointerdown", (e) => {
+                e.preventDefault();
+                tabButtons.forEach(b => b.classList.remove("active"));
+                tabPanes.forEach(p => p.classList.remove("active"));
+                
+                btn.classList.add("active");
+                const targetTab = btn.getAttribute("data-tab");
+                const targetPane = desmosKeyboard.querySelector(`#pane-${targetTab}`);
+                if (targetPane) targetPane.classList.add("active");
+            });
+        });
+
+        // Toggle Function Popup
+        const btnToggleFunction = desmosKeyboard.querySelector("#btn-toggle-function");
+        const functionPopup = desmosKeyboard.querySelector("#desmos-function-popup");
+        if (btnToggleFunction && functionPopup) {
+            btnToggleFunction.addEventListener("pointerdown", (e) => {
+                e.preventDefault();
+                functionPopup.classList.toggle("hidden");
+                btnToggleFunction.classList.toggle("active");
+            });
+        }
+
+        // Layout switching (123 <-> ABC)
+        const btnSwitchAbc = desmosKeyboard.querySelector("#btn-switch-abc");
+        const btnSwitch123 = desmosKeyboard.querySelector("#btn-switch-123");
+        const layout123 = desmosKeyboard.querySelector("#layout-123");
+        const layoutAbc = desmosKeyboard.querySelector("#layout-abc");
+
+        const switchToAbc = (e) => {
+            e.preventDefault();
+            if (layout123 && layoutAbc) {
+                layout123.classList.add("hidden");
+                layoutAbc.classList.remove("hidden");
+                if (functionPopup) functionPopup.classList.add("hidden");
+                if (btnToggleFunction) btnToggleFunction.classList.remove("active");
+            }
+        };
+
+        const switchTo123 = (e) => {
+            e.preventDefault();
+            if (layout123 && layoutAbc) {
+                layoutAbc.classList.add("hidden");
+                layout123.classList.remove("hidden");
+            }
+        };
+
+        if (btnSwitchAbc) btnSwitchAbc.addEventListener("pointerdown", switchToAbc);
+        if (btnSwitch123) btnSwitch123.addEventListener("pointerdown", switchTo123);
+
+        // QWERTY Shift Toggle (Caps Lock)
+        const btnShiftToggle = desmosKeyboard.querySelector("#btn-shift-toggle");
+        let isShiftActive = false;
+        if (btnShiftToggle) {
+            btnShiftToggle.addEventListener("pointerdown", (e) => {
+                e.preventDefault();
+                isShiftActive = !isShiftActive;
+                btnShiftToggle.classList.toggle("active", isShiftActive);
+                
+                const charKeys = desmosKeyboard.querySelectorAll(".char-key");
+                charKeys.forEach(key => {
+                    const origChar = key.getAttribute("data-insert");
+                    if (origChar && origChar !== "\\theta") {
+                        const newChar = isShiftActive ? origChar.toUpperCase() : origChar.toLowerCase();
+                        key.textContent = newChar;
+                        key.setAttribute("data-insert", newChar);
+                    }
+                });
+            });
+        }
+
+        // Action Keys (Backspace, Arrows)
+        const registerAction = (id, command) => {
+            const btn = desmosKeyboard.querySelector(`#${id}`);
+            if (btn) {
+                btn.addEventListener("pointerdown", (e) => {
+                    e.preventDefault();
+                    btn.classList.add("pressing");
+                });
+                btn.addEventListener("pointerup", (e) => {
+                    btn.classList.remove("pressing");
+                    if (command === 'backspace') {
+                        mf.executeCommand('deleteBackward');
+                    } else if (command === 'left') {
+                        mf.executeCommand('moveToPreviousChar');
+                    } else if (command === 'right') {
+                        mf.executeCommand('moveToNextChar');
+                    }
+                });
+                btn.addEventListener("pointerleave", () => btn.classList.remove("pressing"));
+                btn.addEventListener("pointercancel", () => btn.classList.remove("pressing"));
+            }
+        };
+
+        registerAction("btn-backspace", "backspace");
+        registerAction("btn-abc-backspace", "backspace");
+        registerAction("btn-arrow-left", "left");
+        registerAction("btn-arrow-right", "right");
+
+        // Enter keys trigger final evaluation
+        const handleEnter = (e) => {
+            e.preventDefault();
+            const evaluateBtn = document.getElementById("evaluate-btn");
+            if (evaluateBtn) {
+                evaluateBtn.click();
+            }
+        };
+        const btnEnter = desmosKeyboard.querySelector("#btn-enter");
+        const btnAbcEnter = desmosKeyboard.querySelector("#btn-abc-enter");
+        if (btnEnter) btnEnter.addEventListener("pointerdown", handleEnter);
+        if (btnAbcEnter) btnAbcEnter.addEventListener("pointerdown", handleEnter);
+
+        // General keys (Data Insert Keys)
+        const keysToBind = desmosKeyboard.querySelectorAll("[data-insert]");
+        keysToBind.forEach(key => {
+            // pointerdown prevents focus loss, pointerup inserts
+            key.addEventListener("pointerdown", (e) => {
+                e.preventDefault();
+                key.classList.add("pressing");
+            });
+
+            key.addEventListener("pointerup", (e) => {
+                if (key.classList.contains("pressing")) {
+                    key.classList.remove("pressing");
+                    const toInsert = key.getAttribute("data-insert");
+                    if (toInsert) {
+                        mf.insert(toInsert);
+                        mf.focus({ preventScroll: true });
+                    }
+                }
+            });
+
+            const cancelKey = () => key.classList.remove("pressing");
+            key.addEventListener("pointerleave", cancelKey);
+            key.addEventListener("pointercancel", cancelKey);
+        });
+
+        // Speaker Key: Speak Formula in Japanese
+        const btnSpeakMath = desmosKeyboard.querySelector("#btn-speak-math");
+        if (btnSpeakMath) {
+            btnSpeakMath.addEventListener("pointerdown", (e) => {
+                e.preventDefault();
+                btnSpeakMath.classList.add("pressing");
+            });
+            btnSpeakMath.addEventListener("pointerup", (e) => {
+                btnSpeakMath.classList.remove("pressing");
+                speakMath();
+            });
+            btnSpeakMath.addEventListener("pointerleave", () => btnSpeakMath.classList.remove("pressing"));
+            btnSpeakMath.addEventListener("pointercancel", () => btnSpeakMath.classList.remove("pressing"));
+        }
+    }
+
+    // Speak LaTeX helper function using Web Speech API
+    function speakMath() {
+        if (!mf) return;
+        const latex = mf.value;
+        if (!latex) return;
+
+        let speechText = latex;
+
+        // Custom LaTeX replacement rules for Japanese TTS
+        speechText = speechText.replace(/\\frac\s*{(.*?)}\s*{(.*?)}/g, "$2 分の $1");
+        speechText = speechText.replace(/\\sqrt\s*{(.*?)}/g, "ルート $1");
+        speechText = speechText.replace(/\\sqrt/g, "ルート");
+        speechText = speechText.replace(/\+/g, " プラス ");
+        speechText = speechText.replace(/-/g, " マイナス ");
+        speechText = speechText.replace(/\\times/g, " かける ");
+        speechText = speechText.replace(/\//g, " わる ");
+        speechText = speechText.replace(/\\div/g, " わる ");
+        speechText = speechText.replace(/\\left\(/g, "かっこ ");
+        speechText = speechText.replace(/\\right\)/g, " かっこ閉じる");
+        speechText = speechText.replace(/\(/g, "かっこ ");
+        speechText = speechText.replace(/\)/g, " かっこ閉じる");
+        speechText = speechText.replace(/x/g, "エックス");
+        speechText = speechText.replace(/y/g, "ワイ");
+        speechText = speechText.replace(/\\pi/g, "パイ");
+        speechText = speechText.replace(/\\theta/g, "シータ");
+        speechText = speechText.replace(/!/g, "の階乗 ");
+        speechText = speechText.replace(/\^2/g, "の二乗 ");
+        speechText = speechText.replace(/\^{(.*?)}/g, "の $1 乗 ");
+        speechText = speechText.replace(/\\left\|(.*?)\\right\|/g, "$1の絶対値");
+        speechText = speechText.replace(/sin/g, "サイン");
+        speechText = speechText.replace(/cos/g, "コサイン");
+        speechText = speechText.replace(/tan/g, "タンジェント");
+        speechText = speechText.replace(/log/g, "ログ");
+        speechText = speechText.replace(/ln/g, "エルエヌ");
+
+        // Clean up formatting
+        speechText = speechText.replace(/\\/g, " ");
+        speechText = speechText.replace(/[{}]/g, " ");
+        speechText = speechText.replace(/\s+/g, " ").trim();
+
+        // Perform Speech Synthesis
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(speechText);
+            utterance.lang = document.documentElement.lang === "en" ? "en-US" : "ja-JP";
+            window.speechSynthesis.speak(utterance);
+        }
+    }
 
     // Keyboard state machine and policy configuration handled above
 
@@ -860,7 +1075,8 @@ function initSettings() {
 
             // Proactively set inputmode to "text" (standard keyboard) on pointerdown,
             // unless the custom virtual keyboard is currently visible.
-            if (!window.mathVirtualKeyboard?.visible) {
+            const isVirtualVisible = desmosKeyboard && !desmosKeyboard.classList.contains('hidden');
+            if (!isVirtualVisible) {
                 setKeyboardMode('standard');
             } else {
                 setKeyboardMode('none');
@@ -946,23 +1162,18 @@ function initSettings() {
         customKeyboardToggle.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (!window.mathVirtualKeyboard) return;
+            if (!desmosKeyboard) return;
 
-            if (window.mathVirtualKeyboard.visible) {
+            const isVisible = !desmosKeyboard.classList.contains('hidden');
+            if (isVisible) {
                 // Close virtual KB
-                window.mathVirtualKeyboard.hide();
-                setKeyboardMode('standard'); // Set activeKeyboardType to standard proactively for next tap
-                setKeyboardMode('none');     // But hide the keyboard for now
+                setKeyboardMode('none');
                 mf.blur();
             } else {
                 // Open virtual KB
                 setKeyboardMode('virtual');
-                mf.blur();
-                setTimeout(() => {
-                    window.mathVirtualKeyboard.show();
-                    if (mathContainer) mathContainer.classList.add('focused');
-                    mf.focus({ preventScroll: true });
-                }, 80);
+                mf.focus({ preventScroll: true });
+                if (mathContainer) mathContainer.classList.add('focused');
             }
         });
     }
@@ -975,6 +1186,7 @@ function initSettings() {
         const isInsideInput = path.some(el => el === mathContainer);
         const isInsideKeyboard = path.some(el => 
             el && (
+                el.id === 'desmos-keyboard' ||
                 el.tagName === 'MATH-VIRTUAL-KEYBOARD' || 
                 el.id === 'math-virtual-keyboard' ||
                 (el.classList && (
@@ -1003,10 +1215,6 @@ function initSettings() {
             console.error("Focus strip failed:", err);
         }
         mf.blur();
-
-        if (window.mathVirtualKeyboard?.visible) {
-            window.mathVirtualKeyboard.hide();
-        }
         setKeyboardMode('none');
     }, true);
 
@@ -1178,17 +1386,33 @@ function renderDigitCards(usage = null) {
             // Disabled: no pointer events, no click
         } else {
             card.classList.add("active-digit");
-            // Pointerdown listener with preventDefault to prevent focus loss and keyboard dismissals
+            // Prevent default on pointerdown to bypass focus loss and set pressing state
+            let isPressingCard = false;
             card.addEventListener("pointerdown", (e) => {
                 e.preventDefault();
-                // Record which index was pressed
-                clickedIndices.push(idx);
-                // Animate press
+                isPressingCard = true;
                 card.classList.add("pressing");
-                setTimeout(() => card.classList.remove("pressing"), 150);
-                mf.insert(num.toString());
-                mf.focus({ preventScroll: true });
             });
+
+            card.addEventListener("pointerup", (e) => {
+                if (isPressingCard) {
+                    isPressingCard = false;
+                    card.classList.remove("pressing");
+                    // Insert number only when pointerup inside the card
+                    clickedIndices.push(idx);
+                    mf.insert(num.toString());
+                    mf.focus({ preventScroll: true });
+                }
+            });
+
+            const cancelPress = () => {
+                if (isPressingCard) {
+                    isPressingCard = false;
+                    card.classList.remove("pressing");
+                }
+            };
+            card.addEventListener("pointerleave", cancelPress);
+            card.addEventListener("pointercancel", cancelPress);
         }
 
         numbersContainer.appendChild(card);

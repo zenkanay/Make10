@@ -1290,31 +1290,317 @@ math-field.scrolling {
   caret-color: transparent !important;
 }
 
-/* Desmos-like Virtual Keyboard Custom Theme */
-math-virtual-keyboard, .ML__keyboard {
-  --keyboard-background: #18191d !important;
-  --keycap-background: #2a2c33 !important;
-  --keycap-background-active: #40434e !important;
-  --keycap-color: #ffffff !important;
-  --keycap-font-size: 1.3rem !important;
-  --keycap-height: 52px !important;
-  --keycap-gap: 5px !important;
-  --keyboard-padding: 8px !important;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4) !important;
+/* ==========================================
+   Desmos-like Custom Virtual Keyboard
+   ========================================== */
+.desmos-keyboard {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--panel-bg);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
+  box-sizing: border-box;
 }
 
-/* Specific key styles for action buttons (delete, navigation) in MathLive virtual keyboard */
-math-virtual-keyboard .action, 
-math-virtual-keyboard [data-command*="delete"], 
-math-virtual-keyboard [data-command*="move"], 
-math-virtual-keyboard [data-command*="Char"] {
-  background-color: #3f424c !important;
-  font-weight: bold !important;
+.desmos-keyboard.hidden {
+  transform: translateY(100%);
+  display: none !important;
 }
 
-math-virtual-keyboard .action:active,
-math-virtual-keyboard [data-command*="delete"]:active, 
-math-virtual-keyboard [data-command*="move"]:active, 
-math-virtual-keyboard [data-command*="Char"]:active {
-  background-color: #555966 !important;
+/* Base key designs */
+.desmos-keyboard .key, 
+.desmos-keyboard .func-key {
+  font-family: var(--font-main), 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  transition: background-color 0.1s, transform 0.05s, border-color 0.1s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  touch-action: manipulation;
+}
+
+/* Key active/pressing states */
+.desmos-keyboard .key:active, 
+.desmos-keyboard .func-key:active,
+.desmos-keyboard .key.pressing,
+.desmos-keyboard .func-key.pressing {
+  background-color: var(--border-color) !important;
+  transform: scale(0.95);
+}
+
+/* Action key modifiers (gray keys) */
+.desmos-keyboard .action-key {
+  background-color: var(--border-color) !important;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.desmos-keyboard .action-key:active,
+.desmos-keyboard .action-key.pressing {
+  opacity: 0.8;
+}
+
+/* Enter key modifier (blue key) */
+.desmos-keyboard .enter-key {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+  border-color: var(--primary) !important;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.desmos-keyboard .enter-key:active,
+.desmos-keyboard .enter-key.pressing {
+  background-color: var(--primary-hover) !important;
+}
+
+/* Grid layout for 123 layer */
+#layout-123 {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.layout-left, .layout-center {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 6px;
+  flex: 1;
+}
+
+/* Operation keys in center layout (divide, times, minus, plus) */
+.op-key {
+  background-color: var(--border-color) !important;
+  font-size: 1.25rem !important;
+}
+
+.layout-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 120px;
+}
+
+.layout-right .key {
+  height: 44px;
+}
+
+.layout-right .arrow-keys {
+  display: flex;
+  gap: 6px;
+}
+
+.layout-right .arrow-keys .key {
+  flex: 1;
+}
+
+.layout-right .enter-key {
+  flex-grow: 1;
+  height: auto;
+}
+
+/* ABC QWERTY Layout */
+#layout-abc {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.qwerty-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.qwerty-row .key {
+  flex: 1;
+  height: 46px;
+  max-width: 80px;
+}
+
+/* Special sizing for shifts and backspaces on QWERTY */
+#btn-shift-toggle, #btn-abc-backspace {
+  max-width: 110px;
+  flex: 1.5;
+}
+
+.bottom-row .key {
+  font-size: 0.95rem;
+  max-width: 70px;
+}
+
+#btn-switch-123 {
+  max-width: 90px;
+  flex: 1.5;
+}
+
+#btn-abc-enter {
+  max-width: 100px;
+  flex: 1.5;
+}
+
+/* Function Popup Menu */
+.desmos-function-popup {
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-bottom: 4px;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+  overflow: hidden;
+}
+
+.desmos-function-popup.hidden {
+  display: none !important;
+}
+
+.popup-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+}
+
+.popup-tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+  border-bottom: 2px solid transparent;
+}
+
+.popup-tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.popup-tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.tab-pane {
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.tab-pane.active {
+  display: grid;
+}
+
+.tab-pane .func-key {
+  height: 40px;
+  font-size: 0.95rem;
+  background-color: var(--bg-color);
+}
+
+/* Adjust application containers when keyboard is visible */
+body.keyboard-visible {
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  body.keyboard-visible .app-container {
+    padding-bottom: 300px; /* Leave room for keyboard */
+  }
+}
+
+/* Responsive adjustment for keyboard itself */
+@media (max-width: 600px) {
+  .desmos-keyboard {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .desmos-keyboard .key {
+    font-size: 1rem;
+    border-radius: 6px;
+  }
+
+  #layout-123 {
+    gap: 4px;
+  }
+
+  .layout-left, .layout-center {
+    gap: 4px;
+  }
+
+  .layout-right {
+    width: 90px;
+    gap: 4px;
+  }
+
+  .layout-right .key {
+    height: 38px;
+    font-size: 0.95rem;
+  }
+  
+  .layout-right .arrow-keys {
+    gap: 4px;
+  }
+
+  .qwerty-row {
+    gap: 4px;
+  }
+
+  .qwerty-row .key {
+    height: 38px;
+    font-size: 0.95rem;
+    border-radius: 5px;
+  }
+
+  #btn-shift-toggle, #btn-abc-backspace {
+    max-width: 80px;
+  }
+  
+  #btn-switch-123 {
+    max-width: 70px;
+  }
+
+  #btn-abc-enter {
+    max-width: 70px;
+  }
+
+  .desmos-function-popup {
+    max-height: 180px;
+  }
+
+  .tab-pane {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .tab-pane .func-key {
+    height: 34px;
+    font-size: 0.85rem;
+  }
 }
