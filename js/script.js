@@ -3677,7 +3677,8 @@ if (shareModalUrlBtn) {
     const ctx = canvas.getContext('2d');
 
     let strokes = [];
-    let redoStrokes = [];
+    let history = [[]];
+    let historyIndex = 0;
     let currentStroke = null;
     let recognizeTimer = null;
     let hwCurrentLatex = '';
@@ -3686,6 +3687,47 @@ if (shareModalUrlBtn) {
     let hwSessionActive = false;
     let hwOriginalValue = '';
     let hwOriginalPosition = 0;
+
+    function saveHistoryState() {
+        history = history.slice(0, historyIndex + 1);
+        const copy = strokes.map(s => ({
+            x: [...s.x],
+            y: [...s.y]
+        }));
+        history.push(copy);
+        historyIndex = history.length - 1;
+        updateUndoRedoButtons();
+    }
+
+    function restoreHistoryState() {
+        const state = history[historyIndex];
+        strokes = state.map(s => ({
+            x: [...s.x],
+            y: [...s.y]
+        }));
+        
+        redraw();
+        updateUndoRedoButtons();
+
+        if (strokes.length === 0) {
+            hwCurrentLatex = '';
+            if (hwLatexPrev) {
+                hwLatexPrev.value = '';
+                hwLatexPrev.classList.add('hidden');
+            }
+            if (hwSessionActive) {
+                mf.value = hwOriginalValue;
+                mf.position = hwOriginalPosition;
+                handleLiveInput();
+                hwSessionActive = false;
+            }
+            hwInsertBtn.disabled = true;
+            if (recognizeTimer) clearTimeout(recognizeTimer);
+        } else {
+            startHwSession();
+            scheduleRecognize();
+        }
+    }
 
     function resizeCanvas() {
         const r = iinkContainer.getBoundingClientRect();
@@ -3747,8 +3789,6 @@ if (shareModalUrlBtn) {
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
         iinkContainer.classList.add('active');
-        redoStrokes = [];
-        updateUndoRedoButtons();
     }
 
     function onMove(e) {
@@ -3772,7 +3812,7 @@ if (shareModalUrlBtn) {
         if (!currentStroke) return;
         strokes.push(currentStroke);
         currentStroke = null;
-        updateUndoRedoButtons();
+        saveHistoryState();
         scheduleRecognize();
     }
 
@@ -3896,6 +3936,9 @@ if (shareModalUrlBtn) {
 
         requestAnimationFrame(() => {
             resizeCanvas();
+            strokes = [];
+            history = [[]];
+            historyIndex = 0;
             clearCanvas();
         });
     };
@@ -3909,11 +3952,10 @@ if (shareModalUrlBtn) {
     }
 
     function clearCanvas() {
+        if (recognizeTimer) clearTimeout(recognizeTimer);
         strokes = [];
-        redoStrokes = [];
         currentStroke = null;
         hwCurrentLatex = '';
-        if (recognizeTimer) clearTimeout(recognizeTimer);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         iinkContainer.classList.remove('active');
         if (hwLatexPrev) {
@@ -3929,58 +3971,33 @@ if (shareModalUrlBtn) {
             hwSessionActive = false;
         }
 
-        const t = TRANSLATIONS[currentLang];
-        hwStatus.textContent = t.handwriting_status_draw || '数式を書いてください';
-        hwStatus.className = 'hw-status';
-        updateUndoRedoButtons();
+        saveHistoryState();
     }
 
     function updateUndoRedoButtons() {
-        if (hwUndoBtn) hwUndoBtn.disabled = (strokes.length === 0);
-        if (hwRedoBtn) hwRedoBtn.disabled = (redoStrokes.length === 0);
+        if (hwUndoBtn) hwUndoBtn.disabled = (historyIndex === 0);
+        if (hwRedoBtn) hwRedoBtn.disabled = (historyIndex === history.length - 1);
     }
 
     function undo() {
-        if (strokes.length === 0) return;
-        const s = strokes.pop();
-        redoStrokes.push(s);
-        redraw();
-        updateUndoRedoButtons();
-        if (strokes.length === 0) {
-            hwCurrentLatex = '';
-            if (hwLatexPrev) {
-                hwLatexPrev.value = '';
-                hwLatexPrev.classList.add('hidden');
-            }
-            if (hwSessionActive) {
-                mf.value = hwOriginalValue;
-                mf.position = hwOriginalPosition;
-                handleLiveInput();
-                hwSessionActive = false;
-            }
-            const t = TRANSLATIONS[currentLang];
-            hwStatus.textContent = t.handwriting_status_draw || '数式を書いてください';
-            hwStatus.className = 'hw-status';
-            hwInsertBtn.disabled = true;
-            if (recognizeTimer) clearTimeout(recognizeTimer);
-        } else {
-            scheduleRecognize();
-        }
+        if (historyIndex === 0) return;
+        historyIndex--;
+        restoreHistoryState();
     }
 
     function redo() {
-        if (redoStrokes.length === 0) return;
-        const s = redoStrokes.pop();
-        strokes.push(s);
-        redraw();
-        updateUndoRedoButtons();
-        scheduleRecognize();
+        if (historyIndex === history.length - 1) return;
+        historyIndex++;
+        restoreHistoryState();
     }
 
     function insertLatex() {
         hwSessionActive = false;
         hwOriginalValue = '';
         hwOriginalPosition = 0;
+        strokes = [];
+        history = [[]];
+        historyIndex = 0;
         clearCanvas();
         mf.focus();
     }
