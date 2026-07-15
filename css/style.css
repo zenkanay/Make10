@@ -196,11 +196,11 @@ body {
 }
 
 .logo-math {
-  color: var(--primary);
+  color: var(--text-color);
 }
 
 .logo-make10 {
-  color: var(--text-color);
+  color: var(--primary);
 }
 
 /* API Settings & Help Button (Subtle round icon buttons) */
