@@ -1652,8 +1652,7 @@ body.keyboard-visible {
 input[type="text"],
 input[type="number"],
 input[type="password"],
-select,
-math-field {
+select {
   font-size: 16px !important;
 }
 

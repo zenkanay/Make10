@@ -48,6 +48,7 @@ let gameDifficulty = "medium";
 let apiKey = "";
 const backendUrl = "https://make10-backend-1p2j.onrender.com"; // hardcoded backend URL
 let sortNumbers = false;
+let setKeyboardMode;
 let currentLang = "ja";
 let settingsSnapshot = null;
 // Tracks the order of clicked digit-card indices (for duplicate number disambiguation)
@@ -719,7 +720,7 @@ function initSettings() {
 
     const desmosKeyboard = document.getElementById("desmos-keyboard");
 
-    function setKeyboardMode(mode) {
+    setKeyboardMode = function(mode) {
         // mode: "standard" = OS keyboard, "virtual" = virtual KB only, "none" = no keyboard
         if (!mf) return;
 
@@ -2079,6 +2080,13 @@ settingsBtn.addEventListener("click", () => {
         sort: (localStorage.getItem("sort_numbers") === "true"),
         apiKey: localStorage.getItem("gemini_api_key") || ""
     };
+    // Restore UI values immediately to reflect the saved settings
+    if (langSelect) langSelect.value = settingsSnapshot.lang;
+    if (themeSelect) themeSelect.value = settingsSnapshot.theme;
+    if (keyboardTypeSelect) keyboardTypeSelect.value = settingsSnapshot.keyboardType;
+    if (sortNumbersCheckbox) sortNumbersCheckbox.checked = settingsSnapshot.sort;
+    if (apiKeyInput) apiKeyInput.value = settingsSnapshot.apiKey;
+
     settingsModal.classList.remove("hidden");
 });
 
