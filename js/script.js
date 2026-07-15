@@ -979,14 +979,13 @@ function initSettings() {
     } catch(e) {}
 
     // === CRITICAL: ResizeObserver to hard-reset any height change MathLive tries to make ===
-    // This is the nuclear option — if the element somehow changes height, we forcibly reset it.
-    const MF_HEIGHT_PX = window.innerWidth <= 768 ? 54 : 76;
-    const MF_CONTAINER_HEIGHT_PX = window.innerWidth <= 768 ? 66 : 88;
+    // Heights match CSS: PC container=120px / field=106px, mobile container=90px / field=78px
     const mfContainer = mf.closest('.math-field-container');
 
     const forceFixedHeight = () => {
-        const targetH = window.innerWidth <= 768 ? 54 : 76;
-        const containerH = window.innerWidth <= 768 ? 66 : 88;
+        const isMobile = window.innerWidth <= 768;
+        const targetH = isMobile ? 78 : 106;
+        const containerH = isMobile ? 90 : 120;
         if (mf.style.height !== `${targetH}px`) {
             mf.style.setProperty('height', `${targetH}px`, 'important');
             mf.style.setProperty('min-height', `${targetH}px`, 'important');
