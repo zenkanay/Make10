@@ -3656,7 +3656,7 @@ if (shareModalUrlBtn) {
     const hwUndoBtn     = document.getElementById('hw-undo-btn');
     const hwRedoBtn     = document.getElementById('hw-redo-btn');
     const hwInsertBtn   = document.getElementById('hw-insert-btn');
-    const hwStatus      = document.getElementById('hw-status');
+    const hwStatus      = document.getElementById('hw-status') || { textContent: '', className: '' };
     const hwLatexPrev   = document.getElementById('hw-latex-preview');
     const hwNoKeyWarn   = document.getElementById('hw-no-key-warning');
     const iinkContainer = document.getElementById('iink-editor');

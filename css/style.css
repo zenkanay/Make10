@@ -1302,21 +1302,23 @@ math-field::part(virtual-keyboard-toggle) {
 .hw-action-buttons {
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: 4px;
   width: 100%;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .hw-tools-row {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
+  width: 100%;
+  justify-content: space-between;
 }
 
 .hw-tool-btn {
-  width: 36px;
-  height: 36px;
+  width: 31px;
+  height: 31px;
   border-radius: 50%;
   border: none;
   background: var(--primary);
@@ -1325,7 +1327,7 @@ math-field::part(virtual-keyboard-toggle) {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
 }
@@ -1352,12 +1354,6 @@ body.light-theme .hw-tool-btn:disabled,
 html[data-theme='light'] .hw-tool-btn:disabled {
   background: #ebebeb;
   color: rgba(255, 255, 255, 0.9);
-}
-
-#hw-insert-btn {
-  flex: 1;
-  height: 32px;
-  font-size: 0.8rem !important;
 }
 
 .hw-no-key-warning-inline {
@@ -1411,19 +1407,15 @@ html[data-theme='light'] .hw-tool-btn:disabled {
     width: 100%;
     gap: 8px;
     align-items: center;
+    justify-content: flex-end;
   }
   .hw-tools-row {
     display: flex;
-    gap: 8px;
+    gap: 12px;
   }
   .hw-tools-row button.hw-tool-btn {
     width: 38px;
     height: 38px;
-  }
-  #hw-insert-btn {
-    flex: 1;
-    height: 38px;
-    font-size: 0.85rem !important;
   }
   .hw-latex-preview {
     display: none !important;
