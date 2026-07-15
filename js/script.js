@@ -174,7 +174,12 @@ const TRANSLATIONS = {
         help_tip_3: "キーボードショートカット：Space キーで新しい問題を生成、Enter キーで判定ができます。また、Tab キーで仮想キーボードを開きます。",
         keyboard_type_label: "キーボードの種類",
         keyboard_type_virtual: "仮想キーボード",
-        keyboard_type_standard: "標準キーボード (デバイス標準)"
+        keyboard_type_standard: "標準キーボード (デバイス標準)",
+        func_trig: "三角関数",
+        func_stats: "統計学",
+        func_dist: "分布・確率",
+        func_calc: "微積分・極限",
+        func_misc: "その他・数学演算"
     },
     en: {
         settings_btn: "Settings",
@@ -257,7 +262,12 @@ const TRANSLATIONS = {
         help_tip_3: "Keyboard shortcuts: Press Space to generate a new problem, Enter to evaluate. Press Tab to open the virtual keyboard.",
         keyboard_type_label: "Keyboard Type",
         keyboard_type_virtual: "Virtual Keyboard",
-        keyboard_type_standard: "Standard Keyboard (System)"
+        keyboard_type_standard: "Standard Keyboard (System)",
+        func_trig: "Trigonometry",
+        func_stats: "Statistics",
+        func_dist: "Distributions",
+        func_calc: "Calculus & Limits",
+        func_misc: "Misc & Operations"
     },
     zh: {
         settings_btn: "设置",
@@ -339,7 +349,12 @@ const TRANSLATIONS = {
         help_tip_3: "快捷键：按 Space 键生成新题目，按 Enter 键进行判定。按 Tab 键打开虚拟键盘。",
         keyboard_type_label: "键盘类型",
         keyboard_type_virtual: "虚拟键盘",
-        keyboard_type_standard: "标准键盘 (系统)"
+        keyboard_type_standard: "标准键盘 (系统)",
+        func_trig: "三角函数",
+        func_stats: "统计学",
+        func_dist: "分布与概率",
+        func_calc: "微积分与极限",
+        func_misc: "其他与数学运算"
     },
     ko: {
         settings_btn: "설정",
@@ -421,7 +436,12 @@ const TRANSLATIONS = {
         help_tip_3: "단축키: Space 키로 새 문제 생성, Enter 키로 판정. Tab 키로 가상 키보드 열기.",
         keyboard_type_label: "키보드 종류",
         keyboard_type_virtual: "가상 키보드",
-        keyboard_type_standard: "표준 키보드 (시스템)"
+        keyboard_type_standard: "표준 키보드 (시스템)",
+        func_trig: "삼각함수",
+        func_stats: "통계학",
+        func_dist: "분포 및 확률",
+        func_calc: "미적분 및 극한",
+        func_misc: "기타 및 수학 연산"
     },
     es: {
         settings_btn: "Configuración",
@@ -503,7 +523,12 @@ const TRANSLATIONS = {
         help_tip_3: "Atajos de teclado: Space para nueva pregunta, Enter para evaluar. Presione Tab para abrir el teclado virtual.",
         keyboard_type_label: "Tipo de teclado",
         keyboard_type_virtual: "Teclado virtual",
-        keyboard_type_standard: "Teclado estándar (sistema)"
+        keyboard_type_standard: "Teclado estándar (sistema)",
+        func_trig: "Trigonometría",
+        func_stats: "Estadística",
+        func_dist: "Distribuciones",
+        func_calc: "Cálculo y Límites",
+        func_misc: "Otros y Operaciones"
     },
     fr: {
         settings_btn: "Paramètres",
@@ -585,7 +610,12 @@ const TRANSLATIONS = {
         help_tip_3: "Raccourcis clavier : Space pour une nouvelle question, Enter pour évaluer. Appuyez sur Tab pour ouvrir le clavier virtuel.",
         keyboard_type_label: "Type de clavier",
         keyboard_type_virtual: "Clavier virtuel",
-        keyboard_type_standard: "Clavier standard (système)"
+        keyboard_type_standard: "Clavier standard (système)",
+        func_trig: "Trigonométrie",
+        func_stats: "Statistiques",
+        func_dist: "Distributions",
+        func_calc: "Calcul & Limites",
+        func_misc: "Divers & Opérations"
     },
     de: {
         settings_btn: "Einstellungen",
@@ -667,7 +697,12 @@ const TRANSLATIONS = {
         help_tip_3: "Tastenkürzel: Space für neue Aufgabe, Enter zum Auswerten. Drücken Sie Tab, um die virtuelle Tastatur zu öffnen.",
         keyboard_type_label: "Tastaturtyp",
         keyboard_type_virtual: "Virtuelle Tastatur",
-        keyboard_type_standard: "Standardtastatur (System)"
+        keyboard_type_standard: "Standardtastatur (System)",
+        func_trig: "Trigonometrie",
+        func_stats: "Statistik",
+        func_dist: "Verteilungen",
+        func_calc: "Analysis & Grenzwerte",
+        func_misc: "Sonstiges & Operationen"
     }
 };
 

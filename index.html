@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=127">
+  <link rel="stylesheet" href="css/style.css?v=128">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -212,7 +212,7 @@
     <div id="desmos-function-popup" class="desmos-function-popup hidden">
       <div class="popup-scroll-content">
         <div class="func-section">
-          <div class="func-section-title">三角関数</div>
+          <div class="func-section-title" data-i18n="func_trig">三角関数</div>
           <div class="func-grid">
             <button class="func-key" data-insert="sin\left(#?\right)">sin</button>
             <button class="func-key" data-insert="cos\left(#?\right)">cos</button>
@@ -235,7 +235,7 @@
           </div>
         </div>
         <div class="func-section">
-          <div class="func-section-title">統計学</div>
+          <div class="func-section-title" data-i18n="func_stats">統計学</div>
           <div class="func-grid">
             <button class="func-key" data-insert="mean\left(#?\right)">mean</button>
             <button class="func-key" data-insert="median\left(#?\right)">median</button>
@@ -253,7 +253,7 @@
           </div>
         </div>
         <div class="func-section">
-          <div class="func-section-title">分布・確率</div>
+          <div class="func-section-title" data-i18n="func_dist">分布・確率</div>
           <div class="func-grid">
             <button class="func-key" data-insert="normaldist\left(#?, #?\right)">normaldist</button>
             <button class="func-key" data-insert="tdist\left(#?\right)">tdist</button>
@@ -269,7 +269,7 @@
           </div>
         </div>
         <div class="func-section">
-          <div class="func-section-title">微積分・極限</div>
+          <div class="func-section-title" data-i18n="func_calc">微積分・極限</div>
           <div class="func-grid">
             <button class="func-key" data-insert="\frac{d}{dx}\left(#?\right)">d/dx</button>
             <button class="func-key" data-insert="\int_{#?}^{#?}">∫</button>
@@ -279,7 +279,7 @@
           </div>
         </div>
         <div class="func-section">
-          <div class="func-section-title">その他・数学演算</div>
+          <div class="func-section-title" data-i18n="func_misc">その他・数学演算</div>
           <div class="func-grid">
             <button class="func-key" data-insert="ln\left(#?\right)">ln</button>
             <button class="func-key" data-insert="log\left(#?\right)">log</button>
@@ -469,7 +469,7 @@
       </div>
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v127</span>
+        <span class="settings-version">v128</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -519,11 +519,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=127"></script>
+  <script type="module" src="js/script.js?v=128"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=127')
+        navigator.serviceWorker.register('sw.js?v=128')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });
