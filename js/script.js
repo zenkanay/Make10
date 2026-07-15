@@ -1103,6 +1103,15 @@ function initSettings() {
 
         const handleStart = (clientX, clientY, target) => {
             if (target.closest('#custom-keyboard-toggle')) return;
+            
+            // If the input is already focused, bypass handleStart to let standard text selection/drag work smoothly
+            const active = document.activeElement;
+            const isInputFocused = active === mf || mf.contains(active);
+            if (isInputFocused) {
+                isPointerDown = false;
+                return;
+            }
+
             isPointerDown = true;
             touchStartX = clientX;
             touchStartY = clientY;
@@ -2095,8 +2104,10 @@ settingsModal.addEventListener("click", (e) => {
 });
 
 saveSettingsBtn.addEventListener("click", () => {
-    apiKey = apiKeyInput.value.trim();
-    localStorage.setItem("gemini_api_key", apiKey);
+    if (apiKeyInput) {
+        apiKey = apiKeyInput.value.trim();
+        localStorage.setItem("gemini_api_key", apiKey);
+    }
 
     // Save and apply theme
     if (themeSelect) {
