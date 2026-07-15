@@ -3644,17 +3644,15 @@ if (shareModalUrlBtn) {
 // ========================================================================
 (function initHandwriting() {
     const hwBtn         = document.getElementById('handwriting-btn');
-    const hwModal       = document.getElementById('handwriting-modal');
-    const hwCloseBtn    = document.getElementById('close-handwriting-btn');
     const hwClearBtn    = document.getElementById('hw-clear-btn');
-    const hwCancelBtn   = document.getElementById('hw-cancel-btn');
     const hwInsertBtn   = document.getElementById('hw-insert-btn');
+    const hwBackBtn     = document.getElementById('hw-back-to-keyboard');
     const hwStatus      = document.getElementById('hw-status');
     const hwLatexPrev   = document.getElementById('hw-latex-preview');
     const hwNoKeyWarn   = document.getElementById('hw-no-key-warning');
     const iinkContainer = document.getElementById('iink-editor');
 
-    if (!hwBtn || !hwModal || !iinkContainer) return;
+    if (!hwBtn || !iinkContainer) return;
 
     // ── canvas setup ──────────────────────────────────────────────────
     const canvas = document.createElement('canvas');
@@ -3697,7 +3695,7 @@ if (shareModalUrlBtn) {
     function onDown(e) {
         e.preventDefault();
         const p = getPos(e);
-        currentStroke = { x: [p.x], y: [p.y], t: [Date.now()] };
+        currentStroke = { x: [p.x], y: [p.y] };
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
         iinkContainer.classList.add('active');
@@ -3709,7 +3707,6 @@ if (shareModalUrlBtn) {
         const p = getPos(e);
         currentStroke.x.push(p.x);
         currentStroke.y.push(p.y);
-        currentStroke.t.push(Date.now());
         ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim() || '#ffffff';
         ctx.lineWidth = 2.5;
         ctx.lineCap = 'round';
@@ -3770,7 +3767,7 @@ if (shareModalUrlBtn) {
         const body = JSON.stringify({
             configuration: { contentType: 'Math' },
             strokeGroups: [{
-                strokes: strokes.map(s => ({ x: s.x, y: s.y, t: s.t }))
+                strokes: strokes.map(s => ({ x: s.x, y: s.y }))
             }]
         });
 
@@ -3809,26 +3806,43 @@ if (shareModalUrlBtn) {
         }
     }
 
-    // ── open / close ──────────────────────────────────────────────────
-    function openModal() {
+    // ── layout toggles ────────────────────────────────────────────────
+    window.showHandwritingLayout = function() {
+        setKeyboardMode('virtual');
+
+        const l123 = document.getElementById('layout-123');
+        const labc = document.getElementById('layout-abc');
+        const lhw  = document.getElementById('layout-handwriting');
+        const pop  = document.getElementById('desmos-function-popup');
+        const btnFunc = document.getElementById('btn-toggle-function');
+
+        if (l123) l123.classList.add('hidden');
+        if (labc) labc.classList.add('hidden');
+        if (pop) pop.classList.add('hidden');
+        if (btnFunc) btnFunc.classList.remove('active');
+        if (lhw) lhw.classList.remove('hidden');
+
         const appKey  = localStorage.getItem('myscript_app_key')  || '';
         const hmacKey = localStorage.getItem('myscript_hmac_key') || '';
         if (!appKey || !hmacKey) {
-            hwNoKeyWarn.classList.remove('hidden');
-            iinkContainer.style.display = 'none';
+            if (hwNoKeyWarn) hwNoKeyWarn.classList.remove('hidden');
+            canvas.style.display = 'none';
         } else {
-            hwNoKeyWarn.classList.add('hidden');
-            iinkContainer.style.display = '';
+            if (hwNoKeyWarn) hwNoKeyWarn.classList.add('hidden');
+            canvas.style.display = 'block';
         }
-        hwModal.classList.remove('hidden');
+
         requestAnimationFrame(() => {
             resizeCanvas();
             clearCanvas();
         });
-    }
+    };
 
-    function closeModal() {
-        hwModal.classList.add('hidden');
+    function hideHandwritingLayout() {
+        const l123 = document.getElementById('layout-123');
+        const lhw  = document.getElementById('layout-handwriting');
+        if (lhw) lhw.classList.add('hidden');
+        if (l123) l123.classList.remove('hidden');
     }
 
     function clearCanvas() {
@@ -3841,7 +3855,7 @@ if (shareModalUrlBtn) {
         hwLatexPrev.classList.add('hidden');
         hwInsertBtn.disabled = true;
         const t = TRANSLATIONS[currentLang];
-        hwStatus.textContent = t.handwriting_status_draw || '✏️ 数式を書いてください';
+        hwStatus.textContent = t.handwriting_status_draw || '数式を書いてください';
         hwStatus.className = 'hw-status';
     }
 
@@ -3850,16 +3864,27 @@ if (shareModalUrlBtn) {
         mf.executeCommand(['insert', hwCurrentLatex]);
         mf.focus();
         handleLiveInput();
-        closeModal();
+        hideHandwritingLayout();
     }
 
     // ── event bindings ────────────────────────────────────────────────
-    hwBtn.addEventListener('click', openModal);
-    hwCloseBtn.addEventListener('click', closeModal);
-    hwCancelBtn.addEventListener('click', closeModal);
+    hwBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.showHandwritingLayout();
+    });
+    if (hwBackBtn) {
+        hwBackBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideHandwritingLayout();
+        });
+    }
     hwClearBtn.addEventListener('click', clearCanvas);
     hwInsertBtn.addEventListener('click', insertLatex);
-    hwModal.addEventListener('click', (e) => { if (e.target === hwModal) closeModal(); });
 
-    window.addEventListener('resize', () => { if (!hwModal.classList.contains('hidden')) resizeCanvas(); });
+    window.addEventListener('resize', () => {
+        const lhw = document.getElementById('layout-handwriting');
+        if (lhw && !lhw.classList.contains('hidden')) {
+            resizeCanvas();
+        }
+    });
 })();
