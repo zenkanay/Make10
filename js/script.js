@@ -971,6 +971,44 @@ function initSettings() {
     mf.mathVirtualKeyboardPolicy = "manual";
     mf.setAttribute("math-virtual-keyboard-policy", "manual");
 
+    // === CRITICAL: Lock MathLive font-scale so it never resizes the field ===
+    // MathLive auto-scales the formula to fit; we prevent this by fixing the scale.
+    try {
+        mf.minFontScale = 0.5;  // allow shrinking formula text rather than expanding the box
+        mf.maxFontScale = 1.0;  // cap at 100% — never grow larger than the set font-size
+    } catch(e) {}
+
+    // === CRITICAL: ResizeObserver to hard-reset any height change MathLive tries to make ===
+    // This is the nuclear option — if the element somehow changes height, we forcibly reset it.
+    const MF_HEIGHT_PX = window.innerWidth <= 768 ? 54 : 76;
+    const MF_CONTAINER_HEIGHT_PX = window.innerWidth <= 768 ? 66 : 88;
+    const mfContainer = mf.closest('.math-field-container');
+
+    const forceFixedHeight = () => {
+        const targetH = window.innerWidth <= 768 ? 54 : 76;
+        const containerH = window.innerWidth <= 768 ? 66 : 88;
+        if (mf.style.height !== `${targetH}px`) {
+            mf.style.setProperty('height', `${targetH}px`, 'important');
+            mf.style.setProperty('min-height', `${targetH}px`, 'important');
+            mf.style.setProperty('max-height', `${targetH}px`, 'important');
+        }
+        if (mfContainer && mfContainer.style.height !== `${containerH}px`) {
+            mfContainer.style.setProperty('height', `${containerH}px`, 'important');
+            mfContainer.style.setProperty('min-height', `${containerH}px`, 'important');
+            mfContainer.style.setProperty('max-height', `${containerH}px`, 'important');
+        }
+    };
+
+    forceFixedHeight();
+
+    const mfResizeObserver = new ResizeObserver(() => {
+        forceFixedHeight();
+    });
+    mfResizeObserver.observe(mf);
+    if (mfContainer) mfResizeObserver.observe(mfContainer);
+
+    // Also re-lock on every input event (MathLive may resize after parsing)
+    mf.addEventListener('input', () => { requestAnimationFrame(forceFixedHeight); });
 
 
     // --- Desmos-like Virtual Keyboard Controls ---

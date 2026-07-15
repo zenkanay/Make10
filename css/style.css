@@ -488,18 +488,29 @@ body {
   align-items: center;
 }
 
+/* ===== Math Field: COMPLETELY FIXED HEIGHT ===== */
+/* MathLive internally sizes itself — we must use both:
+   1. CSS custom properties it reads (--ML__font-size, etc.)
+   2. Hard clip on the container so internal growth is invisible */
+
 .math-field-container {
   position: relative;
   background-color: var(--input-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 0 10px; /* Zero vertical padding to prevent sizing shift */
-  transition: var(--transition);
-  height: 88px; /* Strict fixed container height */
+  padding: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  /* Strict fixed dimensions: */
+  height: 88px !important;
+  min-height: 88px !important;
+  max-height: 88px !important;
   display: flex;
   align-items: center;
-  overflow: hidden; /* Prevent vertical height leak */
+  /* Hard clip — any internal overflow is cut off */
+  overflow: hidden !important;
+  clip: rect(0, auto, 88px, 0);
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .math-field-container:focus-within {
@@ -508,20 +519,27 @@ body {
 }
 
 math-field {
+  display: block !important;
   width: 100% !important;
-  height: 76px !important; /* Strict fixed math-field height */
+  /* Force the element box to never grow: */
+  height: 76px !important;
+  min-height: 76px !important;
+  max-height: 76px !important;
   background: transparent;
   color: var(--text-color);
-  font-size: 1.8rem !important; /* Comfortable medium text size */
+  /* MathLive reads this CSS variable for its internal font-size: */
+  --ML__font-size: 1.8rem;
+  font-size: 1.8rem !important;
   outline: none;
   --keyboard-zindex: 1000;
   border: none;
-  padding-right: 40px; /* Prevents text overlap with custom keyboard toggle */
+  padding: 0 40px 0 10px;
   caret-color: transparent !important;
   touch-action: pan-y !important;
-  box-sizing: border-box;
-  overflow-x: auto; /* Allow horizontal scroll for long equations */
-  overflow-y: hidden; /* Block vertical height growth */
+  box-sizing: border-box !important;
+  /* Prevent internal content from pushing element boundaries: */
+  overflow: hidden !important;
+  contain: strict;
 }
 
 .math-field-container:focus-within math-field {
@@ -973,13 +991,19 @@ kbd {
     gap: 8px;
   }
 
+  /* Mobile: strict fixed heights for math-field */
   .math-field-container {
-    height: 64px; /* Strict fixed container height on mobile */
-    padding: 0 8px; /* Zero vertical padding */
+    height: 66px !important;
+    min-height: 66px !important;
+    max-height: 66px !important;
+    clip: rect(0, auto, 66px, 0);
   }
 
   math-field {
-    height: 52px !important; /* Strict fixed math-field height on mobile */
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+    --ML__font-size: 1.25rem;
     font-size: 1.25rem !important;
   }
 
