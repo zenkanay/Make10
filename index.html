@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=122">
+  <link rel="stylesheet" href="css/style.css?v=123">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -102,96 +102,105 @@
     </header>
 
     <main class="game-board glass-panel">
-      <!-- コントロールパネル -->
-      <section class="control-panel">
-        <div class="mode-select-wrapper">
-          <label for="difficulty-select" class="control-label" data-i18n="difficulty_label">難易度</label>
-          <select id="difficulty-select" class="custom-select">
-            <option value="easy" data-i18n="easy">Easy (簡単)</option>
-            <option value="medium" selected data-i18n="medium">Medium (標準)</option>
-            <option value="hard" data-i18n="hard">Hard (難問)</option>
-            <option value="random" data-i18n="random_mode">Random (完全ランダム)</option>
-            <option value="custom" data-i18n="custom">Custom (自由設定)</option>
-          </select>
-        </div>
-        <button id="generate-btn" class="primary-btn">
-          <span data-i18n="generate_btn">新規生成</span>
-        </button>
-      </section>
+      <div class="game-layout">
+        <!-- 左カラム: メインのプレイ要素 -->
+        <div class="game-main-column">
+          <!-- 使える数字セクション -->
+          <section class="numbers-section">
+            <h2 class="section-title" data-i18n="available_digits">使える数字</h2>
+            <div id="numbers-container" class="numbers-container">
+              <div class="digit-card" data-index="0">-</div>
+              <div class="digit-card" data-index="1">-</div>
+              <div class="digit-card" data-index="2">-</div>
+              <div class="digit-card" data-index="3">-</div>
+            </div>
+          </section>
 
-      <!-- カスタム入力エリア（通常時は非表示） -->
-      <section id="custom-numbers-section" class="custom-numbers-section hidden">
-        <p class="section-desc" data-i18n="custom_desc">使いたい4つの数字を入力してください（0〜9）</p>
-        <div class="custom-inputs">
-          <input type="number" min="0" max="9" class="custom-digit-input" value="1">
-          <input type="number" min="0" max="9" class="custom-digit-input" value="2">
-          <input type="number" min="0" max="9" class="custom-digit-input" value="3">
-          <input type="number" min="0" max="9" class="custom-digit-input" value="4">
-        </div>
-        <button id="apply-custom-btn" class="secondary-btn" data-i18n="apply_btn">適用</button>
-      </section>
-
-      <!-- 使える数字セクション -->
-      <section class="numbers-section">
-        <h2 class="section-title" data-i18n="available_digits">使える数字</h2>
-        <div id="numbers-container" class="numbers-container">
-          <div class="digit-card" data-index="0">-</div>
-          <div class="digit-card" data-index="1">-</div>
-          <div class="digit-card" data-index="2">-</div>
-          <div class="digit-card" data-index="3">-</div>
-        </div>
-      </section>
-
-      <!-- 数式入力セクション -->
-      <section class="input-section">
-        <div class="input-header">
-          <h2 class="section-title" data-i18n="formula_input">数式入力</h2>
-          <div class="input-actions">
-            <button id="clear-btn" class="text-btn" data-i18n="clear_btn">クリア</button>
-            <button id="evaluate-btn" class="primary-btn evaluate-btn">
-              <span data-i18n="evaluate_btn">判定する</span>
-            </button>
-          </div>
-        </div>
-        <div class="math-field-container">
-          <math-field id="mf" placeholder="ここに数式を入力 (例: 8 / (1 - 1/5))" data-i18n-placeholder="math_field_placeholder"></math-field>
-          <button id="custom-keyboard-toggle" class="keyboard-toggle-btn" aria-label="キーボード切り替え" title="キーボード切り替え">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-              <line x1="8" y1="21" x2="16" y2="21"></line>
-              <line x1="12" y1="17" x2="12" y2="21"></line>
-              <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M18 12h.01M10 12h4"></path>
-            </svg>
-          </button>
-        </div>
-      </section>
-
-      <!-- 結果・ステータスセクション -->
-      <section class="results-section">
-        <div class="result-card" id="status-card">
-          <div class="result-row">
-            <span class="result-label" data-i18n="current_value_label">現在の値</span>
-            <span id="current-value" class="result-value">---</span>
-          </div>
-          <div id="feedback-msg" class="feedback-msg" data-i18n="msg_enter_formula">数式を入力してください</div>
-        </div>
-
-        <div class="details-accordion">
-          <details>
-            <summary data-i18n="debug_info">詳細情報 (デバッグ)</summary>
-            <div class="accordion-content">
-              <div class="info-row">
-                <span class="info-label" data-i18n="latex_expr">LaTeX コード:</span>
-                <code id="latex-code" class="code-box"></code>
-              </div>
-              <div class="info-row">
-                <span class="info-label" data-i18n="eval_engine">評価エンジン:</span>
-                <span id="engine-used" class="info-val">Compute Engine (Local)</span>
+          <!-- 数式入力セクション -->
+          <section class="input-section">
+            <div class="input-header">
+              <h2 class="section-title" data-i18n="formula_input">数式入力</h2>
+              <div class="input-actions">
+                <button id="clear-btn" class="text-btn" data-i18n="clear_btn">クリア</button>
+                <button id="evaluate-btn" class="primary-btn evaluate-btn">
+                  <span data-i18n="evaluate_btn">判定する</span>
+                </button>
               </div>
             </div>
-          </details>
+            <div class="math-field-container">
+              <math-field id="mf" placeholder="ここに数式を入力 (例: 8 / (1 - 1/5))" data-i18n-placeholder="math_field_placeholder"></math-field>
+              <button id="custom-keyboard-toggle" class="keyboard-toggle-btn" aria-label="キーボード切り替え" title="キーボード切り替え">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                  <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M18 12h.01M10 12h4"></path>
+                </svg>
+              </button>
+            </div>
+          </section>
+
+          <!-- 結果・ステータスセクション -->
+          <section class="results-section">
+            <div class="result-card" id="status-card">
+              <div class="result-row">
+                <span class="result-label" data-i18n="current_value_label">現在の値</span>
+                <span id="current-value" class="result-value">---</span>
+              </div>
+              <div id="feedback-msg" class="feedback-msg" data-i18n="msg_enter_formula">数式を入力してください</div>
+            </div>
+          </section>
         </div>
-      </section>
+
+        <!-- 右カラム: コントロールおよび情報要素 -->
+        <div class="game-side-column">
+          <!-- コントロールパネル -->
+          <section class="control-panel">
+            <div class="mode-select-wrapper">
+              <label for="difficulty-select" class="control-label" data-i18n="difficulty_label">難易度</label>
+              <select id="difficulty-select" class="custom-select">
+                <option value="easy" data-i18n="easy">Easy (簡単)</option>
+                <option value="medium" selected data-i18n="medium">Medium (標準)</option>
+                <option value="hard" data-i18n="hard">Hard (難問)</option>
+                <option value="random" data-i18n="random_mode">Random (完全ランダム)</option>
+                <option value="custom" data-i18n="custom">Custom (自由設定)</option>
+              </select>
+            </div>
+            <button id="generate-btn" class="primary-btn">
+              <span data-i18n="generate_btn">新規生成</span>
+            </button>
+          </section>
+
+          <!-- カスタム入力エリア（通常時は非表示） -->
+          <section id="custom-numbers-section" class="custom-numbers-section hidden">
+            <p class="section-desc" data-i18n="custom_desc">使いたい4つの数字を入力してください（0〜9）</p>
+            <div class="custom-inputs">
+              <input type="number" min="0" max="9" class="custom-digit-input" value="1">
+              <input type="number" min="0" max="9" class="custom-digit-input" value="2">
+              <input type="number" min="0" max="9" class="custom-digit-input" value="3">
+              <input type="number" min="0" max="9" class="custom-digit-input" value="4">
+            </div>
+            <button id="apply-custom-btn" class="secondary-btn" data-i18n="apply_btn">適用</button>
+          </section>
+
+          <!-- 詳細情報アコーディオン -->
+          <div class="details-accordion">
+            <details>
+              <div class="accordion-content">
+                <div class="info-row">
+                  <span class="info-label" data-i18n="latex_expr">LaTeX コード:</span>
+                  <code id="latex-code" class="code-box"></code>
+                </div>
+                <div class="info-row">
+                  <span class="info-label" data-i18n="eval_engine">評価エンジン:</span>
+                  <span id="engine-used" class="info-val">Compute Engine (Local)</span>
+                </div>
+              </div>
+              <summary data-i18n="debug_info">詳細情報 (デバッグ)</summary>
+            </details>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -453,7 +462,7 @@
       </div>
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v122</span>
+        <span class="settings-version">v123</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -503,11 +512,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=122"></script>
+  <script type="module" src="js/script.js?v=123"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=122')
+        navigator.serviceWorker.register('sw.js?v=123')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });
