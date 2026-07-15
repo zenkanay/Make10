@@ -1367,7 +1367,10 @@ function initSettings() {
         let touchStartTime = 0;
         let isPointerDown = false;
 
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
         const handleStart = (clientX, clientY, target) => {
+            if (!isTouchDevice) return;
             if (target.closest('#custom-keyboard-toggle') || target.closest('#handwriting-btn')) return;
             
             // If the input is already focused, bypass handleStart to let standard text selection/drag work smoothly
@@ -1411,6 +1414,7 @@ function initSettings() {
         mathContainer.addEventListener('touchcancel', resetScrolling);
 
         const handleEnd = (clientX, clientY, target) => {
+            if (!isTouchDevice) return;
             if (!isPointerDown) return;
             isPointerDown = false;
 
@@ -1424,19 +1428,27 @@ function initSettings() {
             if (deltaX < 10 && deltaY < 10 && deltaTime < 500) {
                 if (mathContainer) mathContainer.classList.add('focused');
                 
-                if (keyboardTypeSetting === 'virtual') {
-                    setKeyboardMode('virtual');
+                const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+                if (!isTouchDevice) {
+                    // PC版：数式入力欄をクリックしても自動で仮想キーボード等は開かず、フォーカスだけを当てる
                     mf.focus({ preventScroll: true });
                 } else {
-                    const active = document.activeElement;
-                    const isInputFocused = active === mf || mf.contains(active);
-                    const isStandardKeyboardActive = allowInputmodeNone === false;
+                    // タッチデバイス（スマホ・タブレット）：従来通り自動で適切なキーボードをオープン
+                    if (keyboardTypeSetting === 'virtual') {
+                        setKeyboardMode('virtual');
+                        mf.focus({ preventScroll: true });
+                    } else {
+                        const active = document.activeElement;
+                        const isInputFocused = active === mf || mf.contains(active);
+                        const isStandardKeyboardActive = allowInputmodeNone === false;
 
-                    if (isInputFocused && isStandardKeyboardActive) {
-                        return;
+                        if (isInputFocused && isStandardKeyboardActive) {
+                            return;
+                        }
+                        setKeyboardMode('standard');
+                        mf.focus({ preventScroll: true });
                     }
-                    setKeyboardMode('standard');
-                    mf.focus({ preventScroll: true });
                 }
             }
         };
@@ -3677,7 +3689,7 @@ if (shareModalUrlBtn) {
     const ctx = canvas.getContext('2d');
 
     let strokes = [];
-    let history = [[]];
+    let history = [{ strokes: [], latex: '' }];
     let historyIndex = 0;
     let currentStroke = null;
     let recognizeTimer = null;
@@ -3690,21 +3702,26 @@ if (shareModalUrlBtn) {
 
     function saveHistoryState() {
         history = history.slice(0, historyIndex + 1);
-        const copy = strokes.map(s => ({
+        const copyStrokes = strokes.map(s => ({
             x: [...s.x],
             y: [...s.y]
         }));
-        history.push(copy);
+        history.push({
+            strokes: copyStrokes,
+            latex: hwCurrentLatex
+        });
         historyIndex = history.length - 1;
         updateUndoRedoButtons();
     }
 
     function restoreHistoryState() {
         const state = history[historyIndex];
-        strokes = state.map(s => ({
+        strokes = state.strokes.map(s => ({
             x: [...s.x],
             y: [...s.y]
         }));
+        
+        hwCurrentLatex = state.latex;
         
         redraw();
         updateUndoRedoButtons();
@@ -3725,7 +3742,11 @@ if (shareModalUrlBtn) {
             if (recognizeTimer) clearTimeout(recognizeTimer);
         } else {
             startHwSession();
-            scheduleRecognize();
+            applyHwResultToMf(hwCurrentLatex);
+            hwInsertBtn.disabled = false;
+            
+            if (recognizeTimer) clearTimeout(recognizeTimer);
+            recognizeTimer = setTimeout(recognize, 800);
         }
     }
 
@@ -3937,7 +3958,7 @@ if (shareModalUrlBtn) {
         requestAnimationFrame(() => {
             resizeCanvas();
             strokes = [];
-            history = [[]];
+            history = [{ strokes: [], latex: '' }];
             historyIndex = 0;
             clearCanvas();
         });
@@ -3996,7 +4017,7 @@ if (shareModalUrlBtn) {
         hwOriginalValue = '';
         hwOriginalPosition = 0;
         strokes = [];
-        history = [[]];
+        history = [{ strokes: [], latex: '' }];
         historyIndex = 0;
         clearCanvas();
         mf.focus();
