@@ -1034,6 +1034,10 @@ function initSettings() {
         let speechText = latex;
 
         // Custom LaTeX replacement rules for Japanese TTS
+        speechText = speechText.replace(/\\sqrt\[(.*?)\]{(.*?)}/g, "$1乗根 $2");
+        speechText = speechText.replace(/\\frac{d}{dx}/g, "d dx 微分");
+        speechText = speechText.replace(/\\lim\s*_{(.*?)\\to\s*(.*?)}/g, "$1が$2に近づく時の極限");
+        speechText = speechText.replace(/\\Gamma/g, "ガンマ関数");
         speechText = speechText.replace(/\\frac\s*{(.*?)}\s*{(.*?)}/g, "$2 分の $1");
         speechText = speechText.replace(/\\sqrt\s*{(.*?)}/g, "ルート $1");
         speechText = speechText.replace(/\\sqrt/g, "ルート");
