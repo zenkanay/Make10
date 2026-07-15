@@ -3742,7 +3742,13 @@ if (shareModalUrlBtn) {
             if (recognizeTimer) clearTimeout(recognizeTimer);
         } else {
             startHwSession();
-            applyHwResultToMf(hwCurrentLatex);
+            // セッションが有効になってから必ず適用
+            if (hwCurrentLatex) {
+                mf.value = hwOriginalValue;
+                mf.position = hwOriginalPosition;
+                mf.executeCommand(['insert', hwCurrentLatex]);
+                handleLiveInput();
+            }
             hwInsertBtn.disabled = false;
             
             if (recognizeTimer) clearTimeout(recognizeTimer);
@@ -4056,6 +4062,13 @@ if (shareModalUrlBtn) {
     if (hwUndoBtn) hwUndoBtn.addEventListener('click', undo);
     if (hwRedoBtn) hwRedoBtn.addEventListener('click', redo);
     hwInsertBtn.addEventListener('click', insertLatex);
+
+    const hwLeftBtn      = document.getElementById('hw-left-btn');
+    const hwRightBtn     = document.getElementById('hw-right-btn');
+    const hwBackspaceBtn = document.getElementById('hw-backspace-btn');
+    if (hwLeftBtn)      hwLeftBtn.addEventListener('click', () => { mf.executeCommand('moveToPreviousChar'); mf.focus(); });
+    if (hwRightBtn)     hwRightBtn.addEventListener('click', () => { mf.executeCommand('moveToNextChar'); mf.focus(); });
+    if (hwBackspaceBtn) hwBackspaceBtn.addEventListener('click', () => { mf.executeCommand('deleteBackward'); handleLiveInput(); mf.focus(); });
 
     window.addEventListener('resize', () => {
         const lhw = document.getElementById('layout-handwriting');
