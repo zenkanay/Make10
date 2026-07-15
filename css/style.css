@@ -954,15 +954,25 @@ kbd {
 
   /* Control Panel adjustments */
   .control-panel {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: flex-end;
     gap: 12px;
     padding-bottom: 12px;
   }
 
   .mode-select-wrapper {
-    width: 100%;
+    flex: 1;
+    width: auto;
   }
+
+  #generate-btn {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    flex-shrink: 0;
+  }
+
 
   .primary-btn,
   .secondary-btn {
@@ -1167,74 +1177,77 @@ math-field::part(virtual-keyboard-toggle) {
   transition: var(--transition);
 }
 
-/* Handwriting button: sits to the left of keyboard toggle */
+/* Handwriting button: sits to the left of keyboard toggle (Styled brightly like keyboard toggle) */
 .handwriting-toggle-btn {
   right: 52px; /* 12px right-pad + 32px keyboard btn + 8px gap */
-  background-color: var(--card-bg, #2a2a3a);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
+  background-color: var(--primary);
+  border: none;
+  color: #ffffff;
 }
 
 .handwriting-toggle-btn svg {
-  stroke: var(--text-color);
+  stroke: #ffffff;
 }
 
 .handwriting-toggle-btn:hover {
-  background-color: var(--border-color);
+  background-color: var(--primary-hover);
   transform: translateY(-50%) scale(1.05);
 }
 
-/* ===== Handwriting Modal ===== */
-.handwriting-modal-content {
-  width: min(600px, 96vw);
-  max-height: 90vh;
+/* ===== Keyboard Handwriting Layout ===== */
+.hw-keyboard-container {
   display: flex;
-  flex-direction: column;
-}
-
-.handwriting-modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex: 1;
-  min-height: 0;
-}
-
-.iink-editor-container {
   width: 100%;
-  height: 280px;
-  border-radius: 12px;
-  border: 2px dashed var(--border-color);
+  height: 220px;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.hw-canvas-container {
+  flex: 1;
+  height: 100%;
+  border-radius: 8px;
+  border: 1px dashed var(--border-color);
   background-color: var(--bg-color);
   position: relative;
   overflow: hidden;
   touch-action: none;
   cursor: crosshair;
-  transition: border-color 0.2s;
 }
 
-.iink-editor-container:focus-within,
-.iink-editor-container.active {
-  border-color: var(--primary);
-  border-style: solid;
+.hw-canvas-container.active {
+  border: 1px solid var(--primary);
 }
 
-/* iink-ts injects its own canvas — ensure it fills the container */
-.iink-editor-container > * {
-  width: 100% !important;
-  height: 100% !important;
+.hw-canvas-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.handwriting-status-bar {
+.hw-sidebar {
+  width: 150px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 6px;
-  min-height: 28px;
+  height: 100%;
+}
+
+.hw-status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+  flex: 1;
 }
 
 .hw-status {
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
+  text-align: center;
 }
 
 .hw-status.recognizing {
@@ -1248,44 +1261,65 @@ math-field::part(virtual-keyboard-toggle) {
 .hw-latex-preview {
   background: var(--input-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: 6px;
+  padding: 4px 6px;
   font-family: var(--font-mono, monospace);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--text-color);
   word-break: break-all;
+  overflow-y: auto;
+  max-height: 70px;
 }
 
-.handwriting-modal-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-color);
-  margin-top: 4px;
-}
-
-.hw-footer-right {
-  display: flex;
-  gap: 8px;
-}
-
-.hw-no-key-warning {
-  background: rgba(255, 160, 0, 0.1);
-  border: 1px solid rgba(255, 160, 0, 0.4);
-  border-radius: 10px;
-  padding: 12px 14px;
+.hw-action-buttons {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  font-size: 0.82rem;
-  color: var(--text-color);
-  margin-top: 4px;
+  gap: 4px;
+}
+
+.hw-action-buttons button {
+  width: 100%;
+  height: 38px;
+  font-size: 0.85rem !important;
+}
+
+.hw-no-key-warning-inline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+  text-align: center;
+  z-index: 10;
+  border-radius: 7px;
+}
+
+.hw-no-key-warning-inline p {
+  font-size: 0.8rem;
+  margin: 0 0 8px 0;
+  color: #ffffff;
 }
 
 @media (max-width: 768px) {
-  .iink-editor-container {
-    height: 220px;
+  .hw-keyboard-container {
+    height: 180px;
+  }
+  .hw-sidebar {
+    width: 110px;
+  }
+  .hw-action-buttons button {
+    height: 34px;
+    font-size: 0.75rem !important;
+  }
+  .hw-latex-preview {
+    display: none !important; /* Hide preview on mobile screen sizes to keep it compact */
   }
   .handwriting-toggle-btn {
     right: 52px;
