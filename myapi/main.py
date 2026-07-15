@@ -335,10 +335,16 @@ async def evaluate(req: EvaluateRequest):
         print(f"SymPy evaluation failed: {sympy_err}")
         explanation = f"SymPy evaluation failed: {str(sympy_err)}"
         
-    # 3. Fallback to Gemini if SymPy failed or returned non-numeric (or symbolic), and API key is available
+    # 3. Fallback to Gemini if SymPy failed or returned non-numeric/symbolic values, and API key is available
     active_api_key = req.api_key or os.environ.get("GEMINI_API_KEY")
     
-    if not sympy_success and active_api_key:
+    # We fallback to Gemini if:
+    # - SymPy failed (sympy_success == False)
+    # - OR value is None
+    # - OR value is a string (e.g. symbolic expression or complex number string representation)
+    is_value_numeric = isinstance(value, (int, float)) and not isinstance(value, bool)
+    
+    if (not sympy_success or value is None or not is_value_numeric) and active_api_key:
         try:
             gemini_result = evaluate_with_gemini(latex_str, active_api_key)
             if gemini_result.get("success") and gemini_result.get("value") is not None:
@@ -346,10 +352,11 @@ async def evaluate(req: EvaluateRequest):
                 # Try converting to float/int if possible, otherwise keep as string
                 try:
                     if isinstance(value, str):
-                        if '.' in value:
-                            value = float(value)
+                        val_clean = value.strip()
+                        if '.' in val_clean:
+                            value = float(val_clean)
                         else:
-                            value = int(value)
+                            value = int(val_clean)
                 except ValueError:
                     pass
                 success = True
