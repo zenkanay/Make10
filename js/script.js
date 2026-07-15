@@ -179,7 +179,9 @@ const TRANSLATIONS = {
         func_stats: "統計学",
         func_dist: "分布・確率",
         func_calc: "微積分・極限",
-        func_misc: "その他・数学演算"
+        func_misc: "その他・数学演算",
+        keyboard_btn_function: "関数",
+        keyboard_btn_speak: "数式を日本語で読み上げる"
     },
     en: {
         settings_btn: "Settings",
@@ -267,7 +269,9 @@ const TRANSLATIONS = {
         func_stats: "Statistics",
         func_dist: "Distributions",
         func_calc: "Calculus & Limits",
-        func_misc: "Misc & Operations"
+        func_misc: "Misc & Operations",
+        keyboard_btn_function: "Func",
+        keyboard_btn_speak: "Speak formula in Japanese"
     },
     zh: {
         settings_btn: "设置",
@@ -354,7 +358,9 @@ const TRANSLATIONS = {
         func_stats: "统计学",
         func_dist: "分布与概率",
         func_calc: "微积分与极限",
-        func_misc: "其他与数学运算"
+        func_misc: "其他与数学运算",
+        keyboard_btn_function: "函数",
+        keyboard_btn_speak: "用日语读出数式"
     },
     ko: {
         settings_btn: "설정",
@@ -441,7 +447,9 @@ const TRANSLATIONS = {
         func_stats: "통계학",
         func_dist: "분포 및 확률",
         func_calc: "미적분 및 극한",
-        func_misc: "기타 및 수학 연산"
+        func_misc: "기타 및 수학 연산",
+        keyboard_btn_function: "함수",
+        keyboard_btn_speak: "수식을 일본어로 읽기"
     },
     es: {
         settings_btn: "Configuración",
@@ -528,7 +536,9 @@ const TRANSLATIONS = {
         func_stats: "Estadística",
         func_dist: "Distribuciones",
         func_calc: "Cálculo y Límites",
-        func_misc: "Otros y Operaciones"
+        func_misc: "Otros y Operaciones",
+        keyboard_btn_function: "Func",
+        keyboard_btn_speak: "Leer fórmula en japonés"
     },
     fr: {
         settings_btn: "Paramètres",
@@ -615,7 +625,9 @@ const TRANSLATIONS = {
         func_stats: "Statistiques",
         func_dist: "Distributions",
         func_calc: "Calcul & Limites",
-        func_misc: "Divers & Opérations"
+        func_misc: "Divers & Opérations",
+        keyboard_btn_function: "Fonctions",
+        keyboard_btn_speak: "Lire la formule en japonais"
     },
     de: {
         settings_btn: "Einstellungen",
@@ -702,7 +714,9 @@ const TRANSLATIONS = {
         func_stats: "Statistik",
         func_dist: "Verteilungen",
         func_calc: "Analysis & Grenzwerte",
-        func_misc: "Sonstiges & Operationen"
+        func_misc: "Sonstiges & Operationen",
+        keyboard_btn_function: "Funkt.",
+        keyboard_btn_speak: "Formel auf Japanisch vorlesen"
     }
 };
 
@@ -744,6 +758,14 @@ function applyLanguage(lang) {
         const key = elem.getAttribute("data-i18n-aria-label");
         if (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) {
             elem.setAttribute("aria-label", TRANSLATIONS[lang][key]);
+        }
+    });
+
+    // Titles (Tooltip texts)
+    document.querySelectorAll("[data-i18n-title]").forEach(elem => {
+        const key = elem.getAttribute("data-i18n-title");
+        if (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) {
+            elem.setAttribute("title", TRANSLATIONS[lang][key]);
         }
     });
 }
@@ -903,6 +925,38 @@ function initSettings() {
     gameDifficulty = savedDifficulty;
     if (difficultySelect) {
         difficultySelect.value = savedDifficulty;
+    }
+
+    // Cache Clear & Service Worker force refresh handler by clicking version label
+    const settingsVersionSpan = document.querySelector(".settings-version");
+    if (settingsVersionSpan) {
+        settingsVersionSpan.style.cursor = "pointer";
+        settingsVersionSpan.addEventListener("click", async () => {
+            if (confirm("キャッシュを強制クリアして最新バージョンにアップデートしますか？\n(Force clear cache and update?)")) {
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const registrations = await navigator.serviceWorker.getRegistrations();
+                        for (let registration of registrations) {
+                            await registration.unregister();
+                        }
+                    } catch (e) {
+                        console.error("SW unregister failed:", e);
+                    }
+                }
+                if ('caches' in window) {
+                    try {
+                        const keys = await caches.keys();
+                        for (let key of keys) {
+                            await caches.delete(key);
+                        }
+                    } catch (e) {
+                        console.error("Cache clear failed:", e);
+                    }
+                }
+                // Reload page
+                window.location.reload(true);
+            }
+        });
     }
 
     // Configure math-field options
