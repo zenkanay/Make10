@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=146">
+  <link rel="stylesheet" href="css/style.css?v=147">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -492,7 +492,10 @@
           </label>
         </div>
         <div class="setting-group">
-          <label for="api-key-input" class="setting-label" data-i18n="api_key_label">Gemini API キー (任意)</label>
+          <div class="setting-group-header">
+            <label for="api-key-input" class="setting-label" data-i18n="api_key_label">Gemini API キー (任意)</label>
+            <a href="https://aistudio.google.com/" target="_blank" rel="noopener" class="setting-link">無料取得</a>
+          </div>
           <input type="password" id="api-key-input" placeholder="AIによる高度な数式評価用 API キーを入力してください" class="text-input" data-i18n-placeholder="api_key_placeholder">
           <p class="setting-help" data-i18n="api_key_help">
             APIキーを設定すると、SymPyで計算できない超複雑な数式（一部の極限、解析的に解けない積分、任意の特殊関数など）をGeminiが正しく判定できるようになります。
@@ -502,7 +505,7 @@
         <div class="setting-group setting-group--myscript">
           <div class="setting-group-header">
             <span class="setting-label" data-i18n="myscript_app_key_label">MyScript Application Key (任意・手書き入力用)</span>
-            <a href="https://developer.myscript.com/" target="_blank" rel="noopener" class="setting-link">🔑 無料取得</a>
+            <a href="https://developer.myscript.com/" target="_blank" rel="noopener" class="setting-link">無料取得</a>
           </div>
           <input type="password" id="myscript-app-key-input" placeholder="MyScript Application Key" class="text-input">
           <label for="myscript-hmac-key-input" class="setting-label" style="margin-top:8px" data-i18n="myscript_hmac_key_label">MyScript HMAC Key (任意・手書き入力用)</label>
@@ -514,7 +517,7 @@
 
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v146</span>
+        <span class="settings-version">v147</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -565,11 +568,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=146"></script>
+  <script type="module" src="js/script.js?v=147"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=146')
+        navigator.serviceWorker.register('sw.js?v=147')
           .then(reg => {
             console.log('Service Worker registered successfully.', reg.scope);
             // Auto reload when a new service worker is installed
