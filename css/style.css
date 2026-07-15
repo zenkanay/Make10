@@ -504,7 +504,7 @@ body {
 
 math-field {
   width: 100%;
-  min-height: 70px; /* Comfortable height */
+  height: 76px; /* Fixed height to prevent size change during input */
   background: transparent;
   color: var(--text-color);
   font-size: 1.8rem !important; /* Comfortable medium text size */
@@ -966,7 +966,7 @@ kbd {
   }
 
   math-field {
-    min-height: 52px;
+    height: 56px; /* Fixed height to prevent size change on input on mobile */
     font-size: 1.25rem;
   }
 
