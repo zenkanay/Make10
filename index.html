@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Make10++</title>
   <meta name="description" content="Make10++ (メイク10) は、提示された4つの数字を組み合わせて10を作る無料の数学パズルゲームです。通常の四則演算（＋−×÷）だけでなく、ルート(√)、階乗(!)、積分などの高度な数式を使って難問を攻略！脳トレや算数・数学の学習に最適です。">
   <meta name="keywords" content="Make10,メイク10,10作り,テンメイク,数学パズル,脳トレ,四則演算,数学ゲーム,無料ゲーム">
@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=124">
+  <link rel="stylesheet" href="css/style.css?v=125">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -166,8 +166,10 @@
                 <option value="custom" data-i18n="custom">Custom (自由設定)</option>
               </select>
             </div>
-            <button id="generate-btn" class="primary-btn">
-              <span data-i18n="generate_btn">新規生成</span>
+            <button id="generate-btn" class="primary-btn" title="新規生成" aria-label="新規生成" data-i18n-title="generate_btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+              </svg>
             </button>
           </section>
 
@@ -467,7 +469,7 @@
       </div>
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v124</span>
+        <span class="settings-version">v125</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -517,11 +519,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=124"></script>
+  <script type="module" src="js/script.js?v=125"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=124')
+        navigator.serviceWorker.register('sw.js?v=125')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });

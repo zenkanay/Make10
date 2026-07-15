@@ -1628,6 +1628,35 @@ body.keyboard-visible {
   width: 100%;
 }
 
+/* Generate button reload animation & style */
+#generate-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% !important;
+  flex-shrink: 0;
+}
+
+#generate-btn svg {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#generate-btn:active svg {
+  transform: rotate(180deg);
+}
+
+/* Mobile input auto-zoom prevention */
+input[type="text"],
+input[type="number"],
+input[type="password"],
+select,
+math-field {
+  font-size: 16px !important;
+}
+
 /* PC (Desktop) view size optimization for virtual keyboard and layout */
 @media (min-width: 769px) {
   .app-container {
