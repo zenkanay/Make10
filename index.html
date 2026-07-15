@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=134">
+  <link rel="stylesheet" href="css/style.css?v=135">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -292,7 +292,7 @@
             <button class="func-key" data-insert="sign\left(#?\right)">sign</button>
             <button class="func-key" data-insert="\bmod">mod</button>
             <button class="func-key" data-insert="\sqrt[#?]{#?}"><sup>n</sup>√</button>
-            <button class="func-key" data-insert="\Gamma\left(#?\right)">Γ (ガンマ)</button>
+            <button class="func-key" data-insert="\Gamma\left(#?\right)" data-i18n="func_label_gamma">Γ (ガンマ)</button>
           </div>
         </div>
       </div>
@@ -469,7 +469,7 @@
       </div>
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v134</span>
+        <span class="settings-version">v135</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -519,11 +519,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=134"></script>
+  <script type="module" src="js/script.js?v=135"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=134')
+        navigator.serviceWorker.register('sw.js?v=135')
           .then(reg => {
             console.log('Service Worker registered successfully.', reg.scope);
             // Auto reload when a new service worker is installed

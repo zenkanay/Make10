@@ -493,8 +493,13 @@ body {
   background-color: var(--input-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 6px 10px;
+  padding: 0 10px; /* Zero vertical padding to prevent sizing shift */
   transition: var(--transition);
+  height: 88px; /* Strict fixed container height */
+  display: flex;
+  align-items: center;
+  overflow: hidden; /* Prevent vertical height leak */
+  box-sizing: border-box;
 }
 
 .math-field-container:focus-within {
@@ -503,8 +508,8 @@ body {
 }
 
 math-field {
-  width: 100%;
-  height: 76px; /* Fixed height to prevent size change during input */
+  width: 100% !important;
+  height: 76px !important; /* Strict fixed math-field height */
   background: transparent;
   color: var(--text-color);
   font-size: 1.8rem !important; /* Comfortable medium text size */
@@ -514,6 +519,9 @@ math-field {
   padding-right: 40px; /* Prevents text overlap with custom keyboard toggle */
   caret-color: transparent !important;
   touch-action: pan-y !important;
+  box-sizing: border-box;
+  overflow-x: auto; /* Allow horizontal scroll for long equations */
+  overflow-y: hidden; /* Block vertical height growth */
 }
 
 .math-field-container:focus-within math-field {
@@ -965,9 +973,14 @@ kbd {
     gap: 8px;
   }
 
+  .math-field-container {
+    height: 64px; /* Strict fixed container height on mobile */
+    padding: 0 8px; /* Zero vertical padding */
+  }
+
   math-field {
-    height: 56px; /* Fixed height to prevent size change on input on mobile */
-    font-size: 1.25rem;
+    height: 52px !important; /* Strict fixed math-field height on mobile */
+    font-size: 1.25rem !important;
   }
 
   /* Results Section */

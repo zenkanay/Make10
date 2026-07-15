@@ -181,7 +181,8 @@ const TRANSLATIONS = {
         func_calc: "微積分・極限",
         func_misc: "その他・数学演算",
         keyboard_btn_function: "関数",
-        keyboard_btn_speak: "数式を日本語で読み上げる"
+        keyboard_btn_speak: "数式を日本語で読み上げる",
+        func_label_gamma: "Γ (ガンマ)"
     },
     en: {
         settings_btn: "Settings",
@@ -271,7 +272,8 @@ const TRANSLATIONS = {
         func_calc: "Calculus & Limits",
         func_misc: "Misc & Operations",
         keyboard_btn_function: "Func",
-        keyboard_btn_speak: "Speak formula in Japanese"
+        keyboard_btn_speak: "Speak formula in Japanese",
+        func_label_gamma: "Γ (Gamma)"
     },
     zh: {
         settings_btn: "设置",
@@ -360,7 +362,8 @@ const TRANSLATIONS = {
         func_calc: "微积分与极限",
         func_misc: "其他与数学运算",
         keyboard_btn_function: "函数",
-        keyboard_btn_speak: "用日语读出数式"
+        keyboard_btn_speak: "用日语读出数式",
+        func_label_gamma: "Γ (伽马)"
     },
     ko: {
         settings_btn: "설정",
@@ -449,7 +452,8 @@ const TRANSLATIONS = {
         func_calc: "미적분 및 극한",
         func_misc: "기타 및 수학 연산",
         keyboard_btn_function: "함수",
-        keyboard_btn_speak: "수식을 일본어로 읽기"
+        keyboard_btn_speak: "수식을 일본어로 읽기",
+        func_label_gamma: "Γ (감마)"
     },
     es: {
         settings_btn: "Configuración",
@@ -538,7 +542,8 @@ const TRANSLATIONS = {
         func_calc: "Cálculo y Límites",
         func_misc: "Otros y Operaciones",
         keyboard_btn_function: "Func",
-        keyboard_btn_speak: "Leer fórmula en japonés"
+        keyboard_btn_speak: "Leer fórmula en japonés",
+        func_label_gamma: "Γ (Gamma)"
     },
     fr: {
         settings_btn: "Paramètres",
@@ -627,7 +632,8 @@ const TRANSLATIONS = {
         func_calc: "Calcul & Limites",
         func_misc: "Divers & Opérations",
         keyboard_btn_function: "Fonctions",
-        keyboard_btn_speak: "Lire la formule en japonais"
+        keyboard_btn_speak: "Lire la formule en japonais",
+        func_label_gamma: "Γ (Gamma)"
     },
     de: {
         settings_btn: "Einstellungen",
@@ -716,7 +722,8 @@ const TRANSLATIONS = {
         func_calc: "Analysis & Grenzwerte",
         func_misc: "Sonstiges & Operationen",
         keyboard_btn_function: "Funkt.",
-        keyboard_btn_speak: "Formel auf Japanisch vorlesen"
+        keyboard_btn_speak: "Formel auf Japanisch vorlesen",
+        func_label_gamma: "Γ (Gamma)"
     }
 };
 
