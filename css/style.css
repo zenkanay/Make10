@@ -762,6 +762,9 @@ kbd {
 .modal-content {
   width: 90%;
   max-width: 440px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
   background-color: var(--panel-bg);
   border: 1px solid var(--border-color);
@@ -807,6 +810,9 @@ kbd {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow-y: auto;
+  max-height: calc(85vh - 120px);
+  padding-right: 4px;
 }
 
 .setting-group {
