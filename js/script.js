@@ -51,6 +51,8 @@ let sortNumbers = false;
 let setKeyboardMode;
 let currentLang = "ja";
 let settingsSnapshot = null;
+let hwCurrentLatex = ""; // Latest LaTeX recognized from handwriting
+let hwEditor = null;    // iink-ts Editor instance
 // Tracks the order of clicked digit-card indices (for duplicate number disambiguation)
 let clickedIndices = [];
 
@@ -125,6 +127,17 @@ const TRANSLATIONS = {
         myscript_app_key_label: "MyScript Application Key (任意・手書き入力用)",
         myscript_hmac_key_label: "MyScript HMAC Key (任意・手書き入力用)",
         myscript_key_help: "手書き入力で数式を認識するためのAPIキーです。developer.myscript.com で無料取得できます（月2,000回まで無料）。キーはLocalStorageにのみ保存されます。",
+        handwriting_btn_title: "手書き入力",
+        handwriting_title: "手書き入力",
+        handwriting_status_draw: "✏️ ここに指またはペンで数式を書いてください",
+        handwriting_status_recognizing: "🔍 認識中...",
+        handwriting_status_ready: "✅ 認識完了。挿入しますか？",
+        handwriting_clear_btn: "消去",
+        handwriting_cancel_btn: "キャンセル",
+        handwriting_insert_btn: "挿入する",
+        handwriting_no_key: "MyScript APIキーが設定されていません。設定画面でキーを入力してください。",
+        handwriting_get_key: "🔑 無料で取得する (developer.myscript.com)",
+        handwriting_no_key_short: "APIキー未設定",
         backend_url_label: "バックエンドサーバー URL",
         save_btn: "保存する",
         // placeholders
@@ -217,6 +230,17 @@ const TRANSLATIONS = {
         sort_label: "Sort available digits in ascending order",
         api_key_label: "Gemini API Key (Optional)",
         api_key_help: "Setting an API key allows Gemini to evaluate highly complex formulas that SymPy cannot calculate. Key is saved only in local storage.",
+        handwriting_btn_title: "Handwriting Input",
+        handwriting_title: "Handwriting Input",
+        handwriting_status_draw: "✏️ Draw your formula here with finger or pen",
+        handwriting_status_recognizing: "🔍 Recognizing...",
+        handwriting_status_ready: "✅ Done! Ready to insert.",
+        handwriting_clear_btn: "Clear",
+        handwriting_cancel_btn: "Cancel",
+        handwriting_insert_btn: "Insert",
+        handwriting_no_key: "MyScript API key is not set. Please enter it in Settings.",
+        handwriting_get_key: "🔑 Get free key (developer.myscript.com)",
+        handwriting_no_key_short: "API key not set",
         backend_url_label: "Backend Server URL",
         save_btn: "Save",
         // placeholders
@@ -308,6 +332,17 @@ const TRANSLATIONS = {
         sort_label: "按升序排列显示可用数字",
         api_key_label: "Gemini API 密钥 (可选)",
         api_key_help: "设置 API 密钥后，Gemini 可以计算 SymPy 无法计算的极复杂公式。密钥仅保存在浏览器的 LocalStorage 中。",
+        handwriting_btn_title: "手写输入",
+        handwriting_title: "手写输入",
+        handwriting_status_draw: "✏️ 请在此处用手指或笔书写数学公式",
+        handwriting_status_recognizing: "🔍 识别中...",
+        handwriting_status_ready: "✅ 识别完成，是否插入？",
+        handwriting_clear_btn: "清除",
+        handwriting_cancel_btn: "取消",
+        handwriting_insert_btn: "插入",
+        handwriting_no_key: "未设置 MyScript API 密钥，请在设置中填写。",
+        handwriting_get_key: "🔑 免费获取密钥 (developer.myscript.com)",
+        handwriting_no_key_short: "未设置API密钥",
         backend_url_label: "后端服务器 URL",
         save_btn: "保存",
         api_key_placeholder: "请输入用于 AI 高级数式评估的 API 密钥",
@@ -398,6 +433,17 @@ const TRANSLATIONS = {
         sort_label: "사용 가능한 숫자를 오름차순으로 정렬하여 표시",
         api_key_label: "Gemini API 키 (선택 사항)",
         api_key_help: "API 키를 설정하면 SymPy가 계산할 수 없는 복잡한 수식을 Gemini가 올바르게 평가할 수 있습니다. 키는 브라우저의 LocalStorage에만 저장됩니다.",
+        handwriting_btn_title: "손글씨 입력",
+        handwriting_title: "손글씨 입력",
+        handwriting_status_draw: "✏️ 손가락이나 펜으로 수식을 입력하세요",
+        handwriting_status_recognizing: "🔍 인식 중...",
+        handwriting_status_ready: "✅ 인식 완료. 삽입하시겠습니까?",
+        handwriting_clear_btn: "지우기",
+        handwriting_cancel_btn: "취소",
+        handwriting_insert_btn: "삽입",
+        handwriting_no_key: "MyScript API 키가 설정되지 않았습니다. 설정에서 입력해주세요.",
+        handwriting_get_key: "🔑 무료 키 발급 (developer.myscript.com)",
+        handwriting_no_key_short: "API 키 미설정",
         backend_url_label: "백엔드 서버 URL",
         save_btn: "저장하기",
         api_key_placeholder: "AI를 통한 고급 수식 평가용 API 키를 입력하세요",
@@ -488,6 +534,17 @@ const TRANSLATIONS = {
         sort_label: "Ordenar dígitos disponibles en orden ascendente",
         api_key_label: "Clave API de Gemini (Opcional)",
         api_key_help: "Configurar una clave API permite a Gemini evaluar fórmulas altamente complejas que SymPy no puede calcular. La clave se guarda solo en el LocalStorage.",
+        handwriting_btn_title: "Entrada manual",
+        handwriting_title: "Entrada manual",
+        handwriting_status_draw: "✏️ Escribe tu fórmula con el dedo o el lápiz",
+        handwriting_status_recognizing: "🔍 Reconociendo...",
+        handwriting_status_ready: "✅ Listo para insertar.",
+        handwriting_clear_btn: "Borrar",
+        handwriting_cancel_btn: "Cancelar",
+        handwriting_insert_btn: "Insertar",
+        handwriting_no_key: "No se ha configurado la clave API de MyScript. Configúrala en Ajustes.",
+        handwriting_get_key: "🔑 Obtener clave gratuita (developer.myscript.com)",
+        handwriting_no_key_short: "Clave API no configurada",
         backend_url_label: "URL del Servidor Backend",
         save_btn: "Guardar",
         api_key_placeholder: "Introduce la clave API para evaluación avanzada de IA",
@@ -578,6 +635,17 @@ const TRANSLATIONS = {
         sort_label: "Trier les chiffres disponibles par ordre croissant",
         api_key_label: "Clé API Gemini (Optionnel)",
         api_key_help: "Définir une clé API permet à Gemini d'évaluer des formules très complexes que SymPy ne peut pas calculer. La clé est enregistrée uniquement dans le LocalStorage.",
+        handwriting_btn_title: "Saisie manuscrite",
+        handwriting_title: "Saisie manuscrite",
+        handwriting_status_draw: "✏️ Dessinez votre formule ici avec le doigt ou un stylet",
+        handwriting_status_recognizing: "🔍 Reconnaissance...",
+        handwriting_status_ready: "✅ Prêt à insérer.",
+        handwriting_clear_btn: "Effacer",
+        handwriting_cancel_btn: "Annuler",
+        handwriting_insert_btn: "Insérer",
+        handwriting_no_key: "Clé API MyScript non configurée. Veuillez la saisir dans Paramètres.",
+        handwriting_get_key: "🔑 Obtenir une clé gratuite (developer.myscript.com)",
+        handwriting_no_key_short: "Clé API non configurée",
         backend_url_label: "URL du Serveur Backend",
         save_btn: "Enregistrer",
         api_key_placeholder: "Entrez la clé API pour l'évaluation IA avancée",
@@ -668,6 +736,17 @@ const TRANSLATIONS = {
         sort_label: "Verfügbare Ziffern aufsteigend sortieren",
         api_key_label: "Gemini API-Schlüssel (Optional)",
         api_key_help: "Durch das Festlegen eines API-Schlüssels kann Gemini hochkomplexe Formeln auswerten, die SymPy nicht berechnen kann. Der Schlüssel wird nur im LocalStorage gespeichert.",
+        handwriting_btn_title: "Handschrifteingabe",
+        handwriting_title: "Handschrifteingabe",
+        handwriting_status_draw: "✏️ Schreiben Sie Ihre Formel hier mit Finger oder Stift",
+        handwriting_status_recognizing: "🔍 Erkennung...",
+        handwriting_status_ready: "✅ Bereit zum Einfügen.",
+        handwriting_clear_btn: "Löschen",
+        handwriting_cancel_btn: "Abbrechen",
+        handwriting_insert_btn: "Einfügen",
+        handwriting_no_key: "MyScript API-Schlüssel ist nicht konfiguriert. Bitte in den Einstellungen eingeben.",
+        handwriting_get_key: "🔑 Kostenloser Schlüssel (developer.myscript.com)",
+        handwriting_no_key_short: "API-Schlüssel nicht konfiguriert",
         backend_url_label: "Backend-Server-URL",
         save_btn: "Speichern",
         api_key_placeholder: "API-Schlüssel für erweiterte KI-Formelprüfung eingeben",
@@ -3559,3 +3638,228 @@ if (shareModalCopyBtn) {
 if (shareModalUrlBtn) {
     shareModalUrlBtn.addEventListener("click", copyGameUrlToClipboard);
 }
+
+// ========================================================================
+// HANDWRITING INPUT — MyScript iink REST Batch API
+// ========================================================================
+(function initHandwriting() {
+    const hwBtn         = document.getElementById('handwriting-btn');
+    const hwModal       = document.getElementById('handwriting-modal');
+    const hwCloseBtn    = document.getElementById('close-handwriting-btn');
+    const hwClearBtn    = document.getElementById('hw-clear-btn');
+    const hwCancelBtn   = document.getElementById('hw-cancel-btn');
+    const hwInsertBtn   = document.getElementById('hw-insert-btn');
+    const hwStatus      = document.getElementById('hw-status');
+    const hwLatexPrev   = document.getElementById('hw-latex-preview');
+    const hwNoKeyWarn   = document.getElementById('hw-no-key-warning');
+    const iinkContainer = document.getElementById('iink-editor');
+
+    if (!hwBtn || !hwModal || !iinkContainer) return;
+
+    // ── canvas setup ──────────────────────────────────────────────────
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;touch-action:none;';
+    iinkContainer.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    let strokes = [];
+    let currentStroke = null;
+    let recognizeTimer = null;
+
+    function resizeCanvas() {
+        const r = iinkContainer.getBoundingClientRect();
+        canvas.width  = r.width  || 500;
+        canvas.height = r.height || 280;
+        redraw();
+    }
+
+    function redraw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim() || '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        for (const s of strokes) {
+            if (s.x.length < 2) continue;
+            ctx.beginPath();
+            ctx.moveTo(s.x[0], s.y[0]);
+            for (let i = 1; i < s.x.length; i++) ctx.lineTo(s.x[i], s.y[i]);
+            ctx.stroke();
+        }
+    }
+
+    function getPos(e) {
+        const r = canvas.getBoundingClientRect();
+        const src = e.touches ? e.touches[0] : e;
+        return { x: src.clientX - r.left, y: src.clientY - r.top };
+    }
+
+    function onDown(e) {
+        e.preventDefault();
+        const p = getPos(e);
+        currentStroke = { x: [p.x], y: [p.y], t: [Date.now()] };
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        iinkContainer.classList.add('active');
+    }
+
+    function onMove(e) {
+        e.preventDefault();
+        if (!currentStroke) return;
+        const p = getPos(e);
+        currentStroke.x.push(p.x);
+        currentStroke.y.push(p.y);
+        currentStroke.t.push(Date.now());
+        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim() || '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+    }
+
+    function onUp(e) {
+        e.preventDefault();
+        if (!currentStroke) return;
+        strokes.push(currentStroke);
+        currentStroke = null;
+        scheduleRecognize();
+    }
+
+    canvas.addEventListener('pointerdown', onDown, { passive: false });
+    canvas.addEventListener('pointermove', onMove, { passive: false });
+    canvas.addEventListener('pointerup',   onUp,   { passive: false });
+    canvas.addEventListener('pointerleave', onUp,  { passive: false });
+    // touch fallback
+    canvas.addEventListener('touchstart', onDown, { passive: false });
+    canvas.addEventListener('touchmove',  onMove, { passive: false });
+    canvas.addEventListener('touchend',   onUp,   { passive: false });
+
+    // ── recognition ───────────────────────────────────────────────────
+    function scheduleRecognize() {
+        if (recognizeTimer) clearTimeout(recognizeTimer);
+        const t = TRANSLATIONS[currentLang];
+        hwStatus.textContent = t.handwriting_status_recognizing || '🔍 認識中...';
+        hwStatus.className = 'hw-status recognizing';
+        recognizeTimer = setTimeout(recognize, 800);
+    }
+
+    async function computeHmac(body, appKey, hmacKey) {
+        const secret   = appKey + hmacKey;
+        const keyData  = new TextEncoder().encode(secret);
+        const msgData  = new TextEncoder().encode(body);
+        const key = await crypto.subtle.importKey(
+            'raw', keyData, { name: 'HMAC', hash: 'SHA-512' }, false, ['sign']
+        );
+        const sig = await crypto.subtle.sign('HMAC', key, msgData);
+        return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    async function recognize() {
+        if (strokes.length === 0) return;
+        const appKey  = localStorage.getItem('myscript_app_key')  || '';
+        const hmacKey = localStorage.getItem('myscript_hmac_key') || '';
+        const t = TRANSLATIONS[currentLang];
+
+        if (!appKey || !hmacKey) {
+            hwStatus.textContent = t.handwriting_no_key_short || 'APIキー未設定';
+            hwStatus.className = 'hw-status';
+            return;
+        }
+
+        const body = JSON.stringify({
+            configuration: { contentType: 'Math' },
+            strokeGroups: [{
+                strokes: strokes.map(s => ({ x: s.x, y: s.y, t: s.t }))
+            }]
+        });
+
+        try {
+            const hmac = await computeHmac(body, appKey, hmacKey);
+            const res = await fetch('https://cloud.myscript.com/api/v4.0/iink/batch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type':  'application/json',
+                    'Accept':        'application/x-latex',
+                    'applicationKey': appKey,
+                    'hmac':           hmac
+                },
+                body
+            });
+
+            if (!res.ok) {
+                const err = await res.text();
+                console.error('MyScript error:', res.status, err);
+                hwStatus.textContent = `⚠️ Error ${res.status}`;
+                hwStatus.className = 'hw-status';
+                return;
+            }
+
+            const latex = (await res.text()).trim();
+            hwCurrentLatex = latex;
+            hwLatexPrev.textContent = latex;
+            hwLatexPrev.classList.remove('hidden');
+            hwStatus.textContent = t.handwriting_status_ready || '✅ 認識完了。挿入しますか？';
+            hwStatus.className = 'hw-status ready';
+            hwInsertBtn.disabled = false;
+        } catch (err) {
+            console.error('MyScript fetch error:', err);
+            hwStatus.textContent = '⚠️ ネットワークエラー';
+            hwStatus.className = 'hw-status';
+        }
+    }
+
+    // ── open / close ──────────────────────────────────────────────────
+    function openModal() {
+        const appKey  = localStorage.getItem('myscript_app_key')  || '';
+        const hmacKey = localStorage.getItem('myscript_hmac_key') || '';
+        if (!appKey || !hmacKey) {
+            hwNoKeyWarn.classList.remove('hidden');
+            iinkContainer.style.display = 'none';
+        } else {
+            hwNoKeyWarn.classList.add('hidden');
+            iinkContainer.style.display = '';
+        }
+        hwModal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            resizeCanvas();
+            clearCanvas();
+        });
+    }
+
+    function closeModal() {
+        hwModal.classList.add('hidden');
+    }
+
+    function clearCanvas() {
+        strokes = [];
+        currentStroke = null;
+        hwCurrentLatex = '';
+        if (recognizeTimer) clearTimeout(recognizeTimer);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        iinkContainer.classList.remove('active');
+        hwLatexPrev.classList.add('hidden');
+        hwInsertBtn.disabled = true;
+        const t = TRANSLATIONS[currentLang];
+        hwStatus.textContent = t.handwriting_status_draw || '✏️ 数式を書いてください';
+        hwStatus.className = 'hw-status';
+    }
+
+    function insertLatex() {
+        if (!hwCurrentLatex) return;
+        mf.executeCommand(['insert', hwCurrentLatex]);
+        mf.focus();
+        handleLiveInput();
+        closeModal();
+    }
+
+    // ── event bindings ────────────────────────────────────────────────
+    hwBtn.addEventListener('click', openModal);
+    hwCloseBtn.addEventListener('click', closeModal);
+    hwCancelBtn.addEventListener('click', closeModal);
+    hwClearBtn.addEventListener('click', clearCanvas);
+    hwInsertBtn.addEventListener('click', insertLatex);
+    hwModal.addEventListener('click', (e) => { if (e.target === hwModal) closeModal(); });
+
+    window.addEventListener('resize', () => { if (!hwModal.classList.contains('hidden')) resizeCanvas(); });
+})();
