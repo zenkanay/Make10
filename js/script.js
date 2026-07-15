@@ -1361,7 +1361,7 @@ function initSettings() {
         let isPointerDown = false;
 
         const handleStart = (clientX, clientY, target) => {
-            if (target.closest('#custom-keyboard-toggle')) return;
+            if (target.closest('#custom-keyboard-toggle') || target.closest('#handwriting-btn')) return;
             
             // If the input is already focused, bypass handleStart to let standard text selection/drag work smoothly
             const active = document.activeElement;
@@ -1375,12 +1375,6 @@ function initSettings() {
             touchStartX = clientX;
             touchStartY = clientY;
             touchStartTime = Date.now();
-
-            if (keyboardTypeSetting === 'virtual') {
-                setKeyboardMode('virtual');
-            } else {
-                setKeyboardMode('standard');
-            }
         };
 
         mathContainer.addEventListener('pointerdown', (e) => {
@@ -1413,13 +1407,13 @@ function initSettings() {
             if (!isPointerDown) return;
             isPointerDown = false;
 
-            if (target.closest('#custom-keyboard-toggle')) return;
+            if (target.closest('#custom-keyboard-toggle') || target.closest('#handwriting-btn')) return;
 
             const deltaX = Math.abs(clientX - touchStartX);
             const deltaY = Math.abs(clientY - touchStartY);
             const deltaTime = Date.now() - touchStartTime;
 
-            // Pure tap detection
+            // Pure tap detection (trigger on release)
             if (deltaX < 10 && deltaY < 10 && deltaTime < 500) {
                 if (mathContainer) mathContainer.classList.add('focused');
                 
@@ -3673,8 +3667,10 @@ if (shareModalUrlBtn) {
 
     function redraw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim() || '#ffffff';
-        ctx.lineWidth = 2.5;
+        const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim();
+        const isLightMode = document.body.classList.contains('light-theme') || document.documentElement.getAttribute('data-theme') === 'light';
+        ctx.strokeStyle = themeColor || (isLightMode ? '#1e293b' : '#f8fafc');
+        ctx.lineWidth = 3.0;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         for (const s of strokes) {
@@ -3707,8 +3703,10 @@ if (shareModalUrlBtn) {
         const p = getPos(e);
         currentStroke.x.push(p.x);
         currentStroke.y.push(p.y);
-        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim() || '#ffffff';
-        ctx.lineWidth = 2.5;
+        const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim();
+        const isLightMode = document.body.classList.contains('light-theme') || document.documentElement.getAttribute('data-theme') === 'light';
+        ctx.strokeStyle = themeColor || (isLightMode ? '#1e293b' : '#f8fafc');
+        ctx.lineWidth = 3.0;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.lineTo(p.x, p.y);
