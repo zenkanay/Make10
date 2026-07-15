@@ -1604,3 +1604,21 @@ body.keyboard-visible {
     font-size: 0.85rem;
   }
 }
+
+/* PC (Desktop) view size optimization for virtual keyboard */
+@media (min-width: 769px) {
+  .desmos-keyboard {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 680px !important;
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  .desmos-keyboard.hidden {
+    transform: translate(-50%, 100%) !important;
+  }
+}
