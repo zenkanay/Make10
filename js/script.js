@@ -3677,7 +3677,7 @@ if (shareModalUrlBtn) {
         // Fix: getBoundingClientRect can be 0x0 if parent or keyboard is hidden/animating.
         // Fallback to reasonable defaults to ensure a writeable canvas.
         canvas.width  = (r.width > 20) ? r.width : (isMobile ? (window.innerWidth - 130) : 400);
-        canvas.height = (r.height > 20) ? r.height : (isMobile ? 180 : 190);
+        canvas.height = (r.height > 20) ? r.height : (isMobile ? 250 : 190);
         redraw();
     }
 
