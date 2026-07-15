@@ -37,10 +37,12 @@ const saveSettingsBtn = document.getElementById("save-settings-btn");
 const apiKeyInput = document.getElementById("api-key-input");
 // backend URL input removed
 const themeSelect = document.getElementById("theme-select");
+const keyboardTypeSelect = document.getElementById("keyboard-type-select");
 const sortNumbersCheckbox = document.getElementById("sort-numbers-checkbox");
 const langSelect = document.getElementById("lang-select");
 
 // State
+let keyboardTypeSetting = "virtual"; // "virtual" or "standard"
 let targetNumbers = [1, 2, 3, 4];
 let gameDifficulty = "medium";
 let apiKey = "";
@@ -168,7 +170,10 @@ const TRANSLATIONS = {
         help_section_tips: "ヒント",
         help_tip_1: "数字カードをタップすると、その数字が数式入力欄に自動で挿入されます。",
         help_tip_2: "難易度「Hard」は、四則演算だけでは絶対に解けません。積極的に「√」や「!」などを使いましょう！",
-        help_tip_3: "キーボードショートカット：Space キーで新しい問題を生成、Enter キーで判定ができます。また、Tab キーで仮想キーボードを開きます。"
+        help_tip_3: "キーボードショートカット：Space キーで新しい問題を生成、Enter キーで判定ができます。また、Tab キーで仮想キーボードを開きます。",
+        keyboard_type_label: "キーボードの種類",
+        keyboard_type_virtual: "仮想キーボード (Desmos風)",
+        keyboard_type_standard: "標準キーボード (デバイス標準)"
     },
     en: {
         settings_btn: "Settings",
@@ -248,7 +253,10 @@ const TRANSLATIONS = {
         help_section_tips: "Tips",
         help_tip_1: "Tap a digit card to automatically insert it into the formula field.",
         help_tip_2: "Hard difficulty cannot be solved with basic arithmetic. Try using '√' or '!' symbols!",
-        help_tip_3: "Keyboard shortcuts: Press Space to generate a new problem, Enter to evaluate. Press Tab to open the virtual keyboard."
+        help_tip_3: "Keyboard shortcuts: Press Space to generate a new problem, Enter to evaluate. Press Tab to open the virtual keyboard.",
+        keyboard_type_label: "Keyboard Type",
+        keyboard_type_virtual: "Virtual Keyboard (Desmos-style)",
+        keyboard_type_standard: "Standard Keyboard (System)"
     },
     zh: {
         settings_btn: "设置",
@@ -327,7 +335,10 @@ const TRANSLATIONS = {
         help_section_tips: "提示",
         help_tip_1: "点击数字卡片可以自动将其插入输入框中。",
         help_tip_2: "“困难”难度无法仅通过四则运算解决，尝试使用“√”或“!”等符号吧！",
-        help_tip_3: "快捷键：按 Space 键生成新题目，按 Enter 键进行判定。按 Tab 键打开虚拟键盘。"
+        help_tip_3: "快捷键：按 Space 键生成新题目，按 Enter 键进行判定。按 Tab 键打开虚拟键盘。",
+        keyboard_type_label: "键盘类型",
+        keyboard_type_virtual: "虚拟键盘 (Desmos风)",
+        keyboard_type_standard: "标准键盘 (系统)"
     },
     ko: {
         settings_btn: "설정",
@@ -406,7 +417,10 @@ const TRANSLATIONS = {
         help_section_tips: "팁",
         help_tip_1: "숫자 카드를 탭하면 입력 필드에 자동으로 삽입됩니다.",
         help_tip_2: "Hard 난이도는 사칙연산만으로 풀 수 없습니다. '√'나 '!' 기호를 사용해 보세요!",
-        help_tip_3: "단축키: Space 키로 새 문제 생성, Enter 키로 판정. Tab 키로 가상 키보드 열기."
+        help_tip_3: "단축키: Space 키로 새 문제 생성, Enter 키로 판정. Tab 키로 가상 키보드 열기.",
+        keyboard_type_label: "키보드 종류",
+        keyboard_type_virtual: "가상 키보드 (Desmos풍)",
+        keyboard_type_standard: "표준 키보드 (시스템)"
     },
     es: {
         settings_btn: "Configuración",
@@ -485,7 +499,10 @@ const TRANSLATIONS = {
         help_section_tips: "Consejos",
         help_tip_1: "Toca una tarjeta de número para insertarla en el campo de entrada.",
         help_tip_2: "La dificultad difícil no se puede resolver solo con aritmética. ¡Prueba con '√' o '!'!",
-        help_tip_3: "Atajos de teclado: Space para nueva pregunta, Enter para evaluar. Presione Tab para abrir el teclado virtual."
+        help_tip_3: "Atajos de teclado: Space para nueva pregunta, Enter para evaluar. Presione Tab para abrir el teclado virtual.",
+        keyboard_type_label: "Tipo de teclado",
+        keyboard_type_virtual: "Teclado virtual (estilo Desmos)",
+        keyboard_type_standard: "Teclado estándar (sistema)"
     },
     fr: {
         settings_btn: "Paramètres",
@@ -564,7 +581,10 @@ const TRANSLATIONS = {
         help_section_tips: "Astuces",
         help_tip_1: "Appuyez sur une carte de nombre pour l'insérer dans la zone de saisie.",
         help_tip_2: "La difficulté difficile ne peut être résolue avec l'arithmétique seule. Essayez les symboles '√' ou '!'!",
-        help_tip_3: "Raccourcis clavier : Space pour une nouvelle question, Enter pour évaluer. Appuyez sur Tab pour ouvrir le clavier virtuel."
+        help_tip_3: "Raccourcis clavier : Space pour une nouvelle question, Enter pour évaluer. Appuyez sur Tab pour ouvrir le clavier virtuel.",
+        keyboard_type_label: "Type de clavier",
+        keyboard_type_virtual: "Clavier virtuel (style Desmos)",
+        keyboard_type_standard: "Clavier standard (système)"
     },
     de: {
         settings_btn: "Einstellungen",
@@ -643,7 +663,10 @@ const TRANSLATIONS = {
         help_section_tips: "Tipps",
         help_tip_1: "Tippe auf eine Zahlenkarte, um sie automatisch in das Eingabefeld einzufügen.",
         help_tip_2: "Die Schwierigkeit 'Schwer' kann nicht nur mit Arithmetik gelöst werden. Versuche '√' oder '!'!",
-        help_tip_3: "Tastenkürzel: Space für neue Aufgabe, Enter zum Auswerten. Drücken Sie Tab, um die virtuelle Tastatur zu öffnen."
+        help_tip_3: "Tastenkürzel: Space für neue Aufgabe, Enter zum Auswerten. Drücken Sie Tab, um die virtuelle Tastatur zu öffnen.",
+        keyboard_type_label: "Tastaturtyp",
+        keyboard_type_virtual: "Virtuelle Tastatur (Desmos-Stil)",
+        keyboard_type_standard: "Standardtastatur (System)"
     }
 };
 
@@ -818,6 +841,13 @@ function initSettings() {
     }
     applyTheme(savedTheme);
 
+    // Keyboard Type initialization
+    const savedKeyboardType = localStorage.getItem("gemini_keyboard_type") || "virtual";
+    keyboardTypeSetting = savedKeyboardType;
+    if (keyboardTypeSelect) {
+        keyboardTypeSelect.value = savedKeyboardType;
+    }
+
     // Sort Numbers initialization
     const savedSort = localStorage.getItem("sort_numbers") === "true";
     sortNumbers = savedSort;
@@ -848,6 +878,11 @@ function initSettings() {
 
     // --- Desmos-like Virtual Keyboard Controls ---
     if (desmosKeyboard) {
+        // Globally prevent default on pointerdown inside the keyboard to avoid losing focus on math-field
+        desmosKeyboard.addEventListener("pointerdown", (e) => {
+            e.preventDefault();
+        }, true);
+
         // Tab switching in Function popup
         const tabButtons = desmosKeyboard.querySelectorAll(".popup-tab-btn");
         const tabPanes = desmosKeyboard.querySelectorAll(".tab-pane");
@@ -1084,13 +1119,10 @@ function initSettings() {
             touchStartY = clientY;
             touchStartTime = Date.now();
 
-            // Proactively set inputmode to "text" (standard keyboard) on pointerdown,
-            // unless the custom virtual keyboard is currently visible.
-            const isVirtualVisible = desmosKeyboard && !desmosKeyboard.classList.contains('hidden');
-            if (!isVirtualVisible) {
-                setKeyboardMode('standard');
+            if (keyboardTypeSetting === 'virtual') {
+                setKeyboardMode('virtual');
             } else {
-                setKeyboardMode('none');
+                setKeyboardMode('standard');
             }
         };
 
@@ -1132,21 +1164,22 @@ function initSettings() {
 
             // Pure tap detection
             if (deltaX < 10 && deltaY < 10 && deltaTime < 500) {
-                // If standard keyboard is already focused/active, do not trigger focus refresh which may toggle the OS keyboard
-                const active = document.activeElement;
-                const isInputFocused = active === mf || mf.contains(active);
-                const isStandardKeyboardActive = allowInputmodeNone === false;
-
-                if (isInputFocused && isStandardKeyboardActive) {
-                    return;
-                }
-
-                if (window.mathVirtualKeyboard?.visible) {
-                    window.mathVirtualKeyboard.hide();
-                }
-                setKeyboardMode('standard');
                 if (mathContainer) mathContainer.classList.add('focused');
-                mf.focus({ preventScroll: true });
+                
+                if (keyboardTypeSetting === 'virtual') {
+                    setKeyboardMode('virtual');
+                    mf.focus({ preventScroll: true });
+                } else {
+                    const active = document.activeElement;
+                    const isInputFocused = active === mf || mf.contains(active);
+                    const isStandardKeyboardActive = allowInputmodeNone === false;
+
+                    if (isInputFocused && isStandardKeyboardActive) {
+                        return;
+                    }
+                    setKeyboardMode('standard');
+                    mf.focus({ preventScroll: true });
+                }
             }
         };
 
@@ -1217,6 +1250,11 @@ function initSettings() {
         }
 
         // 2. それ以外の真の余白（背景など）をタップした場合 ➔ 安全にフォーカスを外してキーボードを閉じる
+        if (keyboardTypeSetting === 'virtual' && desmosKeyboard && !desmosKeyboard.classList.contains('hidden')) {
+            e.preventDefault();
+            return;
+        }
+
         // Force focus to document.body to completely strip focus from the math-field Shadow DOM and clear caret/cursors
         try {
             document.body.setAttribute('tabindex', '-1');
@@ -2044,6 +2082,7 @@ settingsBtn.addEventListener("click", () => {
     settingsSnapshot = {
         lang: localStorage.getItem("app_lang") || "ja",
         theme: localStorage.getItem("color_theme") || "system",
+        keyboardType: localStorage.getItem("gemini_keyboard_type") || "virtual",
         sort: (localStorage.getItem("sort_numbers") === "true"),
         apiKey: localStorage.getItem("gemini_api_key") || ""
     };
@@ -2055,6 +2094,7 @@ const discardSettingsAndClose = () => {
     if (settingsSnapshot) {
         if (langSelect) langSelect.value = settingsSnapshot.lang;
         if (themeSelect) themeSelect.value = settingsSnapshot.theme;
+        if (keyboardTypeSelect) keyboardTypeSelect.value = settingsSnapshot.keyboardType;
         if (sortNumbersCheckbox) sortNumbersCheckbox.checked = settingsSnapshot.sort;
         if (apiKeyInput) apiKeyInput.value = settingsSnapshot.apiKey;
     }
@@ -2079,6 +2119,16 @@ saveSettingsBtn.addEventListener("click", () => {
         const selectedTheme = themeSelect.value;
         localStorage.setItem("color_theme", selectedTheme);
         applyTheme(selectedTheme);
+    }
+
+    // Save and apply keyboard type
+    if (keyboardTypeSelect) {
+        const selectedKeyboardType = keyboardTypeSelect.value;
+        localStorage.setItem("gemini_keyboard_type", selectedKeyboardType);
+        keyboardTypeSetting = selectedKeyboardType;
+        // Apply immediately
+        setKeyboardMode('none');
+        mf.blur();
     }
 
     // Save and apply sorting preference
@@ -2176,9 +2226,26 @@ document.addEventListener("keydown", (e) => {
     // 1. Tab key is handled globally (even when math-field/input is focused)
     if (e.key === "Tab") {
         e.preventDefault();
-        const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
-        if (customKeyboardToggle && window.mathVirtualKeyboard) {
-            customKeyboardToggle.click();
+        if (keyboardTypeSetting === 'virtual') {
+            const customKeyboardToggle = document.getElementById("custom-keyboard-toggle");
+            if (customKeyboardToggle) {
+                customKeyboardToggle.click();
+            }
+        } else {
+            const active = document.activeElement;
+            const isInputFocused = active === mf || mf.contains(active);
+            if (isInputFocused) {
+                try {
+                    document.body.setAttribute('tabindex', '-1');
+                    document.body.focus();
+                    document.body.removeAttribute('tabindex');
+                } catch (err) {}
+                mf.blur();
+                setKeyboardMode('none');
+            } else {
+                setKeyboardMode('standard');
+                mf.focus({ preventScroll: true });
+            }
         }
         return;
     }

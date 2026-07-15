@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=116">
+  <link rel="stylesheet" href="css/style.css?v=117">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -423,6 +423,13 @@
             <option value="dark" data-i18n="theme_dark">ダークモード</option>
           </select>
         </div>
+        <div class="setting-group">
+          <label for="keyboard-type-select" class="setting-label" data-i18n="keyboard_type_label">キーボードの種類</label>
+          <select id="keyboard-type-select" class="custom-select">
+            <option value="virtual" data-i18n="keyboard_type_virtual">仮想キーボード (Desmos風)</option>
+            <option value="standard" data-i18n="keyboard_type_standard">標準キーボード (デバイス標準)</option>
+          </select>
+        </div>
         <div class="setting-group checkbox-group">
           <label class="setting-checkbox-label">
             <input type="checkbox" id="sort-numbers-checkbox">
@@ -439,7 +446,7 @@
       </div>
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v116</span>
+        <span class="settings-version">v117</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -489,11 +496,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=116"></script>
+  <script type="module" src="js/script.js?v=117"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=116')
+        navigator.serviceWorker.register('sw.js?v=117')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });
