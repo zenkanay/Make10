@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=144">
+  <link rel="stylesheet" href="css/style.css?v=145">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -128,7 +128,7 @@
               </div>
             </div>
             <div class="math-field-container">
-              <math-field id="mf" placeholder="ここに数式を入力 (例: 8 / (1 - 1/5))" data-i18n-placeholder="math_field_placeholder"></math-field>
+              <math-field id="mf" placeholder="ここに数式を入力" data-i18n-placeholder="math_field_placeholder"></math-field>
               <!-- 手書き入力ボタン -->
               <button id="handwriting-btn" class="keyboard-toggle-btn handwriting-toggle-btn" aria-label="手書き入力" title="手書き入力" data-i18n-title="handwriting_btn_title" data-i18n-aria-label="handwriting_btn_title">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -514,7 +514,7 @@
 
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v144</span>
+        <span class="settings-version">v145</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -565,11 +565,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=144"></script>
+  <script type="module" src="js/script.js?v=145"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=144')
+        navigator.serviceWorker.register('sw.js?v=145')
           .then(reg => {
             console.log('Service Worker registered successfully.', reg.scope);
             // Auto reload when a new service worker is installed

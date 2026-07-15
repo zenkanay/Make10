@@ -1237,8 +1237,8 @@ math-field::part(virtual-keyboard-toggle) {
   width: 150px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 6px;
+  justify-content: flex-start;
+  gap: 4px;
   height: 100%;
 }
 
@@ -1251,9 +1251,10 @@ math-field::part(virtual-keyboard-toggle) {
 }
 
 .hw-status {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   text-align: center;
+  line-height: 1.25;
 }
 
 .hw-status.recognizing {
@@ -1268,13 +1269,13 @@ math-field::part(virtual-keyboard-toggle) {
   background: var(--input-bg);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  padding: 4px 6px;
+  padding: 2px 4px;
   font-family: var(--font-mono, monospace);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-color);
   word-break: break-all;
   overflow-y: auto;
-  max-height: 70px;
+  max-height: 54px;
 }
 
 .hw-action-buttons {
@@ -1285,8 +1286,8 @@ math-field::part(virtual-keyboard-toggle) {
 
 .hw-action-buttons button {
   width: 100%;
-  height: 38px;
-  font-size: 0.85rem !important;
+  height: 32px;
+  font-size: 0.8rem !important;
 }
 
 .hw-no-key-warning-inline {
@@ -1319,13 +1320,14 @@ math-field::part(virtual-keyboard-toggle) {
   }
   .hw-sidebar {
     width: 110px;
+    gap: 4px;
   }
   .hw-action-buttons button {
-    height: 34px;
-    font-size: 0.75rem !important;
+    height: 28px;
+    font-size: 0.72rem !important;
   }
   .hw-latex-preview {
-    display: none !important; /* Hide preview on mobile screen sizes to keep it compact */
+    display: none !important;
   }
   .handwriting-toggle-btn {
     right: 52px;
