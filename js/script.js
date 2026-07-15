@@ -913,6 +913,20 @@ function initSettings() {
                 document.body.classList.remove('keyboard-visible');
             }
         }
+        // キーボードの実際の高さを測ってapp-containerのpaddingを動的に設定
+        requestAnimationFrame(updateAppPadding);
+    }
+
+    function updateAppPadding() {
+        const appContainer = document.querySelector('.app-container');
+        if (!appContainer) return;
+        const desmosKeyboard = document.getElementById('desmos-keyboard');
+        if (!desmosKeyboard || desmosKeyboard.classList.contains('hidden')) {
+            appContainer.style.paddingBottom = '';
+        } else {
+            const h = desmosKeyboard.offsetHeight;
+            appContainer.style.paddingBottom = (h + 8) + 'px';
+        }
     }
 
     function applyPatchToSink(sink) {
@@ -3741,8 +3755,8 @@ if (shareModalUrlBtn) {
             hwInsertBtn.disabled = true;
             if (recognizeTimer) clearTimeout(recognizeTimer);
         } else {
-            startHwSession();
-            // セッションが有効になってから必ず適用
+            // hwSessionActiveを直接trueにしてhwOriginalValueを上書きしない
+            hwSessionActive = true;
             if (hwCurrentLatex) {
                 mf.value = hwOriginalValue;
                 mf.position = hwOriginalPosition;
@@ -4023,13 +4037,17 @@ if (shareModalUrlBtn) {
     }
 
     function insertLatex() {
+        // strokes/history/hwOriginalValue は Undo のために保持する
+        // セッションフラグだけ落として「コミット済み」状態にする
         hwSessionActive = false;
-        hwOriginalValue = '';
-        hwOriginalPosition = 0;
-        strokes = [];
-        history = [{ strokes: [], latex: '' }];
-        historyIndex = 0;
-        clearCanvas();
+        // キャンバスを視覚的にだけクリア（strokes・history はそのまま）
+        if (recognizeTimer) clearTimeout(recognizeTimer);
+        currentStroke = null;
+        hwCurrentLatex = '';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        iinkContainer.classList.remove('active');
+        hwInsertBtn.disabled = true;
+        updateUndoRedoButtons();
         mf.focus();
     }
 

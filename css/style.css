@@ -1140,16 +1140,6 @@ body.keyboard-visible {
     overflow-y: auto;
     height: auto;
   }
-
-  body.keyboard-visible .app-container {
-    /* キーボードの高さ分だけ下にパディングを追加してコンテンツが隠れないように */
-    padding-bottom: 340px;
-  }
-
-  /* 手書きモード時はキーボードが小さいので余白を合わせる */
-  body.keyboard-visible:has(#layout-handwriting:not(.hidden)) .app-container {
-    padding-bottom: 275px;
-  }
 }
 
 /* Disable default virtual keyboard toggle button in MathLive */
@@ -1766,16 +1756,6 @@ body.keyboard-visible {
   align-items: flex-start;
 }
 
-@media (max-width: 768px) {
-  body.keyboard-visible .app-container {
-    padding-bottom: 300px; /* Leave room for keyboard */
-  }
-
-  /* 手書きモード時はキーボードが小さいので余白を合わせる */
-  body.keyboard-visible:has(#layout-handwriting:not(.hidden)) .app-container {
-    padding-bottom: 275px;
-  }
-}
 
 /* Responsive adjustment for keyboard itself */
 @media (max-width: 600px) {
