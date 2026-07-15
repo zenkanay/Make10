@@ -152,74 +152,69 @@ def convert_latex_to_python(latex_str: str) -> str:
     return s
 
 def evaluate_with_sympy(latex_str: str):
-    """Try parsing and evaluating LaTeX with SymPy / latex2sympy2 / python fallback"""
+    """Try parsing and evaluating LaTeX with Python conversion first, then fallback to standard parsers"""
     expr = None
     
-    # 1. Pre-process LaTeX to make it cleaner
-    clean_latex = latex_str.replace(r'\cdot', '*')
-    
-    # Replace n-th roots: \sqrt[n]{x} ➔ \left(x\right)^{\frac{1}{n}}
-    clean_latex = re.sub(r'\\sqrt\[(.*?)\]{(.*?)}', r'\\left(\2\\right)^{\\frac{1}{\1}}', clean_latex)
-    
-    # Replace \Gamma with gamma
-    clean_latex = re.sub(r'\\Gamma\b', 'gamma', clean_latex)
+    # 1. Try our highly accurate Python conversion & sympify FIRST
+    try:
+        py_expr_str = convert_latex_to_python(latex_str)
+        print(f"SymPy evaluation: Python conversion: {py_expr_str}")
+        
+        # Setup execution context for SymPy
+        eval_env = {
+            'sin': sympy.sin, 'cos': sympy.cos, 'tan': sympy.tan,
+            'csc': sympy.csc, 'sec': sympy.sec, 'cot': sympy.cot,
+            'asin': sympy.asin, 'acos': sympy.acos, 'atan': sympy.atan,
+            'acsc': sympy.acsc, 'asec': sympy.asec, 'acot': sympy.acot,
+            'sinh': sympy.sinh, 'cosh': sympy.cosh, 'tanh': sympy.tanh,
+            'csch': sympy.csch, 'sech': sympy.sech, 'coth': sympy.coth,
+            'asinh': sympy.asinh, 'acosh': sympy.acosh, 'atanh': sympy.atanh,
+            'acsch': sympy.acsch, 'asech': sympy.asech, 'acoth': sympy.acoth,
+            'ln': sympy.log, 'log': sympy.log, 'exp': sympy.exp,
+            'pi': sympy.pi, 'E': sympy.E, 'e': sympy.E, 'I': sympy.I, 'i': sympy.I,
+            'gamma': sympy.gamma, 'factorial': sympy.factorial,
+            'binomial': sympy.binomial,
+            'ceiling': sympy.ceiling, 'floor': sympy.floor, 'round': sympy.round,
+            'sign': sympy.sign, 'Abs': sympy.Abs, 'Mod': sympy.Mod,
+            'lcm': sympy.lcm, 'gcd': sympy.gcd,
+            # Statistics
+            'mean': lambda *args: sum(args)/len(args) if args else 0,
+            'median': lambda *args: sympy.median(args) if args else 0,
+            'min': sympy.Min, 'max': sympy.Max,
+            'stdev': lambda *args: sympy.stats.std(args) if args else 0,
+            'var': lambda *args: sympy.stats.variance(args) if args else 0,
+            'total': lambda *args: sum(args) if args else 0,
+            'length': lambda *args: len(args) if args else 0,
+            # Calculus
+            'diff': sympy.diff, 'Derivative': sympy.Derivative,
+            'integrate': sympy.integrate, 'Integral': sympy.Integral,
+            'limit': sympy.limit, 'Limit': sympy.Limit,
+            'summation': sympy.summation, 'Product': sympy.Product,
+            'x': sympy.Symbol('x'), 'y': sympy.Symbol('y'), 'z': sympy.Symbol('z')
+        }
+        expr = sympy.sympify(py_expr_str, locals=eval_env)
+    except Exception as e:
+        print(f"Python conversion/sympify failed: {e}. Trying standard LaTeX parsers...")
+        expr = None
 
-    # Try parsing with latex2sympy
-    if HAS_LATEX2SYMPY:
-        try:
-            expr = latex2sympy(clean_latex)
-        except Exception as e:
-            print(f"latex2sympy2 failed: {e}")
-            
+    # 2. Fallback to standard LaTeX parsers if Python conversion failed
     if expr is None:
-        try:
-            # Fallback to standard sympy parse_latex
-            expr = parse_latex(clean_latex)
-        except Exception as e:
-            print(f"parse_latex failed: {e}")
-            
-    # 2. Fallback to direct Python expression conversion & sympify
-    if expr is None:
-        try:
-            py_expr_str = convert_latex_to_python(latex_str)
-            print(f"Fallback converted LaTeX to Python: {py_expr_str}")
-            
-            # Setup execution context for SymPy
-            eval_env = {
-                'sin': sympy.sin, 'cos': sympy.cos, 'tan': sympy.tan,
-                'csc': sympy.csc, 'sec': sympy.sec, 'cot': sympy.cot,
-                'asin': sympy.asin, 'acos': sympy.acos, 'atan': sympy.atan,
-                'acsc': sympy.acsc, 'asec': sympy.asec, 'acot': sympy.acot,
-                'sinh': sympy.sinh, 'cosh': sympy.cosh, 'tanh': sympy.tanh,
-                'csch': sympy.csch, 'sech': sympy.sech, 'coth': sympy.coth,
-                'asinh': sympy.asinh, 'acosh': sympy.acosh, 'atanh': sympy.atanh,
-                'acsch': sympy.acsch, 'asech': sympy.asech, 'acoth': sympy.acoth,
-                'ln': sympy.log, 'log': sympy.log, 'exp': sympy.exp,
-                'pi': sympy.pi, 'E': sympy.E, 'e': sympy.E, 'I': sympy.I, 'i': sympy.I,
-                'gamma': sympy.gamma, 'factorial': sympy.factorial,
-                'binomial': sympy.binomial,
-                'ceiling': sympy.ceiling, 'floor': sympy.floor, 'round': sympy.round,
-                'sign': sympy.sign, 'Abs': sympy.Abs, 'Mod': sympy.Mod,
-                'lcm': sympy.lcm, 'gcd': sympy.gcd,
-                # Statistics
-                'mean': lambda *args: sum(args)/len(args) if args else 0,
-                'median': lambda *args: sympy.median(args) if args else 0,
-                'min': sympy.Min, 'max': sympy.Max,
-                'stdev': lambda *args: sympy.stats.std(args) if args else 0,
-                'var': lambda *args: sympy.stats.variance(args) if args else 0,
-                'total': lambda *args: sum(args) if args else 0,
-                'length': lambda *args: len(args) if args else 0,
-                # Calculus
-                'diff': sympy.diff, 'Derivative': sympy.Derivative,
-                'integrate': sympy.integrate, 'Integral': sympy.Integral,
-                'limit': sympy.limit, 'Limit': sympy.Limit,
-                'summation': sympy.summation, 'Product': sympy.Product,
-                'x': sympy.Symbol('x'), 'y': sympy.Symbol('y'), 'z': sympy.Symbol('z')
-            }
-            expr = sympy.sympify(py_expr_str, locals=eval_env)
-        except Exception as e:
-            print(f"Fallback python conversion failed: {e}")
-            raise e
+        clean_latex = latex_str.replace(r'\cdot', '*')
+        clean_latex = re.sub(r'\\sqrt\[(.*?)\]{(.*?)}', r'\\left(\2\\right)^{\\frac{1}{\1}}', clean_latex)
+        clean_latex = re.sub(r'\\Gamma\b', 'gamma', clean_latex)
+        
+        if HAS_LATEX2SYMPY:
+            try:
+                expr = latex2sympy(clean_latex)
+            except Exception as le:
+                print(f"latex2sympy2 fallback failed: {le}")
+                
+        if expr is None:
+            try:
+                expr = parse_latex(clean_latex)
+            except Exception as pe:
+                print(f"parse_latex fallback failed: {pe}")
+                raise pe
         
     # Evaluate expression
     evaluated = expr.doit().evalf()
