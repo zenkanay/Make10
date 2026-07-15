@@ -172,7 +172,7 @@ const TRANSLATIONS = {
         help_tip_2: "難易度「Hard」は、四則演算だけでは絶対に解けません。積極的に「√」や「!」などを使いましょう！",
         help_tip_3: "キーボードショートカット：Space キーで新しい問題を生成、Enter キーで判定ができます。また、Tab キーで仮想キーボードを開きます。",
         keyboard_type_label: "キーボードの種類",
-        keyboard_type_virtual: "仮想キーボード (Desmos風)",
+        keyboard_type_virtual: "仮想キーボード",
         keyboard_type_standard: "標準キーボード (デバイス標準)"
     },
     en: {
@@ -255,7 +255,7 @@ const TRANSLATIONS = {
         help_tip_2: "Hard difficulty cannot be solved with basic arithmetic. Try using '√' or '!' symbols!",
         help_tip_3: "Keyboard shortcuts: Press Space to generate a new problem, Enter to evaluate. Press Tab to open the virtual keyboard.",
         keyboard_type_label: "Keyboard Type",
-        keyboard_type_virtual: "Virtual Keyboard (Desmos-style)",
+        keyboard_type_virtual: "Virtual Keyboard",
         keyboard_type_standard: "Standard Keyboard (System)"
     },
     zh: {
@@ -337,7 +337,7 @@ const TRANSLATIONS = {
         help_tip_2: "“困难”难度无法仅通过四则运算解决，尝试使用“√”或“!”等符号吧！",
         help_tip_3: "快捷键：按 Space 键生成新题目，按 Enter 键进行判定。按 Tab 键打开虚拟键盘。",
         keyboard_type_label: "键盘类型",
-        keyboard_type_virtual: "虚拟键盘 (Desmos风)",
+        keyboard_type_virtual: "虚拟键盘",
         keyboard_type_standard: "标准键盘 (系统)"
     },
     ko: {
@@ -419,7 +419,7 @@ const TRANSLATIONS = {
         help_tip_2: "Hard 난이도는 사칙연산만으로 풀 수 없습니다. '√'나 '!' 기호를 사용해 보세요!",
         help_tip_3: "단축키: Space 키로 새 문제 생성, Enter 키로 판정. Tab 키로 가상 키보드 열기.",
         keyboard_type_label: "키보드 종류",
-        keyboard_type_virtual: "가상 키보드 (Desmos풍)",
+        keyboard_type_virtual: "가상 키보드",
         keyboard_type_standard: "표준 키보드 (시스템)"
     },
     es: {
@@ -501,7 +501,7 @@ const TRANSLATIONS = {
         help_tip_2: "La dificultad difícil no se puede resolver solo con aritmética. ¡Prueba con '√' o '!'!",
         help_tip_3: "Atajos de teclado: Space para nueva pregunta, Enter para evaluar. Presione Tab para abrir el teclado virtual.",
         keyboard_type_label: "Tipo de teclado",
-        keyboard_type_virtual: "Teclado virtual (estilo Desmos)",
+        keyboard_type_virtual: "Teclado virtual",
         keyboard_type_standard: "Teclado estándar (sistema)"
     },
     fr: {
@@ -583,7 +583,7 @@ const TRANSLATIONS = {
         help_tip_2: "La difficulté difficile ne peut être résolue avec l'arithmétique seule. Essayez les symboles '√' ou '!'!",
         help_tip_3: "Raccourcis clavier : Space pour une nouvelle question, Enter pour évaluer. Appuyez sur Tab pour ouvrir le clavier virtuel.",
         keyboard_type_label: "Type de clavier",
-        keyboard_type_virtual: "Clavier virtuel (style Desmos)",
+        keyboard_type_virtual: "Clavier virtuel",
         keyboard_type_standard: "Clavier standard (système)"
     },
     de: {
@@ -665,7 +665,7 @@ const TRANSLATIONS = {
         help_tip_2: "Die Schwierigkeit 'Schwer' kann nicht nur mit Arithmetik gelöst werden. Versuche '√' oder '!'!",
         help_tip_3: "Tastenkürzel: Space für neue Aufgabe, Enter zum Auswerten. Drücken Sie Tab, um die virtuelle Tastatur zu öffnen.",
         keyboard_type_label: "Tastaturtyp",
-        keyboard_type_virtual: "Virtuelle Tastatur (Desmos-Stil)",
+        keyboard_type_virtual: "Virtuelle Tastatur",
         keyboard_type_standard: "Standardtastatur (System)"
     }
 };
@@ -883,21 +883,6 @@ function initSettings() {
             e.preventDefault();
         }, true);
 
-        // Tab switching in Function popup
-        const tabButtons = desmosKeyboard.querySelectorAll(".popup-tab-btn");
-        const tabPanes = desmosKeyboard.querySelectorAll(".tab-pane");
-        tabButtons.forEach(btn => {
-            btn.addEventListener("pointerdown", (e) => {
-                e.preventDefault();
-                tabButtons.forEach(b => b.classList.remove("active"));
-                tabPanes.forEach(p => p.classList.remove("active"));
-                
-                btn.classList.add("active");
-                const targetTab = btn.getAttribute("data-tab");
-                const targetPane = desmosKeyboard.querySelector(`#pane-${targetTab}`);
-                if (targetPane) targetPane.classList.add("active");
-            });
-        });
 
         // Toggle Function Popup
         const btnToggleFunction = desmosKeyboard.querySelector("#btn-toggle-function");
@@ -1250,11 +1235,6 @@ function initSettings() {
         }
 
         // 2. それ以外の真の余白（背景など）をタップした場合 ➔ 安全にフォーカスを外してキーボードを閉じる
-        if (keyboardTypeSetting === 'virtual' && desmosKeyboard && !desmosKeyboard.classList.contains('hidden')) {
-            e.preventDefault();
-            return;
-        }
-
         // Force focus to document.body to completely strip focus from the math-field Shadow DOM and clear caret/cursors
         try {
             document.body.setAttribute('tabindex', '-1');
@@ -1263,7 +1243,7 @@ function initSettings() {
         } catch (err) {
             console.error("Focus strip failed:", err);
         }
-        mf.blur();
+        if (mf) mf.blur();
         setKeyboardMode('none');
     }, true);
 
@@ -2128,7 +2108,7 @@ saveSettingsBtn.addEventListener("click", () => {
         keyboardTypeSetting = selectedKeyboardType;
         // Apply immediately
         setKeyboardMode('none');
-        mf.blur();
+        if (mf) mf.blur();
     }
 
     // Save and apply sorting preference
