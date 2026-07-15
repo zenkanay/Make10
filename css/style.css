@@ -488,10 +488,12 @@ body {
   align-items: center;
 }
 
-/* ===== Math Field: COMPLETELY FIXED HEIGHT ===== */
-/* MathLive internally sizes itself — we must use both:
-   1. CSS custom properties it reads (--ML__font-size, etc.)
-   2. Hard clip on the container so internal growth is invisible */
+/* ===== Math Field: FIXED HEIGHT, NO CLIPPING ===== */
+/* Strategy:
+   - Container: fixed height + overflow:hidden (clips external overflow)
+   - math-field: fixed height but NO contain/overflow — MathLive must render freely inside
+   - JS ResizeObserver resets height if MathLive tries to grow the element
+   - minFontScale=0.5 in JS ensures formula shrinks rather than container growing */
 
 .math-field-container {
   position: relative;
@@ -500,15 +502,12 @@ body {
   border-radius: 12px;
   padding: 0;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  /* Strict fixed dimensions: */
   height: 88px !important;
   min-height: 88px !important;
   max-height: 88px !important;
   display: flex;
   align-items: center;
-  /* Hard clip — any internal overflow is cut off */
-  overflow: hidden !important;
-  clip: rect(0, auto, 88px, 0);
+  overflow: hidden; /* Clips container overflow only — not internal formula */
   box-sizing: border-box;
   flex-shrink: 0;
 }
@@ -521,13 +520,11 @@ body {
 math-field {
   display: block !important;
   width: 100% !important;
-  /* Force the element box to never grow: */
   height: 76px !important;
   min-height: 76px !important;
   max-height: 76px !important;
   background: transparent;
   color: var(--text-color);
-  /* MathLive reads this CSS variable for its internal font-size: */
   --ML__font-size: 1.8rem;
   font-size: 1.8rem !important;
   outline: none;
@@ -537,15 +534,14 @@ math-field {
   caret-color: transparent !important;
   touch-action: pan-y !important;
   box-sizing: border-box !important;
-  /* Prevent internal content from pushing element boundaries: */
-  overflow: hidden !important;
-  contain: strict;
+  /* No contain or overflow here — formula must be able to render freely */
 }
 
 .math-field-container:focus-within math-field {
   caret-color: var(--text-color) !important;
   touch-action: auto !important;
 }
+
 
 /* Results Section */
 .results-section {
@@ -996,7 +992,6 @@ kbd {
     height: 66px !important;
     min-height: 66px !important;
     max-height: 66px !important;
-    clip: rect(0, auto, 66px, 0);
   }
 
   math-field {
