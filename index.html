@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=115">
+  <link rel="stylesheet" href="css/style.css?v=116">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -201,8 +201,10 @@
     <div id="desmos-function-popup" class="desmos-function-popup hidden">
       <div class="popup-tabs">
         <button class="popup-tab-btn active" data-tab="trig" data-i18n="help_sym_trig">三角関数</button>
-        <button class="popup-tab-btn" data-tab="inv-trig">逆三角関数</button>
+        <button class="popup-tab-btn" data-tab="hyperbolic">双曲線</button>
         <button class="popup-tab-btn" data-tab="stats">統計学</button>
+        <button class="popup-tab-btn" data-tab="dist">分布</button>
+        <button class="popup-tab-btn" data-tab="misc">その他</button>
       </div>
       <div class="popup-tab-content">
         <div class="tab-pane active" id="pane-trig">
@@ -212,14 +214,26 @@
           <button class="func-key" data-insert="csc\left(#?\right)">csc</button>
           <button class="func-key" data-insert="sec\left(#?\right)">sec</button>
           <button class="func-key" data-insert="cot\left(#?\right)">cot</button>
-        </div>
-        <div class="tab-pane" id="pane-inv-trig">
           <button class="func-key" data-insert="sin^{-1}\left(#?\right)">sin⁻¹</button>
           <button class="func-key" data-insert="cos^{-1}\left(#?\right)">cos⁻¹</button>
           <button class="func-key" data-insert="tan^{-1}\left(#?\right)">tan⁻¹</button>
           <button class="func-key" data-insert="csc^{-1}\left(#?\right)">csc⁻¹</button>
           <button class="func-key" data-insert="sec^{-1}\left(#?\right)">sec⁻¹</button>
           <button class="func-key" data-insert="cot^{-1}\left(#?\right)">cot⁻¹</button>
+        </div>
+        <div class="tab-pane" id="pane-hyperbolic">
+          <button class="func-key" data-insert="sinh\left(#?\right)">sinh</button>
+          <button class="func-key" data-insert="cosh\left(#?\right)">cosh</button>
+          <button class="func-key" data-insert="tanh\left(#?\right)">tanh</button>
+          <button class="func-key" data-insert="csch\left(#?\right)">csch</button>
+          <button class="func-key" data-insert="sech\left(#?\right)">sech</button>
+          <button class="func-key" data-insert="coth\left(#?\right)">coth</button>
+          <button class="func-key" data-insert="sinh^{-1}\left(#?\right)">sinh⁻¹</button>
+          <button class="func-key" data-insert="cosh^{-1}\left(#?\right)">cosh⁻¹</button>
+          <button class="func-key" data-insert="tanh^{-1}\left(#?\right)">tanh⁻¹</button>
+          <button class="func-key" data-insert="csch^{-1}\left(#?\right)">csch⁻¹</button>
+          <button class="func-key" data-insert="sech^{-1}\left(#?\right)">sech⁻¹</button>
+          <button class="func-key" data-insert="coth^{-1}\left(#?\right)">coth⁻¹</button>
         </div>
         <div class="tab-pane" id="pane-stats">
           <button class="func-key" data-insert="mean\left(#?\right)">mean</button>
@@ -228,6 +242,40 @@
           <button class="func-key" data-insert="max\left(#?, #?\right)">max</button>
           <button class="func-key" data-insert="stdev\left(#?\right)">stdev</button>
           <button class="func-key" data-insert="var\left(#?\right)">var</button>
+          <button class="func-key" data-insert="stdevp\left(#?\right)">stdevp</button>
+          <button class="func-key" data-insert="varp\left(#?\right)">varp</button>
+          <button class="func-key" data-insert="cov\left(#?, #?\right)">cov</button>
+          <button class="func-key" data-insert="corr\left(#?, #?\right)">corr</button>
+          <button class="func-key" data-insert="total\left(#?\right)">total</button>
+          <button class="func-key" data-insert="length\left(#?\right)">length</button>
+          <button class="func-key" data-insert="mad\left(#?\right)">mad</button>
+        </div>
+        <div class="tab-pane" id="pane-dist">
+          <button class="func-key" data-insert="nCr\left(#?, #?\right)">nCr</button>
+          <button class="func-key" data-insert="nPr\left(#?, #?\right)">nPr</button>
+          <button class="func-key" data-insert="!">!</button>
+          <button class="func-key" data-insert="random\left(#?\right)">random</button>
+          <button class="func-key" data-insert="normaldist\left(#?, #?\right)">normaldist</button>
+          <button class="func-key" data-insert="tdist\left(#?\right)">tdist</button>
+          <button class="func-key" data-insert="poissondist\left(#?\right)">poissondist</button>
+          <button class="func-key" data-insert="binomialdist\left(#?, #?\right)">binomialdist</button>
+          <button class="func-key" data-insert="pdf\left(#?, #?\right)">pdf</button>
+          <button class="func-key" data-insert="cdf\left(#?, #?\right)">cdf</button>
+        </div>
+        <div class="tab-pane" id="pane-misc">
+          <button class="func-key" data-insert="ln\left(#?\right)">ln</button>
+          <button class="func-key" data-insert="log\left(#?\right)">log</button>
+          <button class="func-key" data-insert="\log_{#?}\left(#?\right)">log_a</button>
+          <button class="func-key" data-insert="\sum_{#?}^{#?}">∑</button>
+          <button class="func-key" data-insert="\prod_{#?}^{#?}">∏</button>
+          <button class="func-key" data-insert="\int_{#?}^{#?}">∫</button>
+          <button class="func-key" data-insert="\bmod">mod</button>
+          <button class="func-key" data-insert="\mathrm{lcm}\left(#?, #?\right)">lcm</button>
+          <button class="func-key" data-insert="\gcd\left(#?, #?\right)">gcd</button>
+          <button class="func-key" data-insert="\lceil #? \rceil">ceil</button>
+          <button class="func-key" data-insert="\lfloor #? \rfloor">floor</button>
+          <button class="func-key" data-insert="\mathrm{round}\left(#?\right)">round</button>
+          <button class="func-key" data-insert="\mathrm{sign}\left(#?\right)">sign</button>
         </div>
       </div>
     </div>
@@ -391,7 +439,7 @@
       </div>
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v115</span>
+        <span class="settings-version">v116</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -441,11 +489,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=115"></script>
+  <script type="module" src="js/script.js?v=116"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=115')
+        navigator.serviceWorker.register('sw.js?v=116')
           .then(reg => console.log('Service Worker registered successfully.', reg.scope))
           .catch(err => console.error('Service Worker registration failed.', err));
       });

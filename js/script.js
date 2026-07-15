@@ -1034,11 +1034,22 @@ function initSettings() {
         speechText = speechText.replace(/\^2/g, "の二乗 ");
         speechText = speechText.replace(/\^{(.*?)}/g, "の $1 乗 ");
         speechText = speechText.replace(/\\left\|(.*?)\\right\|/g, "$1の絶対値");
+        speechText = speechText.replace(/sinh/g, "ハイパボリックサイン");
+        speechText = speechText.replace(/cosh/g, "ハイパボリックコサイン");
+        speechText = speechText.replace(/tanh/g, "ハイパボリックタンジェント");
         speechText = speechText.replace(/sin/g, "サイン");
         speechText = speechText.replace(/cos/g, "コサイン");
         speechText = speechText.replace(/tan/g, "タンジェント");
         speechText = speechText.replace(/log/g, "ログ");
         speechText = speechText.replace(/ln/g, "エルエヌ");
+        speechText = speechText.replace(/\\sum/g, "シグマ");
+        speechText = speechText.replace(/\\prod/g, "プロダクト");
+        speechText = speechText.replace(/\\int/g, "インテグラル");
+        speechText = speechText.replace(/\\lim/g, "リミット");
+        speechText = speechText.replace(/mean/g, "平均値");
+        speechText = speechText.replace(/median/g, "中央値");
+        speechText = speechText.replace(/stdev/g, "標準偏差");
+        speechText = speechText.replace(/var/g, "分散");
 
         // Clean up formatting
         speechText = speechText.replace(/\\/g, " ");
