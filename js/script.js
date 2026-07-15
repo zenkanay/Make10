@@ -979,15 +979,37 @@ function initSettings() {
             });
         }
 
+        // Prevent events from propagating outside the keyboard container
+        desmosKeyboard.addEventListener("pointerdown", (e) => e.stopPropagation());
+        desmosKeyboard.addEventListener("pointerup", (e) => e.stopPropagation());
+        desmosKeyboard.addEventListener("click", (e) => e.stopPropagation());
+
+        // Helper to bind standard click/touch blocks on keyboard buttons to prevent ghost clicks
+        const preventGhostClicks = (btnElement) => {
+            if (!btnElement) return;
+            btnElement.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
+            btnElement.addEventListener("touchend", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
+        };
+
         // Action Keys (Backspace, Arrows)
         const registerAction = (id, command) => {
             const btn = desmosKeyboard.querySelector(`#${id}`);
             if (btn) {
+                preventGhostClicks(btn);
                 btn.addEventListener("pointerdown", (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     btn.classList.add("pressing");
                 });
                 btn.addEventListener("pointerup", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     btn.classList.remove("pressing");
                     if (command === 'backspace') {
                         mf.executeCommand('deleteBackward');
@@ -1010,6 +1032,7 @@ function initSettings() {
         // Enter keys trigger final evaluation
         const handleEnter = (e) => {
             e.preventDefault();
+            e.stopPropagation();
             const evaluateBtn = document.getElementById("evaluate-btn");
             if (evaluateBtn) {
                 evaluateBtn.click();
@@ -1017,19 +1040,29 @@ function initSettings() {
         };
         const btnEnter = desmosKeyboard.querySelector("#btn-enter");
         const btnAbcEnter = desmosKeyboard.querySelector("#btn-abc-enter");
-        if (btnEnter) btnEnter.addEventListener("pointerdown", handleEnter);
-        if (btnAbcEnter) btnAbcEnter.addEventListener("pointerdown", handleEnter);
+        if (btnEnter) {
+            preventGhostClicks(btnEnter);
+            btnEnter.addEventListener("pointerdown", handleEnter);
+        }
+        if (btnAbcEnter) {
+            preventGhostClicks(btnAbcEnter);
+            btnAbcEnter.addEventListener("pointerdown", handleEnter);
+        }
 
         // General keys (Data Insert Keys)
         const keysToBind = desmosKeyboard.querySelectorAll("[data-insert]");
         keysToBind.forEach(key => {
+            preventGhostClicks(key);
             // pointerdown prevents focus loss, pointerup inserts
             key.addEventListener("pointerdown", (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 key.classList.add("pressing");
             });
 
             key.addEventListener("pointerup", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 if (key.classList.contains("pressing")) {
                     key.classList.remove("pressing");
                     const toInsert = key.getAttribute("data-insert");
@@ -1048,11 +1081,15 @@ function initSettings() {
         // Speaker Key: Speak Formula in Japanese
         const btnSpeakMath = desmosKeyboard.querySelector("#btn-speak-math");
         if (btnSpeakMath) {
+            preventGhostClicks(btnSpeakMath);
             btnSpeakMath.addEventListener("pointerdown", (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 btnSpeakMath.classList.add("pressing");
             });
             btnSpeakMath.addEventListener("pointerup", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 btnSpeakMath.classList.remove("pressing");
                 speakMath();
             });
