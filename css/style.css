@@ -1316,15 +1316,35 @@ math-field::part(virtual-keyboard-toggle) {
 
 @media (max-width: 768px) {
   .hw-keyboard-container {
-    height: 180px;
+    flex-direction: column;
+    height: 240px;
+    gap: 6px;
+  }
+  .hw-canvas-container {
+    width: 100%;
+    height: 185px;
+    flex: none;
   }
   .hw-sidebar {
-    width: 110px;
-    gap: 4px;
+    width: 100%;
+    flex-direction: row;
+    height: auto;
+    gap: 6px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hw-status-info {
+    display: none !important;
+  }
+  .hw-action-buttons {
+    flex-direction: row;
+    width: 100%;
+    gap: 6px;
   }
   .hw-action-buttons button {
-    height: 28px;
-    font-size: 0.72rem !important;
+    flex: 1;
+    height: 38px;
+    font-size: 0.85rem !important;
   }
   .hw-latex-preview {
     display: none !important;

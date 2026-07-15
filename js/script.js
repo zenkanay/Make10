@@ -1460,13 +1460,26 @@ function initSettings() {
             if (!desmosKeyboard) return;
 
             const isVisible = !desmosKeyboard.classList.contains('hidden');
+            const lhw = document.getElementById('layout-handwriting');
+            const isHwActive = lhw && !lhw.classList.contains('hidden');
+
             if (isVisible) {
-                // Close virtual KB
-                setKeyboardMode('none');
-                mf.blur();
+                if (isHwActive) {
+                    // Switch from handwriting layout to normal keyboard layout
+                    const l123 = document.getElementById('layout-123');
+                    if (lhw) lhw.classList.add('hidden');
+                    if (l123) l123.classList.remove('hidden');
+                } else {
+                    // Close virtual KB
+                    setKeyboardMode('none');
+                    mf.blur();
+                }
             } else {
-                // Open virtual KB
+                // Open virtual KB in normal keyboard layout
                 setKeyboardMode('virtual');
+                const l123 = document.getElementById('layout-123');
+                if (lhw) lhw.classList.add('hidden');
+                if (l123) l123.classList.remove('hidden');
                 mf.focus({ preventScroll: true });
                 if (mathContainer) mathContainer.classList.add('focused');
             }
@@ -1492,11 +1505,12 @@ function initSettings() {
             )
         );
         const isInsideToggle = path.some(el => el && el.id === 'custom-keyboard-toggle');
+        const isInsideHwBtn = path.some(el => el && el.id === 'handwriting-btn');
         const isInsideDigitCard = path.some(el => el && el.classList && el.classList.contains('digit-card'));
         const isInsideActionButtons = path.some(el => el && el.id && (el.id === 'clear-btn' || el.id === 'evaluate-btn'));
 
         // 1. 仮想キーボード、数字カード、その他入力エリアがタップされた場合は、キーボードを閉じずにそのまま処理を続行
-        if (isInsideInput || isInsideKeyboard || isInsideToggle || isInsideDigitCard || isInsideActionButtons) {
+        if (isInsideInput || isInsideKeyboard || isInsideToggle || isInsideHwBtn || isInsideDigitCard || isInsideActionButtons) {
             return;
         }
 
@@ -3868,7 +3882,27 @@ if (shareModalUrlBtn) {
     // ── event bindings ────────────────────────────────────────────────
     hwBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        window.showHandwritingLayout();
+        e.stopPropagation();
+
+        const desmosKeyboard = document.getElementById("desmos-keyboard");
+        const lhw = document.getElementById('layout-handwriting');
+        
+        const isVisible = desmosKeyboard && !desmosKeyboard.classList.contains('hidden');
+        const isHwActive = lhw && !lhw.classList.contains('hidden');
+
+        if (isVisible) {
+            if (isHwActive) {
+                // If keyboard is already visible in handwriting mode, close it
+                setKeyboardMode('none');
+                mf.blur();
+            } else {
+                // Switch layout to handwriting
+                window.showHandwritingLayout();
+            }
+        } else {
+            // Open virtual keyboard directly in handwriting mode
+            window.showHandwritingLayout();
+        }
     });
     if (hwBackBtn) {
         hwBackBtn.addEventListener('click', (e) => {
