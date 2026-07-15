@@ -124,8 +124,8 @@ const TRANSLATIONS = {
         sort_label: "使える数字を小さい順に並べ替えて表示する",
         api_key_label: "Gemini API キー (任意)",
         api_key_help: "APIキーを設定すると、SymPyで計算できない超複雑な数式（一部の極限、解析的に解けない積分、任意の特殊関数など）をGeminiが正しく判定できるようになります。※キーはブラウザのLocalStorageにのみ保存されます。",
-        myscript_app_key_label: "MyScript Application Key (任意・手書き入力用)",
-        myscript_hmac_key_label: "MyScript HMAC Key (任意・手書き入力用)",
+        myscript_app_key_label: "MyScript Application Key (任意)",
+        myscript_hmac_key_label: "MyScript HMAC Key (任意)",
         myscript_key_help: "手書き入力で数式を認識するためのAPIキーです。developer.myscript.com で無料取得できます（月2,000回まで無料）。キーはLocalStorageにのみ保存されます。",
         handwriting_btn_title: "手書き入力",
         handwriting_title: "手書き入力",
@@ -3654,7 +3654,6 @@ if (shareModalUrlBtn) {
     const hwBtn         = document.getElementById('handwriting-btn');
     const hwClearBtn    = document.getElementById('hw-clear-btn');
     const hwInsertBtn   = document.getElementById('hw-insert-btn');
-    const hwBackBtn     = document.getElementById('hw-back-to-keyboard');
     const hwStatus      = document.getElementById('hw-status');
     const hwLatexPrev   = document.getElementById('hw-latex-preview');
     const hwNoKeyWarn   = document.getElementById('hw-no-key-warning');
@@ -3674,8 +3673,11 @@ if (shareModalUrlBtn) {
 
     function resizeCanvas() {
         const r = iinkContainer.getBoundingClientRect();
-        canvas.width  = r.width  || 500;
-        canvas.height = r.height || 280;
+        const isMobile = window.innerWidth <= 768;
+        // Fix: getBoundingClientRect can be 0x0 if parent or keyboard is hidden/animating.
+        // Fallback to reasonable defaults to ensure a writeable canvas.
+        canvas.width  = (r.width > 20) ? r.width : (isMobile ? (window.innerWidth - 130) : 400);
+        canvas.height = (r.height > 20) ? r.height : (isMobile ? 180 : 190);
         redraw();
     }
 
@@ -3776,8 +3778,11 @@ if (shareModalUrlBtn) {
             return;
         }
 
+        // Correct MyScript REST API Body payload (contentType must be at root level)
         const body = JSON.stringify({
-            configuration: { contentType: 'Math' },
+            xDPI: 96,
+            yDPI: 96,
+            contentType: 'Math',
             strokeGroups: [{
                 strokes: strokes.map(s => ({ x: s.x, y: s.y }))
             }]
@@ -3799,7 +3804,7 @@ if (shareModalUrlBtn) {
             if (!res.ok) {
                 const err = await res.text();
                 console.error('MyScript error:', res.status, err);
-                hwStatus.textContent = `⚠️ Error ${res.status}`;
+                hwStatus.textContent = `Error ${res.status}`;
                 hwStatus.className = 'hw-status';
                 return;
             }
@@ -3808,12 +3813,12 @@ if (shareModalUrlBtn) {
             hwCurrentLatex = latex;
             hwLatexPrev.textContent = latex;
             hwLatexPrev.classList.remove('hidden');
-            hwStatus.textContent = t.handwriting_status_ready || '✅ 認識完了。挿入しますか？';
+            hwStatus.textContent = t.handwriting_status_ready || '認識完了。挿入しますか？';
             hwStatus.className = 'hw-status ready';
             hwInsertBtn.disabled = false;
         } catch (err) {
             console.error('MyScript fetch error:', err);
-            hwStatus.textContent = '⚠️ ネットワークエラー';
+            hwStatus.textContent = 'ネットワークエラー';
             hwStatus.className = 'hw-status';
         }
     }
@@ -3904,12 +3909,6 @@ if (shareModalUrlBtn) {
             window.showHandwritingLayout();
         }
     });
-    if (hwBackBtn) {
-        hwBackBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideHandwritingLayout();
-        });
-    }
     hwClearBtn.addEventListener('click', clearCanvas);
     hwInsertBtn.addEventListener('click', insertLatex);
 

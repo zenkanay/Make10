@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=147">
+  <link rel="stylesheet" href="css/style.css?v=149">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -442,7 +442,6 @@
           <div class="hw-action-buttons">
             <button id="hw-clear-btn" class="key action-key" data-i18n="handwriting_clear_btn">消去</button>
             <button id="hw-insert-btn" class="key action-key" disabled data-i18n="handwriting_insert_btn">挿入</button>
-            <button id="hw-back-to-keyboard" class="key action-key" data-i18n="keyboard_btn_back">戻る</button>
           </div>
         </div>
       </div>
@@ -504,11 +503,11 @@
         </div>
         <div class="setting-group setting-group--myscript">
           <div class="setting-group-header">
-            <span class="setting-label" data-i18n="myscript_app_key_label">MyScript Application Key (任意・手書き入力用)</span>
+            <span class="setting-label" data-i18n="myscript_app_key_label">MyScript Application Key (任意)</span>
             <a href="https://developer.myscript.com/" target="_blank" rel="noopener" class="setting-link">無料取得</a>
           </div>
           <input type="password" id="myscript-app-key-input" placeholder="MyScript Application Key" class="text-input">
-          <label for="myscript-hmac-key-input" class="setting-label" style="margin-top:8px" data-i18n="myscript_hmac_key_label">MyScript HMAC Key (任意・手書き入力用)</label>
+          <label for="myscript-hmac-key-input" class="setting-label" style="margin-top:8px" data-i18n="myscript_hmac_key_label">MyScript HMAC Key (任意)</label>
           <input type="password" id="myscript-hmac-key-input" placeholder="MyScript HMAC Key" class="text-input">
           <p class="setting-help" data-i18n="myscript_key_help">
             手書き入力で数式を認識するためのAPIキーです。developer.myscript.com で無料取得できます（月2,000回まで無料）。キーはLocalStorageにのみ保存されます。
@@ -517,7 +516,7 @@
 
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v147</span>
+        <span class="settings-version">v149</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -568,11 +567,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=147"></script>
+  <script type="module" src="js/script.js?v=149"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=147')
+        navigator.serviceWorker.register('sw.js?v=149')
           .then(reg => {
             console.log('Service Worker registered successfully.', reg.scope);
             // Auto reload when a new service worker is installed
