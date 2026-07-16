@@ -1132,16 +1132,10 @@ math-field::part(menu-toggle) {
 
 body.keyboard-visible {
   align-items: flex-start;
-}
-
-/* スマホでキーボード表示時は、画面サイズにぴったり収めて無駄な余白を完全にカット */
-@media (max-width: 768px) {
-  body.keyboard-visible {
-    height: 100vh;
-    height: -webkit-fill-available;
-    overflow: hidden;
-    padding-bottom: 0 !important;
-  }
+  height: 100vh;
+  height: -webkit-fill-available;
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
 }
 
 /* Disable default virtual keyboard toggle button in MathLive */
