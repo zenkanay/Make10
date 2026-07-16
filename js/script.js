@@ -3787,10 +3787,16 @@ if (shareModalUrlBtn) {
     function resizeCanvas() {
         const r = iinkContainer.getBoundingClientRect();
         const isMobile = window.innerWidth <= 768;
-        // Fix: getBoundingClientRect can be 0x0 if parent or keyboard is hidden/animating.
-        // Fallback to reasonable defaults to ensure a writeable canvas.
-        canvas.width  = (r.width > 20) ? r.width : (isMobile ? (window.innerWidth - 130) : 400);
-        canvas.height = (r.height > 20) ? r.height : (isMobile ? 250 : 190);
+        const targetW = (r.width > 20) ? r.width : (isMobile ? (window.innerWidth - 130) : 400);
+        const targetH = (r.height > 20) ? r.height : (isMobile ? 250 : 190);
+
+        // Guard: prevent resetting canvas context if the size hasn't changed, restoring drawing ability
+        if (Math.abs(canvas.width - targetW) < 1 && Math.abs(canvas.height - targetH) < 1) {
+            return;
+        }
+
+        canvas.width  = targetW;
+        canvas.height = targetH;
         redraw();
     }
 

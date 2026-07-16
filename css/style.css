@@ -1193,7 +1193,7 @@ math-field::part(virtual-keyboard-toggle) {
 
 /* ===== Keyboard Handwriting Layout ===== */
 .desmos-keyboard:has(#layout-handwriting:not(.hidden)) {
-  padding: 4px !important;
+  padding: 0 !important;
   gap: 0 !important;
 }
 
@@ -1206,9 +1206,9 @@ math-field::part(virtual-keyboard-toggle) {
 
 .hw-canvas-container {
   width: 100%;
-  margin-top: 30px;
-  height: calc(100% - 30px);
-  border-radius: 8px;
+  margin-top: 0;
+  height: 100%;
+  border-radius: 0;
   border: 1px dashed var(--border-color);
   background-color: var(--bg-color);
   position: relative;
@@ -1232,16 +1232,16 @@ math-field::part(virtual-keyboard-toggle) {
 
 .hw-floating-controls {
   position: absolute;
-  top: 1px;
+  top: 4px;
   right: 4px;
   display: flex;
-  gap: 6px;
+  gap: 4px;
   z-index: 20;
 }
 
 .hw-tool-btn {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: none;
   background: var(--primary);
@@ -1256,8 +1256,8 @@ math-field::part(virtual-keyboard-toggle) {
 }
 
 .hw-tool-btn svg {
-  width: 13px !important;
-  height: 13px !important;
+  width: 12px !important;
+  height: 12px !important;
 }
 
 .hw-tool-btn:hover:not(:disabled) {
@@ -1310,17 +1310,21 @@ html[data-theme='light'] .hw-tool-btn:disabled {
     height: 100%;
   }
   .hw-canvas-container {
-    margin-top: 34px;
-    height: calc(100% - 34px);
+    margin-top: 0;
+    height: 100%;
   }
   .hw-floating-controls {
-    top: 0;
-    right: 1px;
-    gap: 5px;
+    top: 4px;
+    right: 4px;
+    gap: 4px;
   }
   .hw-floating-controls button.hw-tool-btn {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
+  }
+  .hw-floating-controls button.hw-tool-btn svg {
+    width: 14px !important;
+    height: 14px !important;
   }
   .handwriting-toggle-btn {
     right: 52px;
@@ -1895,7 +1899,7 @@ select {
   }
 
   .desmos-keyboard:has(#layout-handwriting:not(.hidden)) {
-    padding: 4px 12px !important;
+    padding: 0 !important;
   }
 
   .desmos-keyboard.hidden {
