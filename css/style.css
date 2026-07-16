@@ -165,7 +165,7 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding-top: 20px;
-  padding-bottom: 0;
+  padding-bottom: 100vh; /* 最下部コンテンツをビューポート最上部までスクロール可能にする */
   transition: var(--transition);
   overscroll-behavior: none;
 }
