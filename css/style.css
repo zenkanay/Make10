@@ -1192,10 +1192,10 @@ math-field::part(virtual-keyboard-toggle) {
 }
 
 /* ===== Keyboard Handwriting Layout ===== */
-/* ===== Keyboard Handwriting Layout ===== */
 .desmos-keyboard:has(#layout-handwriting:not(.hidden)) {
-  padding: 4px !important;
-  gap: 4px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  height: auto !important;
 }
 
 .hw-keyboard-container {
@@ -1896,7 +1896,8 @@ select {
   }
 
   .desmos-keyboard:has(#layout-handwriting:not(.hidden)) {
-    padding: 4px 12px !important;
+    padding: 0 !important;
+    height: auto !important;
   }
 
   .desmos-keyboard.hidden {
