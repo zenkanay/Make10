@@ -1134,11 +1134,13 @@ body.keyboard-visible {
   align-items: flex-start;
 }
 
-/* スマホでキーボード表示時はスクロールで全体を見られるようにする */
-@media (max-width: 600px) {
+/* スマホでキーボード表示時は、画面サイズにぴったり収めて無駄な余白を完全にカット */
+@media (max-width: 768px) {
   body.keyboard-visible {
-    overflow-y: auto;
-    height: auto;
+    height: 100vh;
+    height: -webkit-fill-available;
+    overflow: hidden;
+    padding-bottom: 0 !important;
   }
 }
 

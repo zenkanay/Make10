@@ -925,9 +925,11 @@ function initSettings() {
 
         if (!isMobile || !desmosKeyboard || desmosKeyboard.classList.contains('hidden')) {
             appContainer.style.paddingBottom = '';
+            document.documentElement.style.removeProperty('--keyboard-real-height');
         } else {
             const h = desmosKeyboard.offsetHeight;
             appContainer.style.paddingBottom = (h + 8) + 'px';
+            document.documentElement.style.setProperty('--keyboard-real-height', (h + 8) + 'px');
         }
     };
 
