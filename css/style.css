@@ -1235,10 +1235,10 @@ math-field::part(virtual-keyboard-toggle) {
 
 .hw-floating-controls {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 4px;
+  right: 4px;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   z-index: 20;
 }
 
@@ -1254,19 +1254,16 @@ math-field::part(virtual-keyboard-toggle) {
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: filter 0.2s ease, background-color 0.2s ease;
   padding: 0;
 }
 
 .hw-tool-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
-  filter: brightness(1.05);
+  filter: brightness(0.85);
 }
 
 .hw-tool-btn:active:not(:disabled) {
-  transform: translateY(1px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+  filter: brightness(0.75);
 }
 
 .hw-tool-btn:disabled {
@@ -1311,11 +1308,11 @@ html[data-theme='light'] .hw-tool-btn:disabled {
     height: 260px;
   }
   .hw-canvas-container {
-    margin-top: 36px;
-    height: calc(100% - 36px);
+    margin-top: 33px;
+    height: calc(100% - 33px);
   }
   .hw-floating-controls {
-    top: 1px;
+    top: 0;
     right: 1px;
     gap: 5px;
   }
