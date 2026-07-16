@@ -3785,7 +3785,17 @@ if (shareModalUrlBtn) {
     let canvasInitialized = false;
 
     function resizeCanvas() {
+        // Skip dimension adjustments entirely if the panel is hidden to prevent collapsing canvas size to 0x0
+        const lhw = document.getElementById('layout-handwriting');
+        if (!lhw || lhw.classList.contains('hidden')) {
+            return;
+        }
+
         const r = iinkContainer.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) {
+            return;
+        }
+
         const isMobile = window.innerWidth <= 768;
         const targetW = (r.width > 20) ? r.width : (isMobile ? (window.innerWidth - 130) : 400);
         const targetH = (r.height > 20) ? r.height : (isMobile ? 250 : 190);
