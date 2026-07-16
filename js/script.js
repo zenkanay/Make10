@@ -3706,6 +3706,10 @@ if (shareModalUrlBtn) {
     iinkContainer.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
+    // Automatically track parent container size changes and adjust canvas bounds
+    const ro = new ResizeObserver(() => resizeCanvas());
+    ro.observe(iinkContainer);
+
     let strokes = [];
     let history = [{ strokes: [], latex: '' }];
     let historyIndex = 0;
