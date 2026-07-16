@@ -4004,11 +4004,10 @@ if (shareModalUrlBtn) {
         const hmacKey = localStorage.getItem('myscript_hmac_key') || '';
         if (!appKey || !hmacKey) {
             if (hwNoKeyWarn) hwNoKeyWarn.classList.remove('hidden');
-            canvas.style.display = 'none';
         } else {
             if (hwNoKeyWarn) hwNoKeyWarn.classList.add('hidden');
-            canvas.style.display = 'block';
         }
+        canvas.style.display = 'block';
 
         requestAnimationFrame(() => {
             resizeCanvas();
