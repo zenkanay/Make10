@@ -3782,19 +3782,22 @@ if (shareModalUrlBtn) {
         }
     }
 
+    let canvasInitialized = false;
+
     function resizeCanvas() {
         const r = iinkContainer.getBoundingClientRect();
         const isMobile = window.innerWidth <= 768;
         const targetW = (r.width > 20) ? r.width : (isMobile ? (window.innerWidth - 130) : 400);
         const targetH = (r.height > 20) ? r.height : (isMobile ? 250 : 190);
 
-        // Guard: prevent resetting canvas context if the size hasn't changed, restoring drawing ability
-        if (Math.abs(canvas.width - targetW) < 1 && Math.abs(canvas.height - targetH) < 1) {
+        // Guard: prevent resetting canvas context if the size hasn't changed, but NEVER bypass the initial setup
+        if (canvasInitialized && Math.abs(canvas.width - targetW) < 1 && Math.abs(canvas.height - targetH) < 1) {
             return;
         }
 
         canvas.width  = targetW;
         canvas.height = targetH;
+        canvasInitialized = true;
         redraw();
     }
 
