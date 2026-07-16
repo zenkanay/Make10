@@ -1196,19 +1196,10 @@ math-field::part(virtual-keyboard-toggle) {
 }
 
 /* ===== Keyboard Handwriting Layout ===== */
+/* ===== Keyboard Handwriting Layout ===== */
 .desmos-keyboard:has(#layout-handwriting:not(.hidden)) {
-  position: relative !important;
-  bottom: auto !important;
-  left: auto !important;
-  transform: none !important;
-  width: 100% !important;
-  max-width: 600px !important;
-  margin: 12px auto 0 auto !important;
-  border-radius: 12px !important;
   padding: 4px !important;
   gap: 4px !important;
-  border: 1px solid var(--border-color) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
 }
 
 .hw-keyboard-container {
@@ -1220,7 +1211,8 @@ math-field::part(virtual-keyboard-toggle) {
 
 .hw-canvas-container {
   width: 100%;
-  height: 100%;
+  margin-top: 30px;
+  height: calc(100% - 30px);
   border-radius: 8px;
   border: 1px dashed var(--border-color);
   background-color: var(--bg-color);
@@ -1245,7 +1237,7 @@ math-field::part(virtual-keyboard-toggle) {
 
 .hw-floating-controls {
   position: absolute;
-  top: 4px;
+  top: 1px;
   right: 4px;
   display: flex;
   gap: 6px;
@@ -1253,8 +1245,8 @@ math-field::part(virtual-keyboard-toggle) {
 }
 
 .hw-tool-btn {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: none;
   background: var(--primary);
@@ -1263,9 +1255,14 @@ math-field::part(virtual-keyboard-toggle) {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
   transition: filter 0.2s ease, background-color 0.2s ease;
   padding: 0;
+}
+
+.hw-tool-btn svg {
+  width: 13px !important;
+  height: 13px !important;
 }
 
 .hw-tool-btn:hover:not(:disabled) {
@@ -1892,7 +1889,7 @@ select {
     align-items: start;
   }
 
-  .desmos-keyboard:not(:has(#layout-handwriting:not(.hidden))) {
+  .desmos-keyboard {
     left: 0 !important;
     transform: none !important;
     width: 100% !important;
@@ -1903,19 +1900,7 @@ select {
   }
 
   .desmos-keyboard:has(#layout-handwriting:not(.hidden)) {
-    position: relative !important;
-    bottom: auto !important;
-    left: auto !important;
-    transform: none !important;
-    width: 100% !important;
-    max-width: 900px !important;
-    margin: 12px auto 0 auto !important;
-    border-radius: 12px !important;
-    padding: 4px !important;
-    gap: 4px !important;
-    height: auto !important;
-    border: 1px solid var(--border-color) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+    padding: 4px 12px !important;
   }
 
   .desmos-keyboard.hidden {
