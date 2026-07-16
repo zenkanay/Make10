@@ -3706,9 +3706,7 @@ if (shareModalUrlBtn) {
     iinkContainer.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
-    // Automatically track parent container size changes and adjust canvas bounds
-    const ro = new ResizeObserver(() => resizeCanvas());
-    ro.observe(iinkContainer);
+
 
     let strokes = [];
     let history = [{ strokes: [], latex: '' }];
@@ -4121,6 +4119,10 @@ if (shareModalUrlBtn) {
     if (hwLeftBtn)      hwLeftBtn.addEventListener('click', () => { mf.executeCommand('moveToPreviousChar'); mf.focus(); });
     if (hwRightBtn)     hwRightBtn.addEventListener('click', () => { mf.executeCommand('moveToNextChar'); mf.focus(); });
     if (hwBackspaceBtn) hwBackspaceBtn.addEventListener('click', () => { mf.executeCommand('deleteBackward'); handleLiveInput(); mf.focus(); });
+
+    // Automatically track parent container size changes and adjust canvas bounds
+    const ro = new ResizeObserver(() => resizeCanvas());
+    ro.observe(iinkContainer);
 
     window.addEventListener('resize', () => {
         const lhw = document.getElementById('layout-handwriting');

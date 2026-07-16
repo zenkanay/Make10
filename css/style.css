@@ -1233,16 +1233,16 @@ math-field::part(virtual-keyboard-toggle) {
 
 .hw-floating-controls {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 6px;
+  right: 6px;
   display: flex;
-  gap: 4px;
+  gap: 6px;
   z-index: 20;
 }
 
 .hw-tool-btn {
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: none;
   background: var(--primary);
@@ -1251,14 +1251,14 @@ math-field::part(virtual-keyboard-toggle) {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   transition: filter 0.2s ease, background-color 0.2s ease;
   padding: 0;
 }
 
 .hw-tool-btn svg {
-  width: 12px !important;
-  height: 12px !important;
+  width: 18px !important;
+  height: 18px !important;
 }
 
 .hw-tool-btn:hover:not(:disabled) {
@@ -1315,17 +1315,17 @@ html[data-theme='light'] .hw-tool-btn:disabled {
     height: 100%;
   }
   .hw-floating-controls {
-    top: 4px;
-    right: 4px;
-    gap: 4px;
+    top: 6px;
+    right: 6px;
+    gap: 6px;
   }
   .hw-floating-controls button.hw-tool-btn {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
   }
   .hw-floating-controls button.hw-tool-btn svg {
-    width: 14px !important;
-    height: 14px !important;
+    width: 18px !important;
+    height: 18px !important;
   }
   .handwriting-toggle-btn {
     right: 52px;
