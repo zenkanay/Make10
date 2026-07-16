@@ -1195,6 +1195,7 @@ math-field::part(virtual-keyboard-toggle) {
 .desmos-keyboard:has(#layout-handwriting:not(.hidden)) {
   padding: 0 !important;
   gap: 0 !important;
+  height: 260px !important;
 }
 
 .hw-keyboard-container {
@@ -1900,6 +1901,7 @@ select {
 
   .desmos-keyboard:has(#layout-handwriting:not(.hidden)) {
     padding: 0 !important;
+    height: 220px !important;
   }
 
   .desmos-keyboard.hidden {
