@@ -1207,8 +1207,8 @@ math-field::part(virtual-keyboard-toggle) {
 
 .hw-canvas-container {
   width: 100%;
-  margin-top: 30px;
-  height: calc(100% - 30px);
+  margin-top: 28px;
+  height: calc(100% - 28px);
   border-radius: 8px;
   border: 1px dashed var(--border-color);
   background-color: var(--bg-color);
@@ -1311,8 +1311,8 @@ html[data-theme='light'] .hw-tool-btn:disabled {
     height: 260px;
   }
   .hw-canvas-container {
-    margin-top: 33px;
-    height: calc(100% - 33px);
+    margin-top: 32px;
+    height: calc(100% - 32px);
   }
   .hw-floating-controls {
     top: 0;
