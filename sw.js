@@ -1,8 +1,8 @@
-const CACHE_NAME = 'make10-cache-v162';
+const CACHE_NAME = 'make10-cache-v164';
 const ASSETS_TO_CACHE = [
   './index.html',
-  './css/style.css?v=162',
-  './js/script.js?v=162',
+  './css/style.css?v=164',
+  './js/script.js?v=164',
   './favicon.png',
   './apple-touch-icon.png',
   './manifest.json',
@@ -56,4 +56,10 @@ self.addEventListener('fetch', (event) => {
         return caches.match(event.request);
       })
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

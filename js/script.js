@@ -914,20 +914,22 @@ function initSettings() {
             }
         }
         // キーボードの実際の高さを測ってapp-containerのpaddingを動的に設定
-        requestAnimationFrame(updateAppPadding);
+        requestAnimationFrame(window.updateAppPadding);
     }
 
-    function updateAppPadding() {
+    window.updateAppPadding = function updateAppPadding() {
         const appContainer = document.querySelector('.app-container');
         if (!appContainer) return;
         const desmosKeyboard = document.getElementById('desmos-keyboard');
-        if (!desmosKeyboard || desmosKeyboard.classList.contains('hidden')) {
+        const isMobile = window.innerWidth <= 768;
+
+        if (!isMobile || !desmosKeyboard || desmosKeyboard.classList.contains('hidden')) {
             appContainer.style.paddingBottom = '';
         } else {
             const h = desmosKeyboard.offsetHeight;
             appContainer.style.paddingBottom = (h + 8) + 'px';
         }
-    }
+    };
 
     function applyPatchToSink(sink) {
         if (!sink || sink.__patched) return;
@@ -3722,7 +3724,9 @@ if (shareModalUrlBtn) {
         }));
         history.push({
             strokes: copyStrokes,
-            latex: hwCurrentLatex
+            latex: hwCurrentLatex,
+            origValue: hwOriginalValue,
+            origPosition: hwOriginalPosition
         });
         historyIndex = history.length - 1;
         updateUndoRedoButtons();
@@ -3736,6 +3740,11 @@ if (shareModalUrlBtn) {
         }));
         
         hwCurrentLatex = state.latex;
+        // 各履歴エントリが持つ「手書き開始前のmf値」を復元する
+        if (state.origValue !== undefined) {
+            hwOriginalValue = state.origValue;
+            hwOriginalPosition = state.origPosition ?? 0;
+        }
         
         redraw();
         updateUndoRedoButtons();
@@ -3746,16 +3755,15 @@ if (shareModalUrlBtn) {
                 hwLatexPrev.value = '';
                 hwLatexPrev.classList.add('hidden');
             }
-            if (hwSessionActive) {
-                mf.value = hwOriginalValue;
-                mf.position = hwOriginalPosition;
-                handleLiveInput();
-                hwSessionActive = false;
-            }
+            // strokes が空の状態まで戻ったら mf を元の値に戻す
+            mf.value = hwOriginalValue;
+            mf.position = hwOriginalPosition;
+            handleLiveInput();
+            hwSessionActive = false;
             hwInsertBtn.disabled = true;
             if (recognizeTimer) clearTimeout(recognizeTimer);
         } else {
-            // hwSessionActiveを直接trueにしてhwOriginalValueを上書きしない
+            // セッションをアクティブ化（hwOriginalValue は上で正しく復元済み）
             hwSessionActive = true;
             if (hwCurrentLatex) {
                 mf.value = hwOriginalValue;
@@ -3981,10 +3989,15 @@ if (shareModalUrlBtn) {
 
         requestAnimationFrame(() => {
             resizeCanvas();
+            // 手書きパネルを開いた時点の mf 値をセッション原点として記録
+            hwOriginalValue = mf.value;
+            hwOriginalPosition = mf.position;
             strokes = [];
-            history = [{ strokes: [], latex: '' }];
+            history = [{ strokes: [], latex: '', origValue: hwOriginalValue, origPosition: hwOriginalPosition }];
             historyIndex = 0;
             clearCanvas();
+            // パネル切り替え後に正しい高さを測定してパディングを更新
+            if (window.updateAppPadding) window.updateAppPadding();
         });
     };
 
@@ -3994,6 +4007,9 @@ if (shareModalUrlBtn) {
         if (lhw) lhw.classList.add('hidden');
         if (l123) l123.classList.remove('hidden');
         hwSessionActive = false;
+        requestAnimationFrame(() => {
+            if (window.updateAppPadding) window.updateAppPadding();
+        });
     }
 
     function clearCanvas() {
@@ -4047,6 +4063,12 @@ if (shareModalUrlBtn) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         iinkContainer.classList.remove('active');
         hwInsertBtn.disabled = true;
+        // コミット済み空状態を履歴に追加（Undoで一発で戻れるように）
+        const committedOrigValue = mf.value;
+        const committedOrigPos = mf.position;
+        history = history.slice(0, historyIndex + 1);
+        history.push({ strokes: [], latex: '', origValue: committedOrigValue, origPosition: committedOrigPos });
+        historyIndex = history.length - 1;
         updateUndoRedoButtons();
         mf.focus();
     }
