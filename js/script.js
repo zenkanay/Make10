@@ -3513,7 +3513,7 @@ function completeShareImageDrawing(canvas, ctx, isDark, textColor, textMuted, bo
     ctx.fillStyle = textMuted;
     ctx.font = "12px 'Outfit', sans-serif";
     ctx.textAlign = "right";
-    ctx.fillText("make10.app", 570, 520);
+    ctx.fillText("make10pp.vercel.app", 570, 520);
 
     function onShareImageReady() {
         const modalContent = document.getElementById("share-modal-content");
