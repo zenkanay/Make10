@@ -1198,6 +1198,11 @@ math-field::part(virtual-keyboard-toggle) {
   height: 260px !important;
 }
 
+#layout-handwriting {
+  width: 100%;
+  height: 100%;
+}
+
 .hw-keyboard-container {
   position: relative;
   width: 100%;
