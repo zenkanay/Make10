@@ -3222,7 +3222,7 @@ function prepareShareImage() {
     }
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
-    canvas.height = 1000; // 500 logical height (down from 560)
+    canvas.height = 940; // 470 logical height (down from 500)
     const ctx = canvas.getContext("2d");
     ctx.scale(2, 2);
 
@@ -3244,7 +3244,7 @@ function prepareShareImage() {
 
     // 1. Draw page background
     ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, 600, 500);
+    ctx.fillRect(0, 0, 600, 470);
 
     // Helper for rounded rectangles
     function roundRect(c, x, y, w, h, r) {
@@ -3349,17 +3349,17 @@ function prepareShareImage() {
                 const vbWidth = parseFloat(viewBox[2]);
                 const vbHeight = parseFloat(viewBox[3]);
                 
-                // Containment fit calculation to make formula fill the box space as much as possible
-                const maxW = inputW - 20;  // 460px (minimizing horizontal margins)
-                const maxH = inputH - 12;  // 108px (minimizing vertical margins)
+                // Containment fit calculation to make formula fill the box space as much as possible with generous padding
+                const maxW = inputW - 40;  // 440px (leave comfortable horizontal margins)
+                const maxH = inputH - 48;  // 72px (leave at least 24px top/bottom padding)
                 
                 // Calculate scales for width and height constraints
                 const scaleX = maxW / vbWidth;
                 const scaleY = maxH / vbHeight;
                 let scale = Math.min(scaleX, scaleY);
                 
-                // Cap height to 104px (maximizes the formula size with a tight 8px padding top/bottom)
-                const maxRenderH = 104;
+                // Cap height to 72px (guarantees a comfortable margin inside the 120px box)
+                const maxRenderH = 72;
                 if (vbHeight * scale > maxRenderH) {
                     scale = maxRenderH / vbHeight;
                 }
@@ -3513,7 +3513,7 @@ function completeShareImageDrawing(canvas, ctx, isDark, textColor, textMuted, bo
     ctx.fillStyle = textMuted;
     ctx.font = "12px 'Outfit', sans-serif";
     ctx.textAlign = "right";
-    ctx.fillText("make10pp.vercel.app", 570, 478);
+    ctx.fillText("make10pp.vercel.app", 570, 454);
 
     function onShareImageReady() {
         const modalContent = document.getElementById("share-modal-content");
