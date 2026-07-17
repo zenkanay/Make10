@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=182">
+  <link rel="stylesheet" href="css/style.css?v=183">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -553,7 +553,7 @@
 
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v182</span>
+        <span class="settings-version">v183</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -604,42 +604,17 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=182"></script>
+  <script type="module" src="js/script.js?v=183"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      // コントローラーが変更された（skipWaitingが適用された）ら即座にリロード
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-          refreshing = true;
-          console.log('Service Worker controller changed. Reloading...');
-          window.location.reload();
-        }
-      });
-
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=182')
+        navigator.serviceWorker.register('sw.js?v=183')
           .then(reg => {
             console.log('Service Worker registered successfully.', reg.scope);
-            // 待機中の新しいSWがある場合はskipWaitingを要求する
-            if (reg.waiting) {
-              reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-            }
-            reg.onupdatefound = () => {
-              const installingWorker = reg.installing;
-              if (installingWorker) {
-                installingWorker.onstatechange = () => {
-                  if (installingWorker.state === 'installed') {
-                    if (navigator.serviceWorker.controller) {
-                      console.log('New service worker installed. Activating...');
-                      installingWorker.postMessage({ type: 'SKIP_WAITING' });
-                    }
-                  }
-                };
-              }
-            };
           })
-          .catch(err => console.error('Service Worker registration failed.', err));
+          .catch(err => {
+            console.error('Service Worker registration failed:', err);
+          });
       });
     }
   </script>
