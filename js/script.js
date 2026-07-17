@@ -3784,15 +3784,25 @@ if (shareModalUrlBtn) {
 
     let canvasInitialized = false;
 
+    function logHwDebug(msg) {
+        const dbg = document.getElementById('hw-debug-info');
+        if (dbg) {
+            dbg.textContent = `Hw: ${msg} (w:${canvas.width}, h:${canvas.height}, disp:${canvas.style.display})`;
+        }
+        console.log(`[HwDebug] ${msg} (w:${canvas.width}, h:${canvas.height}, display:${canvas.style.display})`);
+    }
+
     function resizeCanvas() {
         // Skip dimension adjustments entirely if the panel is hidden to prevent collapsing canvas size to 0x0
         const lhw = document.getElementById('layout-handwriting');
         if (!lhw || lhw.classList.contains('hidden')) {
+            logHwDebug('resize skipped (hidden)');
             return;
         }
 
         const r = iinkContainer.getBoundingClientRect();
         if (r.width === 0 || r.height === 0) {
+            logHwDebug(`resize skipped (bounds 0x0)`);
             return;
         }
 
@@ -3802,6 +3812,7 @@ if (shareModalUrlBtn) {
 
         // Guard: prevent resetting canvas context if the size hasn't changed, but NEVER bypass the initial setup
         if (canvasInitialized && Math.abs(canvas.width - targetW) < 1 && Math.abs(canvas.height - targetH) < 1) {
+            logHwDebug(`resize skipped (no change)`);
             return;
         }
 
@@ -3809,6 +3820,7 @@ if (shareModalUrlBtn) {
         canvas.height = targetH;
         canvasInitialized = true;
         redraw();
+        logHwDebug(`resized to ${targetW}x${targetH}`);
     }
 
     function redraw() {
@@ -3855,6 +3867,7 @@ if (shareModalUrlBtn) {
 
     function onDown(e) {
         e.preventDefault();
+        logHwDebug(`down at ${e.clientX || (e.touches && e.touches[0].clientX)},${e.clientY || (e.touches && e.touches[0].clientY)}`);
         startHwSession(); // 手書き開始前の状態を記憶
         const p = getPos(e);
         currentStroke = { x: [p.x], y: [p.y] };
@@ -4132,9 +4145,17 @@ if (shareModalUrlBtn) {
     if (hwRightBtn)     hwRightBtn.addEventListener('click', () => { mf.executeCommand('moveToNextChar'); mf.focus(); });
     if (hwBackspaceBtn) hwBackspaceBtn.addEventListener('click', () => { mf.executeCommand('deleteBackward'); handleLiveInput(); mf.focus(); });
 
-    // Automatically track parent container size changes and adjust canvas bounds
-    const ro = new ResizeObserver(() => resizeCanvas());
-    ro.observe(iinkContainer);
+    // Automatically track parent container size changes and adjust canvas bounds safely
+    if (window.ResizeObserver) {
+        try {
+            const ro = new ResizeObserver(() => resizeCanvas());
+            ro.observe(iinkContainer);
+        } catch (roErr) {
+            console.error('Failed to initialize ResizeObserver:', roErr);
+        }
+    } else {
+        console.warn('ResizeObserver is not supported in this browser. Falling back to resize event.');
+    }
 
     window.addEventListener('resize', () => {
         const lhw = document.getElementById('layout-handwriting');

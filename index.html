@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=179">
+  <link rel="stylesheet" href="css/style.css?v=180">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -433,6 +433,10 @@
             <p data-i18n="handwriting_no_key">MyScript APIキーが設定されていません。設定でキーを入力してください。</p>
             <a href="https://developer.myscript.com/" target="_blank" rel="noopener" class="setting-link" data-i18n="handwriting_get_key">無料で取得する (developer.myscript.com)</a>
           </div>
+          <!-- リアルタイムデバッグ表示用（問題解決後に削除可能） -->
+          <div id="hw-debug-info" style="position: absolute; bottom: 4px; left: 4px; z-index: 50; color: #ff0000; font-family: monospace; font-size: 10px; pointer-events: none; background: rgba(255,255,255,0.85); padding: 2px 4px; border-radius: 2px; font-weight: bold; border: 1px solid #ff0000;">
+            Hw: Init
+          </div>
         </div>
         <div class="hw-floating-controls">
           <button id="hw-left-btn" class="hw-tool-btn" title="左へ移動" aria-label="左へ移動">
@@ -553,7 +557,7 @@
 
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v179</span>
+        <span class="settings-version">v180</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -604,7 +608,7 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=179"></script>
+  <script type="module" src="js/script.js?v=180"></script>
   <script>
     if ('serviceWorker' in navigator) {
       // コントローラーが変更された（skipWaitingが適用された）ら即座にリロード
@@ -618,7 +622,7 @@
       });
 
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=179')
+        navigator.serviceWorker.register('sw.js?v=180')
           .then(reg => {
             console.log('Service Worker registered successfully.', reg.scope);
             // 待機中の新しいSWがある場合はskipWaitingを要求する

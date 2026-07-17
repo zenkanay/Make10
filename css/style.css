@@ -1298,6 +1298,12 @@ html[data-theme='light'] .hw-tool-btn:disabled {
   text-align: center;
   z-index: 10;
   border-radius: 0;
+  pointer-events: none; /* Let pointer events pass through to canvas underneath */
+}
+
+.hw-no-key-warning-inline p,
+.hw-no-key-warning-inline a {
+  pointer-events: auto; /* Ensure key links remain clickable */
 }
 
 .hw-no-key-warning-inline p {
