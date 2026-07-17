@@ -3262,10 +3262,12 @@ function prepareShareImage() {
     // 2. Draw Header (Logo)
     ctx.fillStyle = textColor;
     ctx.font = "bold 26px 'Outfit', -apple-system, sans-serif";
-    ctx.fillText("Make10", 40, 52);
+    const logoX = 40;
+    const logoY = 52;
+    ctx.fillText("Make10", logoX, logoY);
+    const make10Width = ctx.measureText("Make10").width;
     ctx.fillStyle = primaryColor;
-    ctx.font = "bold 26px 'Outfit', -apple-system, sans-serif";
-    ctx.fillText("++", 136, 52);
+    ctx.fillText("++", logoX + make10Width + 1, logoY);
 
     // 3. Draw Game Board (.glass-panel)
     ctx.shadowColor = isDark ? "rgba(0, 0, 0, 0.4)" : "rgba(0, 0, 0, 0.03)";
