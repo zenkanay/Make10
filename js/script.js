@@ -3222,7 +3222,7 @@ function prepareShareImage() {
     }
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
-    canvas.height = 1120; // 560 logical height (down from 600)
+    canvas.height = 1000; // 500 logical height (down from 560)
     const ctx = canvas.getContext("2d");
     ctx.scale(2, 2);
 
@@ -3244,7 +3244,7 @@ function prepareShareImage() {
 
     // 1. Draw page background
     ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, 600, 560);
+    ctx.fillRect(0, 0, 600, 500);
 
     // Helper for rounded rectangles
     function roundRect(c, x, y, w, h, r) {
@@ -3261,9 +3261,9 @@ function prepareShareImage() {
 
     // 2. Draw Header (Logo - slightly smaller and tighter)
     ctx.fillStyle = textColor;
-    ctx.font = "bold 20px 'Outfit', -apple-system, sans-serif";
+    ctx.font = "bold 16px 'Outfit', -apple-system, sans-serif";
     const logoX = 30;
-    const logoY = 40;
+    const logoY = 30;
     ctx.fillText("Make10", logoX, logoY);
     const make10Width = ctx.measureText("Make10").width;
     ctx.fillStyle = primaryColor;
@@ -3276,7 +3276,7 @@ function prepareShareImage() {
     ctx.fillStyle = panelBg;
     ctx.strokeStyle = borderColor;
     ctx.lineWidth = 1;
-    roundRect(ctx, 30, 52, 540, 435, 16); // Lowered Y to 52, compact height to 435
+    roundRect(ctx, 30, 42, 540, 410, 16); // Lowered Y to 42, compact height to 410
     ctx.fill();
     ctx.stroke();
     ctx.shadowColor = "transparent"; // reset
@@ -3286,12 +3286,12 @@ function prepareShareImage() {
     // 4. Available Digits Section (Medium cards)
     ctx.fillStyle = textMuted;
     ctx.font = "bold 14px 'Outfit', -apple-system, sans-serif";
-    ctx.fillText(TRANSLATIONS[currentLang].available_digits || "使える数字", 60, 90); // 118 -> 90
+    ctx.fillText(TRANSLATIONS[currentLang].available_digits || "使える数字", 60, 72); // 90 -> 72
 
     const digitGap = 14;
     const digitSize = 76; // Medium size digits
     const startX = 127; // centered: (540 - (4*76 + 3*14))/2 + 30 = 127
-    const startY = 104; // 132 -> 104
+    const startY = 82; // 104 -> 82
 
     targetNumbers.forEach((num, index) => {
         const x = startX + index * (digitSize + digitGap);
@@ -3316,10 +3316,10 @@ function prepareShareImage() {
     // 5. Formula Input Section (Much Larger and LaTeX rendered)
     ctx.fillStyle = textMuted;
     ctx.font = "bold 14px 'Outfit', -apple-system, sans-serif";
-    ctx.fillText(TRANSLATIONS[currentLang].formula_input || "数式入力", 60, 212); // 240 -> 212
+    ctx.fillText(TRANSLATIONS[currentLang].formula_input || "数式入力", 60, 180); // 212 -> 180
 
     const inputX = 60;
-    const inputY = 227; // 255 -> 227
+    const inputY = 192; // 227 -> 192
     const inputW = 480;
     const inputH = 120; // Height 120 for prominent, large formula layout
 
@@ -3427,7 +3427,7 @@ function completeShareImageDrawing(canvas, ctx, isDark, textColor, textMuted, bo
     const isSuccess = statusCard.classList.contains("success-card");
     const isError = statusCard.classList.contains("error-card");
     const badgeX = 60;
-    const badgeY = 382; // 410 -> 382
+    const badgeY = 328; // 382 -> 328
     const badgeW = 480;
     const badgeH = 80;
 
@@ -3513,7 +3513,7 @@ function completeShareImageDrawing(canvas, ctx, isDark, textColor, textMuted, bo
     ctx.fillStyle = textMuted;
     ctx.font = "12px 'Outfit', sans-serif";
     ctx.textAlign = "right";
-    ctx.fillText("make10pp.vercel.app", 570, 520);
+    ctx.fillText("make10pp.vercel.app", 570, 478);
 
     function onShareImageReady() {
         const modalContent = document.getElementById("share-modal-content");
