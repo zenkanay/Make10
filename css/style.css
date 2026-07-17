@@ -1166,7 +1166,7 @@ math-field::part(virtual-keyboard-toggle) {
 
 .keyboard-toggle-btn:hover {
   background-color: var(--primary-hover);
-  transform: translateY(-50%) scale(1.05);
+  transform: translateY(-50%);
 }
 
 .keyboard-toggle-btn svg {
@@ -1188,7 +1188,7 @@ math-field::part(virtual-keyboard-toggle) {
 
 .handwriting-toggle-btn:hover {
   background-color: var(--primary-hover);
-  transform: translateY(-50%) scale(1.05);
+  transform: translateY(-50%);
 }
 
 /* ===== Keyboard Handwriting Layout ===== */
