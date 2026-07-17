@@ -52,7 +52,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=192">
+  <link rel="stylesheet" href="css/style.css?v=193">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -553,7 +553,7 @@
 
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v192</span>
+        <span class="settings-version">v193</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -598,17 +598,17 @@
         <button id="share-modal-copy-btn" class="secondary-btn" data-i18n="share_modal_copy">画像をコピー</button>
         <button id="share-modal-download-btn" class="primary-btn" data-i18n="share_modal_download">ダウンロード</button>
       </div>
-      <div class="share-modal-url-section" style="width: 100%; border-top: 1px solid var(--border-color); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+      <div class="share-modal-url-section" style="width: 100%; border-top: 1px solid var(--border-color); padding-top: 8px; display: flex; flex-direction: column; gap: 8px;">
         <button id="share-modal-url-btn" class="primary-btn" style="width: 100%;" data-i18n="share_modal_url">ゲームのURLをコピー</button>
       </div>
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=192"></script>
+  <script type="module" src="js/script.js?v=193"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=192')
+        navigator.serviceWorker.register('sw.js?v=193')
           .then(reg => {
             console.log('Service Worker registered successfully.', reg.scope);
           })

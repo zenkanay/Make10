@@ -1397,7 +1397,7 @@ html[data-theme='light'] .hw-tool-btn:disabled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 12px; /* Tighten gap from 16px to 12px */
   position: relative;
   transform: scale(0.9);
   transition: transform 0.2s ease;
@@ -1484,7 +1484,7 @@ html[data-theme='light'] .hw-tool-btn:disabled {
 .share-modal-img-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 1;
+  height: auto; /* Remove aspect-ratio constraint to let height fit the dynamic canvas aspect ratio */
 }
 
 .share-modal-img-wrapper .spinner {
