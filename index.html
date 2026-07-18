@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Make10++</title>
+  <link rel="canonical" href="https://make10pp.vercel.app/">
   <meta name="description" content="Make10++ (メイク10) は、提示された4つの数字を組み合わせて10を作る無料の数学パズルゲームです。通常の四則演算（＋−×÷）だけでなく、ルート(√)、階乗(!)、積分などの高度な数式を使って難問を攻略！脳トレや算数・数学の学習に最適です。">
   <meta name="keywords" content="Make10,メイク10,10作り,テンメイク,数学パズル,脳トレ,四則演算,数学ゲーム,無料ゲーム">
   <link rel="icon" type="image/png" href="favicon.png">
@@ -52,7 +53,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=193">
+  <link rel="stylesheet" href="css/style.css?v=194">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -553,7 +554,7 @@
 
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v193</span>
+        <span class="settings-version">v194</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -604,11 +605,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=193"></script>
+  <script type="module" src="js/script.js?v=194"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=193')
+        navigator.serviceWorker.register('sw.js?v=194')
           .then(reg => {
             console.log('Service Worker registered successfully.', reg.scope);
           })
