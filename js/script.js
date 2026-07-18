@@ -3222,7 +3222,7 @@ function prepareShareImage() {
     }
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
-    canvas.height = 940; // 470 logical height (down from 500)
+    canvas.height = 970; // 485 logical height (up from 470 to clear watermark from border line)
     const ctx = canvas.getContext("2d");
     ctx.scale(2, 2);
 
@@ -3244,7 +3244,7 @@ function prepareShareImage() {
 
     // 1. Draw page background
     ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, 600, 470);
+    ctx.fillRect(0, 0, 600, 485);
 
     // Helper for rounded rectangles
     function roundRect(c, x, y, w, h, r) {
@@ -3513,7 +3513,7 @@ function completeShareImageDrawing(canvas, ctx, isDark, textColor, textMuted, bo
     ctx.fillStyle = textMuted;
     ctx.font = "12px 'Outfit', sans-serif";
     ctx.textAlign = "right";
-    ctx.fillText("make10pp.vercel.app", 570, 454);
+    ctx.fillText("make10pp.vercel.app", 570, 471);
 
     function onShareImageReady() {
         const modalContent = document.getElementById("share-modal-content");
