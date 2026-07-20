@@ -1432,31 +1432,6 @@ html[data-theme='light'] .hw-tool-btn:disabled {
   margin: 0;
 }
 
-.close-share-modal {
-  position: absolute;
-  top: 4px;
-  right: 8px;
-  background: transparent;
-  border: none;
-  font-size: 1.8rem;
-  color: var(--text-muted);
-  cursor: pointer;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border-radius: 50%;
-  transition: color var(--transition), background var(--transition);
-}
-
-@media (hover: hover) {
-  .close-share-modal:hover {
-    color: var(--text-color);
-    background: var(--border-color);
-  }
-}
 
 .share-modal-buttons {
   display: flex;
