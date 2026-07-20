@@ -2004,25 +2004,9 @@ async function evaluateFinal() {
 
     console.log("evaluateFinal: Local evaluation finished. Success:", localSuccess, "Value:", localValue);
 
-    const engineBadge = document.getElementById("engine-badge");
-    const detailsAccordion = document.getElementById("details-accordion");
-
-    // Helper to update engine badge style
-    function updateEngineBadge(type, label) {
-        if (!engineBadge) return;
-        engineBadge.className = "engine-badge"; // reset classes
-        if (type === "hidden") {
-            engineBadge.classList.add("hidden");
-        } else {
-            engineBadge.classList.add(type);
-            engineBadge.textContent = label;
-        }
-    }
-
     // 2. Render locally if successful, otherwise fallback to backend
     if (localSuccess && localValue !== null) {
         engineUsed.textContent = "Compute Engine (Local)";
-        updateEngineBadge("local", "Local");
         const roundedVal = Number(localValue.toFixed(6));
         currentValue.textContent = roundedVal.toString();
 
@@ -2049,11 +2033,6 @@ async function evaluateFinal() {
                 feedbackMsg.textContent = msg;
             }
         }
-        
-        // Auto-expand the debug info accordion so the user sees the details immediately
-        if (detailsAccordion) {
-            detailsAccordion.open = true;
-        }
     } else {
         console.log("evaluateFinal: Local evaluation failed or skipped. Sending backend request to:", backendUrl);
         // Fallback: request backend server for advanced formulas or when local fails
@@ -2078,9 +2057,7 @@ async function evaluateFinal() {
             console.log("evaluateFinal: Backend evaluation returned:", data);
 
             // Render result based on backend response
-            const isGemini = data.engine_used === "gemini";
-            engineUsed.textContent = isGemini ? "Gemini 2.5 Flash" : "SymPy (Backend)";
-            updateEngineBadge(isGemini ? "ai" : "backend", isGemini ? "Gemini" : "SymPy");
+            engineUsed.textContent = data.engine_used === "gemini" ? "Gemini 2.5 Flash" : "SymPy (Backend)";
 
             if (data.success) {
                 let displayVal;
@@ -2120,19 +2097,12 @@ async function evaluateFinal() {
                 statusCard.className = "result-card error-card";
                 currentValue.textContent = TRANSLATIONS[currentLang].err_label;
                 feedbackMsg.textContent = TRANSLATIONS[currentLang].msg_eval_failed.replace("{explanation}", data.explanation);
-                updateEngineBadge("hidden", "");
             }
         } catch (err) {
             console.error("Backend request failed:", err);
             statusCard.className = "result-card error-card";
             currentValue.textContent = TRANSLATIONS[currentLang].err_label;
             feedbackMsg.textContent = TRANSLATIONS[currentLang].msg_backend_offline;
-            updateEngineBadge("hidden", "");
-        }
-
-        // Auto-expand the debug info accordion so the user sees the details immediately
-        if (detailsAccordion) {
-            detailsAccordion.open = true;
         }
     }
     // Pre-prepare the share image Blob so downloads are synchronous and user-triggered
