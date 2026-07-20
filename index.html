@@ -53,7 +53,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=199">
+  <link rel="stylesheet" href="css/style.css?v=200">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive-fonts.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.mjs" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.24.0/dist/compute-engine.min.js" defer></script>
@@ -152,7 +152,10 @@
           <section class="results-section">
             <div class="result-card" id="status-card">
               <div class="result-row">
-                <span class="result-label" data-i18n="current_value_label">現在の値</span>
+                <div class="result-label-wrapper" style="display: flex; align-items: center; gap: 8px;">
+                  <span class="result-label" data-i18n="current_value_label" style="margin-bottom: 0;">現在の値</span>
+                  <span id="engine-badge" class="engine-badge hidden"></span>
+                </div>
                 <span id="current-value" class="result-value">---</span>
               </div>
               <div id="feedback-msg" class="feedback-msg" data-i18n="msg_enter_formula">数式を入力してください</div>
@@ -195,7 +198,7 @@
 
           <!-- 詳細情報アコーディオン -->
           <div class="details-accordion">
-            <details>
+            <details id="details-accordion">
               <div class="accordion-content">
                 <div class="info-row">
                   <span class="info-label" data-i18n="latex_expr">LaTeX コード:</span>
@@ -554,7 +557,7 @@
 
       </div>
       <div class="modal-footer">
-        <span class="settings-version">v199</span>
+        <span class="settings-version">v200</span>
         <button id="save-settings-btn" class="primary-btn" data-i18n="save_btn">保存する</button>
       </div>
     </div>
@@ -607,11 +610,11 @@
     </div>
   </div>
 
-  <script type="module" src="js/script.js?v=199"></script>
+  <script type="module" src="js/script.js?v=200"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=199')
+        navigator.serviceWorker.register('sw.js?v=200')
           .then(reg => {
             console.log('Service Worker registered successfully.', reg.scope);
           })
