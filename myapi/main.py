@@ -99,7 +99,9 @@ def convert_latex_to_python(latex_str: str) -> str:
     s = re.sub(r'\\abs\\left\((.*?)\\right\)', r'Abs(\1)', s)
     s = re.sub(r'\\abs\((.*?)\)', r'Abs(\1)', s)
     
-    # Ceil/Floor
+    # Ceil/Floor (handle raw, \left/\right, and function-style versions)
+    s = re.sub(r'\\left\\lceil(.*?)\\right\\rceil', r'ceiling(\1)', s)
+    s = re.sub(r'\\left\\lfloor(.*?)\\right\\rfloor', r'floor(\1)', s)
     s = re.sub(r'\\lceil(.*?)\\rceil', r'ceiling(\1)', s)
     s = re.sub(r'\\lfloor(.*?)\\rfloor', r'floor(\1)', s)
     s = re.sub(r'\\ceil\\left\((.*?)\\right\)', r'ceiling(\1)', s)
@@ -129,10 +131,8 @@ def convert_latex_to_python(latex_str: str) -> str:
     # Factorial: x! ➔ factorial(x)
     s = re.sub(r'(\d+|\w+|\([^)]*\))!', r'factorial(\1)', s)
     
-    # Square root: \sqrt{x} ➔ (x)**(0.5)
-    s = re.sub(r'\\sqrt\\left\((.*?)\\right\)', r'(\1)**(0.5)', s)
-    s = re.sub(r'\\sqrt\((.*?)\)', r'(\1)**(0.5)', s)
-    s = re.sub(r'\\sqrt{(.*?)}', r'(\1)**(0.5)', s)
+    # Square root: \sqrt ➔ sqrt (let SymPy handle nested sqrts natively)
+    s = s.replace(r'\sqrt', 'sqrt')
     
     # Fraction: \frac{a}{b} ➔ (a)/(b)
     s = re.sub(r'\\frac\s*{(.*?)}\s*{(.*?)}', r'( \1 ) / ( \2 )', s)
@@ -174,7 +174,8 @@ def evaluate_with_sympy(latex_str: str):
             'pi': sympy.pi, 'E': sympy.E, 'e': sympy.E, 'I': sympy.I, 'i': sympy.I,
             'gamma': sympy.gamma, 'factorial': sympy.factorial,
             'binomial': sympy.binomial,
-            'ceiling': sympy.ceiling, 'floor': sympy.floor, 'round': sympy.round,
+            'ceiling': sympy.ceiling, 'floor': sympy.floor, 'round': round,
+            'sqrt': sympy.sqrt,
             'sign': sympy.sign, 'Abs': sympy.Abs, 'Mod': sympy.Mod,
             'lcm': sympy.lcm, 'gcd': sympy.gcd,
             # Statistics
